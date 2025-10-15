@@ -1,87 +1,171 @@
-# suggest-alternative API Documentation
+# suggest-alternative
 
-Request alternative approaches or solutions to your current implementation or plan.
-
----
-
-## Overview
-
-The `suggest-alternative` tool provides different perspectives and alternative solutions to your proposed approach. It considers different paradigms, simpler solutions, proven patterns, trade-offs, and edge cases you might not have considered.
-
-**Use this tool when:**
-
-- Seeking different approaches to a problem
-- Want to explore options before committing
-- Current solution has limitations
-- Looking for simpler or more elegant solutions
-- Need to compare trade-offs
+Explore alternative approaches and solutions to your current implementation or plan. Considers different paradigms, simpler solutions, proven patterns, and trade-offs you might not have considered.
 
 ---
 
-## API Signature
+## Quick Start
 
-```typescript
-tool("suggest-alternative", {
-  current_approach: string;  // Your current approach or solution
-  context?: string;          // Additional context (optional)
-})
+Get alternative approaches in seconds:
+
+```json
+{
+  "currentApproach": "Using Redux for state management in React app with 20 components"
+}
 ```
 
----
-
-## Parameters
-
-### `current_approach` (required)
-
-Description of your current approach or the problem you're solving.
-
-- **Type**: String
-- **Required**: Yes
-- **Recommended length**: 50-300 words
-
-### `context` (optional)
-
-Additional context about constraints, requirements, or tried approaches.
-
-- **Type**: String
-- **Required**: No
+The tool returns multiple alternatives with pros, cons, trade-offs, and recommendations based on your context.
 
 ---
 
-## Response Format
+## How to Use
 
-Returns a structured comparison of alternatives:
+Choose your depth based on your needs:
+
+<details open>
+<summary><strong>Minimal</strong> - Quick alternatives (30 seconds)</summary>
+
+**When to use**: You have an approach and want to quickly see other options.
+
+**Example**:
+
+```json
+{
+  "currentApproach": "Using WebSockets for real-time notifications in mobile app"
+}
+```
+
+**What you get**: 2-3 alternative approaches with brief pros/cons.
+
+</details>
+
+<details>
+<summary><strong>Standard</strong> - Comprehensive comparison (recommended)</summary>
+
+**When to use**: Evaluating technology choices and need detailed trade-off analysis.
+
+**Example**:
+
+```json
+{
+  "currentApproach": "Using Elasticsearch for product search, costs $500/mo for 100k products",
+  "goals": ["Reduce costs", "Maintain search quality"],
+  "constraints": ["Team has SQL experience, no Elasticsearch expertise", "Budget: $100/mo"]
+}
+```
+
+**What you get**:
+
+- 3-5 detailed alternatives with descriptions
+- Comprehensive pros and cons for each option
+- Trade-off analysis (cost vs performance, complexity vs features)
+- Clear recommendations based on your constraints
+- Implementation considerations
+
+</details>
+
+<details>
+<summary><strong>Advanced</strong> - Strategic evaluation</summary>
+
+**When to use**: Major technology decisions with significant architectural impact.
+
+**Example**:
+
+```json
+{
+  "currentApproach": "Planning to use PostgreSQL for time-series data, 1M writes/sec, 100GB/day growth",
+  "goals": [
+    "Handle high write throughput",
+    "Cost-effective long-term storage",
+    "Fast queries on recent data"
+  ],
+  "constraints": ["Team knows PostgreSQL well", "Budget: $2k/mo infrastructure", "Cannot lose data"]
+}
+```
+
+**What you get**:
+
+- Comprehensive architectural alternatives (TimescaleDB, InfluxDB, ClickHouse, hybrid solutions)
+- Detailed trade-off matrices (performance, cost, complexity, team expertise)
+- Migration paths for each alternative
+- Total cost of ownership analysis
+- Scalability projections
+- Risk assessment for each approach
+
+</details>
+
+---
+
+<details>
+<summary><strong>API Reference</strong></summary>
+
+### Parameters
+
+| Parameter         | Type     | Required | Description                                                            |
+| ----------------- | -------- | -------- | ---------------------------------------------------------------------- |
+| `currentApproach` | string   | Yes      | Your current approach or problem (50-300 words recommended)            |
+| `goals`           | string[] | No       | What you're trying to achieve                                          |
+| `constraints`     | string[] | No       | Limitations (budget, team skills, time, technology)                    |
+| `preferredModel`  | enum     | No       | GPT model: `gpt-5`, `gpt-5-mini`, `gpt-5-nano` (default: `gpt-5-mini`) |
+
+### Response Structure
+
+The tool returns structured alternatives:
 
 1. **Alternative Approaches** (typically 3-5 options)
-   - Description of each approach
-   - How it differs from current approach
-   - When to use it
-
 2. **Pros and Cons** for each alternative
-   - Advantages
-   - Disadvantages
-   - Trade-offs
+3. **Trade-off Analysis**
+4. **Recommendations** based on your context
 
-3. **Recommendations**
-   - Best fit based on context
-   - Considerations for selection
+</details>
+
+## Common Use Cases
+
+### Technology Selection
+
+Compare different technologies for the same problem. Understand trade-offs before choosing your stack.
+
+### Algorithm Choices
+
+Explore different algorithmic approaches with complexity and performance trade-offs.
+
+### Architecture Patterns
+
+Evaluate architectural patterns and their suitability for your specific requirements.
+
+### Tool and Library Selection
+
+Compare tools and libraries with clear pros, cons, and use case recommendations.
 
 ---
 
-## Example Usage
+## Task Playbooks
 
-### Example 1: State Management
+Jump to common scenarios:
+
+- [State Management Alternatives](#example-state-management)
+- [API Communication Patterns](#example-api-communication)
+- [Search Solutions](#how-to-use)
+- [Time-Series Databases](#how-to-use)
+
+---
+
+## Example: State Management
+
+<details>
+<summary>View full example with alternatives</summary>
 
 **Input:**
 
 ```json
 {
-  "current_approach": "Using Redux for state management in React app",
-  "context": "Small team, simple CRUD app, 20 components"
+  "currentApproach": "Using Redux for state management in React app",
+  "goals": ["Global state management", "Simple developer experience"],
+  "constraints": ["Small team", "Simple CRUD app", "20 components"]
 }
 ```
 
-**Response:**
+**Response Summary:**
 
 ```markdown
 ## Alternative 1: React Context + useReducer
@@ -150,20 +234,25 @@ Start with Context + useReducer (zero dependencies), move to Zustand if you
 need better performance or more features.
 ```
 
+</details>
+
 ---
 
-### Example 2: API Communication
+## Example: API Communication
+
+<details>
+<summary>View full example with alternatives</summary>
 
 **Input:**
 
 ```json
 {
-  "current_approach": "Using WebSockets for real-time notifications in mobile app",
-  "context": "Battery life is a concern, connection is intermittent"
+  "currentApproach": "Using WebSockets for real-time notifications in mobile app",
+  "constraints": ["Battery life is a concern", "Connection is intermittent"]
 }
 ```
 
-**Response:**
+**Response Summary:**
 
 ```markdown
 ## Alternative 1: Server-Sent Events (SSE)
@@ -234,11 +323,16 @@ WebSockets are overkill and drain battery. SSE is better but still drains
 battery more than push notifications.
 ```
 
+</details>
+
 ---
 
 ## Best Practices
 
-### 1. Describe Your Current Approach Clearly
+<details>
+<summary><strong>How to Get Better Alternatives</strong></summary>
+
+### Describe Your Current Approach Clearly
 
 **Good:**
 
@@ -268,34 +362,28 @@ battery more than push notifications.
 
 ```json
 {
-  "context": "Considered PostgreSQL full-text search but concerned about performance"
+  "constraints": ["Considered PostgreSQL full-text search but concerned about performance"]
 }
 ```
 
----
-
-## Common Use Cases
-
-- Technology selection
-- Architecture patterns
-- Algorithm choices
-- Tool and library selection
-- Deployment strategies
-- Testing approaches
+</details>
 
 ---
 
 ## Related Tools
 
-- **think-about-plan**: Evaluate a specific plan
-- **solve-problem**: Debug implementation issues
+- **[think-about-plan](./think-about-plan.md)** - Evaluate a specific implementation plan
+- **[solve-problem](./solve-problem.md)** - Debug and troubleshoot issues
+- **[improve-copy](./improve-copy.md)** - Enhance documentation and messaging
 
 ---
 
 ## Next Steps
 
-- 📖 [think-about-plan documentation](./think-about-plan.md)
-- 🎯 [Example Workflows](../../examples/)
+- 📖 [think-about-plan](./think-about-plan.md) - Plan strategic implementations
+- 📖 [solve-problem](./solve-problem.md) - Debug and troubleshoot
+- 📖 [improve-copy](./improve-copy.md) - Refine your documentation
+- 🔧 [Configuration Guide](../configuration.md) - Customize models and behavior
 
 ---
 
