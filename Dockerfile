@@ -1,6 +1,6 @@
 # Multi-stage build for production-ready MCP Consultant server
 # Build stage
-FROM node:22.18-alpine AS builder
+FROM node:22.20-alpine AS builder
 
 WORKDIR /app
 
@@ -24,7 +24,7 @@ RUN npm ci --only=production --ignore-scripts && \
     npm cache clean --force
 
 # Production stage
-FROM node:22.18-alpine
+FROM node:22.20-alpine
 
 # Security: Run as non-root user
 RUN addgroup -g 1001 -S nodejs && \
