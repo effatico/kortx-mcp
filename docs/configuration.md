@@ -374,11 +374,11 @@ TRANSPORT=streaming
 Custom server name for identification.
 
 - **Required**: No
-- **Default**: `mcp-consultant`
+- **Default**: `llm-consultants`
 - **Example**: `SERVER_NAME=my-consultant`
 
 ```bash
-SERVER_NAME=mcp-consultant
+SERVER_NAME=llm-consultants
 ```
 
 ---
@@ -418,8 +418,8 @@ PORT=3000
 
 Logs are written to:
 
-- **Global install**: `~/.mcp-consultant/logs/mcp-consultant.log`
-- **Local development**: `./logs/mcp-consultant.log`
+- **Global install**: `~/.llm-consultants/logs/llm-consultants.log`
+- **Local development**: `./logs/llm-consultants.log`
 
 ### Log Format
 
@@ -756,6 +756,6 @@ MCP Consultant validates configuration on startup:
 ## Getting Help
 
 - 📖 [Troubleshooting Guide](./troubleshooting.md)
-- 💬 [GitHub Discussions](https://github.com/amsv01/mcp-consultant/discussions)
-- 🐛 [Report an Issue](https://github.com/amsv01/mcp-consultant/issues)
+- 💬 [GitHub Discussions](https://github.com/amsv01/llm-consultants/discussions)
+- 🐛 [Report an Issue](https://github.com/amsv01/llm-consultants/issues)
 - 📧 [Email Support](mailto:amin@effati.se)

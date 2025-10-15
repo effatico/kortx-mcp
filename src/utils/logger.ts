@@ -12,7 +12,7 @@ export function createLogger(config: Config): Logger {
 
   // In production with stdio, log to file. Otherwise use stdout with pino-pretty in dev
   const destination = isStdioTransport
-    ? createWriteStream(join(process.cwd(), 'mcp-consultant.log'), { flags: 'a' })
+    ? createWriteStream(join(process.cwd(), 'llm-consultants.log'), { flags: 'a' })
     : undefined;
 
   return pino(

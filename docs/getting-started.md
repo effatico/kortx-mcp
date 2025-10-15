@@ -18,7 +18,7 @@ Before you begin, ensure you have:
 The fastest way to get started. No installation required:
 
 ```bash
-npx -y mcp-consultant
+npx -y llm-consultants
 ```
 
 This will download and run the latest version automatically. Perfect for trying it out or using occasionally.
@@ -28,13 +28,13 @@ This will download and run the latest version automatically. Perfect for trying 
 For regular use, install globally:
 
 ```bash
-npm install -g mcp-consultant
+npm install -g llm-consultants
 ```
 
 Then run anytime with:
 
 ```bash
-mcp-consultant
+llm-consultants
 ```
 
 ### Option 3: Docker
@@ -43,10 +43,10 @@ For containerized deployments:
 
 ```bash
 # Pull the image
-docker pull ghcr.io/amsv01/mcp-consultant:latest
+docker pull ghcr.io/amsv01/llm-consultants:latest
 
 # Run with environment variables
-docker run -e OPENAI_API_KEY=sk-your-key ghcr.io/amsv01/mcp-consultant:latest
+docker run -e OPENAI_API_KEY=sk-your-key ghcr.io/amsv01/llm-consultants:latest
 ```
 
 ## Configuration
@@ -108,7 +108,7 @@ The simplest integration:
 
 ```bash
 # Add the server
-claude mcp add consultant -- npx -y mcp-consultant
+claude mcp add consultant -- npx -y llm-consultants
 ```
 
 Or manually edit `~/.config/claude/mcp.json`:
@@ -118,7 +118,7 @@ Or manually edit `~/.config/claude/mcp.json`:
   "mcpServers": {
     "consultant": {
       "command": "npx",
-      "args": ["-y", "mcp-consultant"],
+      "args": ["-y", "llm-consultants"],
       "env": {
         "OPENAI_API_KEY": "sk-your-key-here"
       }
@@ -139,7 +139,7 @@ Edit your Copliot configuration file:
     "servers": {
       "consultant": {
         "command": "npx",
-        "args": ["-y", "mcp-consultant"],
+        "args": ["-y", "llm-consultants"],
         "env": {
           "OPENAI_API_KEY": "your-key-here"
         }
@@ -159,7 +159,7 @@ Install the MCP extension, then add to `.vscode/mcp-config.json`:
 {
   "consultant": {
     "command": "npx",
-    "args": ["-y", "mcp-consultant"],
+    "args": ["-y", "llm-consultants"],
     "env": {
       "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
     }
@@ -177,7 +177,7 @@ Add to Cursor's MCP settings:
 {
   "mcp-servers": {
     "consultant": {
-      "command": "npx -y mcp-consultant",
+      "command": "npx -y llm-consultants",
       "env": {
         "OPENAI_API_KEY": "your-key-here"
       }
@@ -313,12 +313,12 @@ Now that you're up and running:
 
 ## Common Issues
 
-### "Command not found: mcp-consultant"
+### "Command not found: llm-consultants"
 
 Install globally first:
 
 ```bash
-npm install -g mcp-consultant
+npm install -g llm-consultants
 ```
 
 ### "Invalid API key"
@@ -338,7 +338,7 @@ Check the logs:
 tail -f ~/.config/claude/logs/mcp-*.log
 
 # Or check stderr
-OPENAI_API_KEY=sk-your-key npx mcp-consultant 2>&1 | head -20
+OPENAI_API_KEY=sk-your-key npx llm-consultants 2>&1 | head -20
 ```
 
 ### "Tools not appearing"
@@ -352,8 +352,8 @@ For more detailed troubleshooting, see the [Troubleshooting Guide](./troubleshoo
 If you need assistance:
 
 - 📖 [Full Documentation](../README.md#-documentation)
-- 🐛 [Report an Issue](https://github.com/amsv01/mcp-consultant/issues)
-- 💬 [GitHub Discussions](https://github.com/amsv01/mcp-consultant/discussions)
+- 🐛 [Report an Issue](https://github.com/amsv01/llm-consultants/issues)
+- 💬 [GitHub Discussions](https://github.com/amsv01/llm-consultants/discussions)
 - 📧 [Email Support](mailto:amin@effati.se)
 
 ## What's Next?
