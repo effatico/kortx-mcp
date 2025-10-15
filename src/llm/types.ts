@@ -27,3 +27,14 @@ export interface LLMError extends Error {
   code?: string;
   retryable?: boolean;
 }
+
+export interface ConsultationContext {
+  query: string;
+  codeContext?: string[];
+  fileContents?: Map<string, string>;
+  memoryContext?: string[];
+  lspContext?: string[];
+  additionalInfo?: Record<string, string[]>;
+  totalTokens: number;
+  sourcesUsed: string[];
+}
