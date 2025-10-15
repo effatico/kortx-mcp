@@ -1,46 +1,60 @@
-# 🤖 MCP Consultant
+# MCP Consultant
 
 [![npm version](https://badge.fury.io/js/mcp-consultant.svg)](https://www.npmjs.com/package/mcp-consultant)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://github.com/amsv01/mcp-consultant/workflows/Test/badge.svg)](https://github.com/amsv01/mcp-consultant/actions)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.12.0-brightgreen)](https://nodejs.org)
 
-> An open-source MCP server that enables AI assistants like Claude Code to consult with GPT-5 for specialized tasks, with intelligent context gathering from your codebase.
+A lightweight, open-source MCP server that lets AI assistants like Claude Code consult GPT-5 models for specialized tasks and automatically gathers relevant context from your codebase.
 
 [Quick Start](#-quick-start) • [Documentation](./docs) • [Examples](./examples) • [Contributing](./CONTRIBUTING.md)
 
 ---
 
-## ✨ Features
+## Who Should Use This
 
-- 🧠 **Multi-Model Support** - GPT-5, GPT-5-mini, and GPT-5-nano with configurable reasoning effort
-- 📚 **Smart Context Gathering** - Automatically integrates with Serena, graph-memory, and cclsp MCPs
-- 🔧 **Four Specialized Tools** - Strategic planning, alternative solutions, copy improvement, problem-solving
-- 🐳 **Docker Ready** - Containerized deployment with security best practices
-- 📦 **NPX Support** - Install and run with a single command
-- 🔒 **Production Secure** - Non-root execution, sensitive data redaction, comprehensive logging
-- 📊 **Observable** - Structured Pino logging with request/response tracking
-- ⚡ **Optimized Defaults** - Fast time-to-first-token with gpt-5-mini and minimal reasoning
-- 🧪 **Well Tested** - 46 passing unit tests with 80%+ coverage
+AI researchers, tool builders, and platform engineers who want to enhance AI assistants with specialized consultation capabilities and intelligent context gathering from codebases.
 
 ---
 
-## 🚀 Quick Start
+## Features
 
-### Install via NPX (Recommended)
+- **Multi-model support**: GPT-5, GPT-5-mini, and GPT-5-nano with configurable reasoning effort.
+- **Smart context gathering**: Integrates automatically with Serena, graph-memory, and cclsp MCPs to surface relevant code and metadata.
+- **Specialized tools**: Four purpose-built tools for strategic planning, alternative solutions, copy improvement, and problem solving.
+- **Docker-ready**: Containerized deployment with secure defaults.
+- **NPX support**: Install and run with a single command.
+- **Production-secure**: Non-root execution, sensitive-data redaction, and comprehensive logging.
+- **Observable**: Structured Pino logs with request/response tracking.
+- **Optimized defaults**: Fast time-to-first-token using gpt-5-mini and minimal reasoning settings.
+- **Well tested**: 46 passing unit tests with 80%+ coverage.
+
+---
+
+## Quick Start
+
+Get started in seconds with a single command:
 
 ```bash
 npx mcp-consultant
 ```
 
-### Install via NPM
+### Installation Options
+
+**NPX (Recommended)**
+
+```bash
+npx mcp-consultant
+```
+
+**NPM Global Install**
 
 ```bash
 npm install -g mcp-consultant
 mcp-consultant
 ```
 
-### Using Docker
+**Docker**
 
 ```bash
 docker run -e OPENAI_API_KEY=your-key ghcr.io/amsv01/mcp-consultant:latest
@@ -48,7 +62,7 @@ docker run -e OPENAI_API_KEY=your-key ghcr.io/amsv01/mcp-consultant:latest
 
 ---
 
-## 📦 Integration with AI Assistants
+## Integration with AI Assistants
 
 ### Claude Code
 
@@ -56,31 +70,23 @@ docker run -e OPENAI_API_KEY=your-key ghcr.io/amsv01/mcp-consultant:latest
 
 ```bash
 # Using npx (recommended)
-claude mcp add consultant -- npx -y mcp-consultant
+claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- npx -y mcp-consultant
 
 # Using global install
 npm install -g mcp-consultant
-claude mcp add consultant -- mcp-consultant
+claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- mcp-consultant
 ```
 
-**Manual Configuration:**
+**Optional Configuration:**
 
-Add to your Claude Code MCP config file (`~/.config/claude/mcp.json` on macOS/Linux, `%APPDATA%\Claude\mcp.json` on Windows):
+You can add additional environment variables to customize the server:
 
-```json
-{
-  "mcpServers": {
-    "consultant": {
-      "command": "npx",
-      "args": ["-y", "mcp-consultant"],
-      "env": {
-        "OPENAI_API_KEY": "sk-your-api-key-here",
-        "OPENAI_MODEL": "gpt-5-mini",
-        "LOG_LEVEL": "info"
-      }
-    }
-  }
-}
+```bash
+claude mcp add --transport stdio consultant \
+  --env OPENAI_API_KEY=YOUR_KEY \
+  --env OPENAI_MODEL=gpt-5-mini \
+  --env LOG_LEVEL=info \
+  -- npx -y mcp-consultant
 ```
 
 [Detailed Claude Code setup guide →](./docs/integration/claude-code.md)
@@ -147,7 +153,7 @@ Add to Cursor's MCP settings:
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 Create a `.env` file or set environment variables:
 
@@ -189,7 +195,7 @@ MAX_CONTEXT_TOKENS=32000             # Context limit
 
 ---
 
-## 🎯 Available Tools
+## Available Tools
 
 ### 1. think-about-plan
 
@@ -276,7 +282,7 @@ Error: Request Entity Too Large, ETIMEDOUT: Socket timeout"
 
 ---
 
-## 📖 Documentation
+## Documentation
 
 ### Getting Started
 
@@ -315,7 +321,7 @@ Error: Request Entity Too Large, ETIMEDOUT: Socket timeout"
 
 ---
 
-## 🔧 Development
+## Development
 
 ### Prerequisites
 
@@ -370,7 +376,7 @@ npm run inspector        # Debug with MCP Inspector
 
 ---
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 mcp-consultant/
@@ -404,7 +410,7 @@ mcp-consultant/
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for details.
 
@@ -415,7 +421,7 @@ We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md)
 
 ---
 
-## 🔒 Security
+## Security
 
 Security is a top priority. See our [Security Policy](./SECURITY.md) for:
 
@@ -428,7 +434,7 @@ Security is a top priority. See our [Security Policy](./SECURITY.md) for:
 
 ---
 
-## 📊 Tech Stack
+## Tech Stack
 
 - **Runtime**: Node.js 22.20+
 - **Language**: TypeScript with strict mode
@@ -441,13 +447,13 @@ Security is a top priority. See our [Security Policy](./SECURITY.md) for:
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Built with the [Model Context Protocol](https://modelcontextprotocol.io) by Anthropic
 - Powered by [OpenAI GPT-5](https://openai.com)
@@ -455,7 +461,7 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 
 ---
 
-## 📊 Project Status
+## Project Status
 
 **Current Version**: 1.0.0
 
@@ -472,7 +478,7 @@ This project is actively maintained and production-ready:
 
 ---
 
-## 💬 Support
+## Support
 
 - 📖 [Documentation](./docs)
 - 💬 [GitHub Discussions](https://github.com/amsv01/mcp-consultant/discussions)
@@ -481,7 +487,7 @@ This project is actively maintained and production-ready:
 
 ---
 
-## ⭐ Star History
+## Star History
 
 If you find this project useful, please consider giving it a star on GitHub!
 
