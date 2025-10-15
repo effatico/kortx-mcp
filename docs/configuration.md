@@ -42,16 +42,17 @@ The GPT-5 model to use for consultations.
 
 - **Required**: No
 - **Default**: `gpt-5-mini`
-- **Valid values**: `gpt-5`, `gpt-5-mini`, `gpt-5-nano`
+- **Valid values**: `gpt-5`, `gpt-5-mini`, `gpt-5-nano`, `gpt-5-codex`
 - **Example**: `OPENAI_MODEL=gpt-5-mini`
 
 #### Model Comparison
 
-| Model          | Speed     | Cost | Reasoning | Best For                                   |
-| -------------- | --------- | ---- | --------- | ------------------------------------------ |
-| **gpt-5**      | Moderate  | $$$  | Excellent | Complex reasoning, architectural decisions |
-| **gpt-5-mini** | Fast      | $$   | Good      | General consultation, balanced use         |
-| **gpt-5-nano** | Very Fast | $    | Basic     | High-throughput, simple questions          |
+| Model           | Speed     | Cost | Reasoning | Best For                                   |
+| --------------- | --------- | ---- | --------- | ------------------------------------------ |
+| **gpt-5**       | Moderate  | $$$  | Excellent | Complex reasoning, architectural decisions |
+| **gpt-5-mini**  | Fast      | $$   | Good      | General consultation, balanced use         |
+| **gpt-5-nano**  | Very Fast | $    | Basic     | High-throughput, simple questions          |
+| **gpt-5-codex** | Moderate  | $$$  | Excellent | Code generation, refactoring, debugging    |
 
 ```bash
 # Fast and economical (recommended)
@@ -62,6 +63,9 @@ OPENAI_MODEL=gpt-5
 
 # Highest throughput for simple tasks
 OPENAI_MODEL=gpt-5-nano
+
+# Code-focused tasks
+OPENAI_MODEL=gpt-5-codex
 ```
 
 ---
@@ -734,7 +738,7 @@ MCP Consultant validates configuration on startup:
 
 ```bash
 ✗ Configuration error: OPENAI_API_KEY is required
-✗ Invalid model: gpt-4-turbo (must be gpt-5, gpt-5-mini, or gpt-5-nano)
+✗ Invalid model: gpt-4-turbo (must be gpt-5, gpt-5-mini, gpt-5-nano, or gpt-5-codex)
 ✗ Invalid reasoning effort: extreme (must be minimal, low, medium, or high)
 ```
 

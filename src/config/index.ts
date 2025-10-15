@@ -7,7 +7,7 @@ dotenvConfig();
 // OpenAI configuration schema
 const OpenAIConfigSchema = z.object({
   apiKey: z.string().min(1, 'OPENAI_API_KEY is required'),
-  model: z.enum(['gpt-5', 'gpt-5-mini', 'gpt-5-nano']).default('gpt-5-mini'),
+  model: z.enum(['gpt-5', 'gpt-5-mini', 'gpt-5-nano', 'gpt-5-codex']).default('gpt-5-mini'),
   reasoningEffort: z.enum(['minimal', 'low', 'medium', 'high']).default('minimal'),
   verbosity: z.enum(['low', 'medium', 'high']).default('low'),
   maxTokens: z.number().int().positive().default(1024),

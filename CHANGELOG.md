@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **GPT-5-codex Model Support**: Added `gpt-5-codex` to supported models for code generation, refactoring, debugging, and code explanations
+  - Updated configuration schema validation
+  - Updated documentation across README, configuration guide, and integration guides
+  - Model remains opt-in with `gpt-5-mini` as the default
+
 ## [1.0.0] - 2025-10-15
 
 ### Added
@@ -14,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Core Features
 
 - **MCP Server**: Full implementation with stdio transport for Claude Code integration
-- **GPT-5 Integration**: Support for GPT-5, GPT-5-mini, and GPT-5-nano via OpenAI Responses API
+- **GPT-5 Integration**: Support for GPT-5, GPT-5-mini, GPT-5-nano, and GPT-5-codex via OpenAI Responses API
 - **Four Consultation Tools**:
   - `think-about-plan`: Strategic planning feedback with 6-point analysis framework
   - `suggest-alternative`: Alternative approaches with trade-off analysis
