@@ -3,7 +3,7 @@
 [![npm version](https://badge.fury.io/js/mcp-consultant.svg)](https://www.npmjs.com/package/mcp-consultant)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://github.com/amsv01/mcp-consultant/workflows/Test/badge.svg)](https://github.com/amsv01/mcp-consultant/actions)
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.20.0-brightgreen)](https://nodejs.org)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.12.0-brightgreen)](https://nodejs.org)
 
 > An open-source MCP server that enables AI assistants like Claude Code to consult with GPT-5 for specialized tasks, with intelligent context gathering from your codebase.
 
@@ -319,7 +319,7 @@ Error: Request Entity Too Large, ETIMEDOUT: Socket timeout"
 
 ### Prerequisites
 
-- Node.js >= 22.20.0
+- Node.js >= 22.12.0
 - npm >= 9.0.0
 - OpenAI API key
 

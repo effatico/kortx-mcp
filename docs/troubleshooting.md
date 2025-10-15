@@ -65,7 +65,7 @@ This guide helps you diagnose and resolve common issues with MCP Consultant.
    node --version
    ```
 
-2. Upgrade to Node.js >= 22.20.0:
+2. Upgrade to Node.js >= 22.12.0:
    - Visit [nodejs.org](https://nodejs.org)
    - Or use nvm:
      ```bash

@@ -7,7 +7,7 @@ This guide will help you set up MCP Consultant with Claude Code, Anthropic's off
 ## Prerequisites
 
 - Claude Code installed ([Installation Guide](https://docs.claude.com/claude-code/installation))
-- Node.js >= 22.20.0
+- Node.js >= 22.12.0
 - OpenAI API key ([Get one here](https://platform.openai.com/api-keys))
 
 ---
