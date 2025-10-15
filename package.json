@@ -1,6 +1,6 @@
 {
   "name": "mcp-consultant",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Open-source MCP server enabling AI assistants to consult with GPT-5 for specialized tasks with intelligent context gathering",
   "type": "module",
   "bin": {
