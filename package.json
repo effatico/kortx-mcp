@@ -1,10 +1,10 @@
 {
-  "name": "mcp-consultant",
+  "name": "llm-consultants",
   "version": "1.0.0",
   "description": "Open-source MCP server enabling AI assistants to consult with GPT-5 for specialized tasks with intelligent context gathering",
   "type": "module",
   "bin": {
-    "mcp-consultant": "./build/index.js"
+    "llm-consultants": "./build/index.js"
   },
   "main": "./build/server.js",
   "types": "./build/server.d.ts",
@@ -39,12 +39,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/amsv01/mcp-consultant.git"
+    "url": "https://github.com/amsv01/llm-consultants.git"
   },
   "bugs": {
-    "url": "https://github.com/amsv01/mcp-consultant/issues"
+    "url": "https://github.com/amsv01/llm-consultants/issues"
   },
-  "homepage": "https://github.com/amsv01/mcp-consultant#readme",
+  "homepage": "https://github.com/amsv01/llm-consultants#readme",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"

@@ -17,6 +17,6 @@ docker run -i --rm \
   -e OPENAI_API_KEY=$OPENAI_API_KEY \
   -e OPENAI_MODEL=${OPENAI_MODEL:-gpt-5} \
   -e NODE_ENV=production \
-  mcp-consultant:latest
+  llm-consultants:latest
 
 echo "Container stopped."

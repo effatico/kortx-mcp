@@ -33,14 +33,14 @@ This project adheres to a code of conduct. By participating, you are expected to
 2. Clone your fork locally:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/mcp-consultant.git
-cd mcp-consultant
+git clone https://github.com/YOUR_USERNAME/llm-consultants.git
+cd llm-consultants
 ```
 
 3. Add the upstream repository:
 
 ```bash
-git remote add upstream https://github.com/amsv01/mcp-consultant.git
+git remote add upstream https://github.com/amsv01/llm-consultants.git
 ```
 
 ### Initial Setup
@@ -340,7 +340,7 @@ Any other relevant information
 ## Questions?
 
 - 📖 Check the [documentation](./docs)
-- 💬 Ask in [GitHub Discussions](https://github.com/amsv01/mcp-consultant/discussions)
+- 💬 Ask in [GitHub Discussions](https://github.com/amsv01/llm-consultants/discussions)
 - 📧 Email: amin@effati.se
 
 Thank you for contributing to MCP Consultant! 🎉

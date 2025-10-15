@@ -301,5 +301,5 @@ battery more than push notifications.
 
 ## Getting Help
 
-- 💬 [GitHub Discussions](https://github.com/amsv01/mcp-consultant/discussions)
-- 🐛 [Report an Issue](https://github.com/amsv01/mcp-consultant/issues)
+- 💬 [GitHub Discussions](https://github.com/amsv01/llm-consultants/discussions)
+- 🐛 [Report an Issue](https://github.com/amsv01/llm-consultants/issues)

@@ -1,12 +1,12 @@
 version: '3.8'
 
 services:
-  mcp-consultant:
+  llm-consultants:
     build:
       context: .
       dockerfile: Dockerfile
-    image: mcp-consultant:latest
-    container_name: mcp-consultant
+    image: llm-consultants:latest
+    container_name: llm-consultants
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_MODEL=${OPENAI_MODEL:-gpt-5}
