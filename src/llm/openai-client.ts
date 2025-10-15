@@ -65,7 +65,7 @@ export class OpenAIClient {
     logLLMRequest(this.logger, model, JSON.stringify(request.messages).length);
 
     try {
-      const stream = await this.client.chat.completions.create({
+      const stream = (await this.client.chat.completions.create({
         model,
         messages: request.messages,
         max_tokens: maxTokens,
@@ -74,7 +74,7 @@ export class OpenAIClient {
         ...(model.startsWith('gpt-5') && {
           reasoning_effort: reasoningEffort,
         }),
-      } as any);
+      } as any)) as unknown as AsyncIterable<OpenAI.Chat.Completions.ChatCompletionChunk>;
 
       let fullContent = '';
       let promptTokens = 0;
