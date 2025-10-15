@@ -22,19 +22,10 @@ export function requestLoggingMiddleware(logger: Logger) {
       `Request received: ${req.method} ${req.path}`
     );
 
-    // Capture the original end function
-    const originalEnd = res.end;
-
-    // Override res.end to log when response is sent
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    res.end = function (chunk?: any, encoding?: any, callback?: any): any {
-      // Restore original end
-      res.end = originalEnd;
-
-      // Calculate duration
+    // Log when response is finished
+    res.on('finish', () => {
       const duration = Date.now() - startTime;
 
-      // Log completed request
       logger.info(
         {
           event: 'request_complete',
@@ -45,10 +36,7 @@ export function requestLoggingMiddleware(logger: Logger) {
         },
         `Request completed: ${req.method} ${req.path} - ${res.statusCode} (${duration}ms)`
       );
-
-      // Call original end
-      return originalEnd.call(this, chunk, encoding, callback);
-    };
+    });
 
     next();
   };
