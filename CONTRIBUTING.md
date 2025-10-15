@@ -1,0 +1,346 @@
+# Contributing to MCP Consultant
+
+Thank you for your interest in contributing to MCP Consultant! This document provides guidelines and instructions for contributing.
+
+## Table of Contents
+
+- [Code of Conduct](#code-of-conduct)
+- [Getting Started](#getting-started)
+- [Development Workflow](#development-workflow)
+- [Pull Request Process](#pull-request-process)
+- [Coding Standards](#coding-standards)
+- [Testing Guidelines](#testing-guidelines)
+- [Documentation](#documentation)
+- [Reporting Bugs](#reporting-bugs)
+- [Requesting Features](#requesting-features)
+
+## Code of Conduct
+
+This project adheres to a code of conduct. By participating, you are expected to uphold this code. Please be respectful and constructive in all interactions.
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js >= 22.18.0
+- npm >= 9.0.0
+- OpenAI API key (for testing)
+- Git
+
+### Fork and Clone
+
+1. Fork the repository on GitHub
+2. Clone your fork locally:
+
+```bash
+git clone https://github.com/YOUR_USERNAME/mcp-consultant.git
+cd mcp-consultant
+```
+
+3. Add the upstream repository:
+
+```bash
+git remote add upstream https://github.com/amsv01/mcp-consultant.git
+```
+
+### Initial Setup
+
+```bash
+# Install dependencies
+npm install
+
+# Copy environment template
+cp .env.example .env
+# Edit .env with your OpenAI API key
+
+# Build the project
+npm run build
+
+# Run tests
+npm test
+```
+
+## Development Workflow
+
+### Creating a Branch
+
+Always create a feature branch for your work:
+
+```bash
+git checkout -b feature/your-feature-name
+# or
+git checkout -b fix/bug-description
+```
+
+Branch naming conventions:
+
+- `feature/` - New features
+- `fix/` - Bug fixes
+- `docs/` - Documentation changes
+- `test/` - Test additions or modifications
+- `refactor/` - Code refactoring
+
+### Making Changes
+
+1. Make your changes in your feature branch
+2. Write or update tests as needed
+3. Update documentation if required
+4. Ensure all tests pass: `npm test`
+5. Ensure code quality: `npm run lint` and `npm run format:check`
+6. Build successfully: `npm run build`
+
+### Commit Messages
+
+Follow Conventional Commits format:
+
+```
+type(scope): subject
+
+body (optional)
+
+footer (optional)
+```
+
+**Types:**
+
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, etc.)
+- `refactor`: Code refactoring
+- `test`: Test additions or changes
+- `chore`: Build process or auxiliary tool changes
+
+**Examples:**
+
+```
+feat(tools): add code analysis tool
+
+Implements a new tool for analyzing code quality and suggesting improvements.
+
+Closes #42
+```
+
+```
+fix(config): handle missing environment variables
+
+Improves error messages when required env vars are not set.
+```
+
+## Pull Request Process
+
+### Before Submitting
+
+Ensure your PR:
+
+- [ ] Passes all tests (`npm test`)
+- [ ] Passes linting (`npm run lint`)
+- [ ] Is properly formatted (`npm run format:check`)
+- [ ] Builds successfully (`npm run build`)
+- [ ] Includes tests for new functionality
+- [ ] Updates relevant documentation
+- [ ] Has a clear, descriptive title
+- [ ] References any related issues
+
+### Submitting a Pull Request
+
+1. Push your branch to your fork:
+
+```bash
+git push origin feature/your-feature-name
+```
+
+2. Open a Pull Request on GitHub
+3. Fill out the PR template completely
+4. Link any related issues
+5. Request review from maintainers
+
+### PR Review Process
+
+- Maintainers will review your PR
+- Address any requested changes
+- Keep your PR up to date with the main branch
+- Once approved, a maintainer will merge your PR
+
+### Keeping Your Fork Updated
+
+```bash
+git checkout master
+git fetch upstream
+git merge upstream/master
+git push origin master
+```
+
+## Coding Standards
+
+### TypeScript Guidelines
+
+- Use TypeScript strict mode
+- Provide type annotations for function parameters and return types
+- Avoid `any` types when possible
+- Use interfaces for object shapes
+- Use enums for fixed sets of values
+
+### Code Style
+
+We use ESLint and Prettier for code formatting:
+
+```bash
+# Check linting
+npm run lint
+
+# Fix linting issues
+npm run lint:fix
+
+# Check formatting
+npm run format:check
+
+# Fix formatting
+npm run format
+```
+
+### File Organization
+
+- Keep files focused and single-purpose
+- Use clear, descriptive file names
+- Group related functionality in directories
+- Export only what's necessary
+
+### Error Handling
+
+- Use proper error types
+- Provide meaningful error messages
+- Log errors appropriately
+- Handle edge cases
+
+## Testing Guidelines
+
+### Test Structure
+
+- Unit tests: Test individual functions/classes in isolation
+- Integration tests: Test component interactions
+- Use Vitest testing framework
+- Follow AAA pattern (Arrange, Act, Assert)
+
+### Writing Tests
+
+```typescript
+import { describe, it, expect, beforeEach } from 'vitest';
+
+describe('Feature Name', () => {
+  beforeEach(() => {
+    // Setup
+  });
+
+  it('should do something specific', () => {
+    // Arrange
+    const input = 'test';
+
+    // Act
+    const result = someFunction(input);
+
+    // Assert
+    expect(result).toBe('expected');
+  });
+});
+```
+
+### Test Coverage
+
+- Aim for >80% line coverage
+- Cover edge cases and error conditions
+- Test both happy paths and error paths
+- Run `npm run test:coverage` to check coverage
+
+## Documentation
+
+### What to Document
+
+- New features and APIs
+- Configuration options
+- Breaking changes
+- Migration guides
+- Examples and use cases
+
+### Documentation Style
+
+- Use clear, concise language
+- Provide code examples
+- Include expected inputs/outputs
+- Add links to related documentation
+
+### README Updates
+
+If your changes affect:
+
+- Installation process
+- Configuration
+- Available features
+- Usage examples
+
+Update the README.md accordingly.
+
+## Reporting Bugs
+
+### Before Reporting
+
+- Check existing issues
+- Verify it's not a configuration issue
+- Test with the latest version
+
+### Bug Report Template
+
+```markdown
+**Description**
+Clear description of the bug
+
+**To Reproduce**
+Steps to reproduce:
+
+1. ...
+2. ...
+
+**Expected Behavior**
+What you expected to happen
+
+**Actual Behavior**
+What actually happened
+
+**Environment**
+
+- OS: [e.g., macOS 13.0]
+- Node.js: [e.g., 22.18.0]
+- Package version: [e.g., 1.0.0]
+
+**Additional Context**
+Any other relevant information
+```
+
+## Requesting Features
+
+### Feature Request Template
+
+```markdown
+**Feature Description**
+Clear description of the feature
+
+**Use Case**
+Why this feature would be useful
+
+**Proposed Solution**
+How you think it could be implemented
+
+**Alternatives**
+Other solutions you've considered
+
+**Additional Context**
+Any other relevant information
+```
+
+## Questions?
+
+- 📖 Check the [documentation](./docs)
+- 💬 Ask in [GitHub Discussions](https://github.com/amsv01/mcp-consultant/discussions)
+- 📧 Email: amin@effati.se
+
+Thank you for contributing to MCP Consultant! 🎉
