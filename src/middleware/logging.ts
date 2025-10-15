@@ -26,6 +26,7 @@ export function requestLoggingMiddleware(logger: Logger) {
     const originalEnd = res.end;
 
     // Override res.end to log when response is sent
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     res.end = function (chunk?: any, encoding?: any, callback?: any): any {
       // Restore original end
       res.end = originalEnd;

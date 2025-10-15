@@ -34,7 +34,7 @@ export function createLogger(config: Config): Logger {
 }
 
 // Logging utility functions
-export function logToolCall(logger: Logger, toolName: string, params: any): void {
+export function logToolCall(logger: Logger, toolName: string, params: unknown): void {
   logger.info(
     {
       event: 'tool_call',
@@ -90,7 +90,7 @@ export function logContextGathering(
   );
 }
 
-export function logError(logger: Logger, error: Error, context?: any): void {
+export function logError(logger: Logger, error: Error, context?: unknown): void {
   logger.error(
     {
       event: 'error',
@@ -106,7 +106,7 @@ export function logError(logger: Logger, error: Error, context?: any): void {
 }
 
 // Application lifecycle logging
-export function logApplicationStart(logger: Logger, config: any): void {
+export function logApplicationStart(logger: Logger, config: unknown): void {
   logger.info(
     {
       event: 'application_start',
@@ -146,7 +146,7 @@ export function logConfigurationLoaded(logger: Logger): void {
 }
 
 // Tool execution logging
-export function logToolExecutionStart(logger: Logger, toolName: string, params: any): void {
+export function logToolExecutionStart(logger: Logger, toolName: string, params: unknown): void {
   logger.debug(
     {
       event: 'tool_execution_start',
@@ -175,13 +175,14 @@ export function logToolExecutionComplete(
 }
 
 // Sanitize sensitive data from logs
-function sanitizeParams(params: any): any {
+function sanitizeParams(params: unknown): unknown {
   if (typeof params !== 'object' || params === null) {
     return params;
   }
 
   const sensitiveKeys = ['apikey', 'token', 'password', 'secret', 'authorization', 'api_key'];
-  const sanitized = Array.isArray(params) ? [...params] : { ...params };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sanitized: any = Array.isArray(params) ? [...params] : { ...params };
 
   for (const key of Object.keys(sanitized)) {
     const lowerKey = key.toLowerCase();

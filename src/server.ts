@@ -286,6 +286,7 @@ export class MCPConsultantServer {
 
       try {
         let result;
+
         switch (name) {
           case 'think-about-plan': {
             const input = ThinkAboutPlanInputSchema.parse(args);
