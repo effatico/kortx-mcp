@@ -24,30 +24,32 @@ export class OpenAIClient {
     const model = request.model || this.config.openai.model;
     const reasoningEffort = request.reasoningEffort || this.config.openai.reasoningEffort;
     const maxTokens = request.maxTokens || this.config.openai.maxTokens;
-    const temperature = request.temperature ?? this.config.openai.temperature;
+    const verbosity = this.config.openai.verbosity;
 
     const startTime = Date.now();
 
     logLLMRequest(this.logger, model, JSON.stringify(request.messages).length);
 
     try {
-      const completion = await this.client.chat.completions.create({
+      // GPT-5 uses the Responses API, not Chat Completions
+      const response = await this.client.responses.create({
         model,
-        messages: request.messages,
-        max_tokens: maxTokens,
-        temperature,
-        // GPT-5 specific parameters
-        ...(model.startsWith('gpt-5') && {
-          reasoning_effort: reasoningEffort,
-        }),
+        input: request.messages,
+        max_output_tokens: maxTokens,
+        reasoning: {
+          effort: reasoningEffort,
+        },
+        text: {
+          verbosity,
+        },
       } as any); // Type assertion due to potential SDK version differences
 
       const duration = Date.now() - startTime;
-      const response = this.parseResponse(completion);
+      const llmResponse = this.parseResponsesAPIResponse(response);
 
-      logLLMResponse(this.logger, model, response.tokensUsed, duration);
+      logLLMResponse(this.logger, model, llmResponse.tokensUsed, duration);
 
-      return response;
+      return llmResponse;
     } catch (error) {
       logError(this.logger, error as Error, { model, request });
       throw this.handleError(error);
@@ -58,63 +60,63 @@ export class OpenAIClient {
     const model = request.model || this.config.openai.model;
     const reasoningEffort = request.reasoningEffort || this.config.openai.reasoningEffort;
     const maxTokens = request.maxTokens || this.config.openai.maxTokens;
-    const temperature = request.temperature ?? this.config.openai.temperature;
+    const verbosity = this.config.openai.verbosity;
 
     const startTime = Date.now();
 
     logLLMRequest(this.logger, model, JSON.stringify(request.messages).length);
 
     try {
-      const stream = (await this.client.chat.completions.create({
+      // GPT-5 uses the Responses API with streaming
+      const stream = (await this.client.responses.create({
         model,
-        messages: request.messages,
-        max_tokens: maxTokens,
-        temperature,
+        input: request.messages,
+        max_output_tokens: maxTokens,
         stream: true,
-        ...(model.startsWith('gpt-5') && {
-          reasoning_effort: reasoningEffort,
-        }),
-      } as any)) as unknown as AsyncIterable<OpenAI.Chat.Completions.ChatCompletionChunk>;
+        reasoning: {
+          effort: reasoningEffort,
+        },
+        text: {
+          verbosity,
+        },
+      } as any)) as unknown as AsyncIterable<any>;
 
       let fullContent = '';
-      let promptTokens = 0;
-      let completionTokens = 0;
+      let inputTokens = 0;
+      let outputTokens = 0;
       let reasoningTokens = 0;
-      let finishReason = 'stop';
 
-      for await (const chunk of stream) {
-        const delta = chunk.choices[0]?.delta?.content || '';
-        if (delta) {
-          fullContent += delta;
-          onChunk(delta);
+      for await (const event of stream) {
+        // Handle Responses API streaming events
+        if (event.type === 'response.output_text.delta') {
+          const delta = event.delta || '';
+          if (delta) {
+            fullContent += delta;
+            onChunk(delta);
+          }
         }
 
-        // Track finish reason
-        if (chunk.choices[0]?.finish_reason) {
-          finishReason = chunk.choices[0].finish_reason;
-        }
-
-        // Note: Token counts typically only available at the end of stream
-        if (chunk.usage) {
-          promptTokens = chunk.usage.prompt_tokens || 0;
-          completionTokens = chunk.usage.completion_tokens || 0;
-          reasoningTokens = (chunk.usage as any).reasoning_tokens || 0;
+        // Token counts typically available at the end
+        if (event.type === 'response.done' && event.response?.usage) {
+          inputTokens = event.response.usage.input_tokens || 0;
+          outputTokens = event.response.usage.output_tokens || 0;
+          reasoningTokens = event.response.usage.reasoning_tokens || 0;
         }
       }
 
       const duration = Date.now() - startTime;
-      const totalTokens = promptTokens + completionTokens + reasoningTokens;
+      const totalTokens = inputTokens + outputTokens + reasoningTokens;
 
       const response: LLMResponse = {
         content: fullContent,
         model,
         tokensUsed: {
-          prompt: promptTokens,
-          completion: completionTokens,
+          prompt: inputTokens,
+          completion: outputTokens,
           total: totalTokens,
           ...(reasoningTokens > 0 && { reasoning: reasoningTokens }),
         },
-        finishReason,
+        finishReason: 'stop',
       };
 
       logLLMResponse(this.logger, model, response.tokensUsed, duration);
@@ -145,6 +147,26 @@ export class OpenAIClient {
       ...((message as any)?.reasoning_content && {
         reasoningContent: (message as any).reasoning_content,
       }),
+    };
+  }
+
+  private parseResponsesAPIResponse(response: any): LLMResponse {
+    // Parse Responses API response format
+    const outputText = response.output_text || '';
+    const usage = response.usage;
+
+    return {
+      content: outputText,
+      model: response.model || 'gpt-5',
+      tokensUsed: {
+        prompt: usage?.input_tokens || 0,
+        completion: usage?.output_tokens || 0,
+        total: (usage?.input_tokens || 0) + (usage?.output_tokens || 0),
+        ...(usage?.reasoning_tokens && {
+          reasoning: usage.reasoning_tokens,
+        }),
+      },
+      finishReason: 'stop',
     };
   }
 

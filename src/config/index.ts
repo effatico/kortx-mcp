@@ -7,10 +7,10 @@ dotenvConfig();
 // OpenAI configuration schema
 const OpenAIConfigSchema = z.object({
   apiKey: z.string().min(1, 'OPENAI_API_KEY is required'),
-  model: z.enum(['gpt-5', 'gpt-5-mini', 'gpt-5-nano', 'gpt-5-pro', 'gpt-5-codex']).default('gpt-5'),
-  reasoningEffort: z.enum(['minimal', 'low', 'medium', 'high']).default('medium'),
-  maxTokens: z.number().int().positive().default(4096),
-  temperature: z.number().min(0).max(2).default(0.7),
+  model: z.enum(['gpt-5', 'gpt-5-mini', 'gpt-5-nano']).default('gpt-5-mini'),
+  reasoningEffort: z.enum(['minimal', 'low', 'medium', 'high']).default('minimal'),
+  verbosity: z.enum(['low', 'medium', 'high']).default('low'),
+  maxTokens: z.number().int().positive().default(1024),
 });
 
 // MCP Server configuration schema
@@ -49,11 +49,9 @@ export function loadConfig(): Config {
         apiKey: process.env.OPENAI_API_KEY,
         model: process.env.OPENAI_MODEL,
         reasoningEffort: process.env.OPENAI_REASONING_EFFORT,
+        verbosity: process.env.OPENAI_VERBOSITY,
         maxTokens: process.env.OPENAI_MAX_TOKENS
           ? parseInt(process.env.OPENAI_MAX_TOKENS, 10)
-          : undefined,
-        temperature: process.env.OPENAI_TEMPERATURE
-          ? parseFloat(process.env.OPENAI_TEMPERATURE)
           : undefined,
       },
       server: {
@@ -90,24 +88,10 @@ export function loadConfig(): Config {
 }
 
 // Validate model-specific constraints
-export function validateModelConstraints(config: Config): void {
-  const { model, reasoningEffort } = config.openai;
-
-  // gpt-5-pro only supports high effort
-  if (model === 'gpt-5-pro' && reasoningEffort !== 'high') {
-    console.warn(
-      '⚠️  Warning: gpt-5-pro only supports reasoning_effort: high. Overriding to high.'
-    );
-    config.openai.reasoningEffort = 'high';
-  }
-
-  // gpt-5-codex doesn't support minimal effort
-  if (model === 'gpt-5-codex' && reasoningEffort === 'minimal') {
-    console.warn(
-      '⚠️  Warning: gpt-5-codex does not support reasoning_effort: minimal. Using low instead.'
-    );
-    config.openai.reasoningEffort = 'low';
-  }
+export function validateModelConstraints(_config: Config): void {
+  // GPT-5 models support all reasoning efforts (minimal, low, medium, high)
+  // and all verbosity levels (low, medium, high)
+  // No specific constraints needed per the OpenAI documentation
 }
 
 // Export singleton instance
