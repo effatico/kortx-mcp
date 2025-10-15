@@ -1,40 +1,61 @@
 import { pino, type Logger as PinoLogger } from 'pino';
+import { createWriteStream } from 'fs';
+import { join } from 'path';
 import type { Config } from '../config/index.js';
 
 export type Logger = PinoLogger;
 
 export function createLogger(config: Config): Logger {
-  return pino({
-    level: config.server.logLevel,
-    transport:
-      process.env.NODE_ENV === 'development'
-        ? {
-            target: 'pino-pretty',
-            options: {
-              colorize: true,
-              translateTime: 'HH:MM:ss Z',
-              ignore: 'pid,hostname',
-            },
-          }
-        : undefined,
-    formatters: {
-      level: (label: string) => {
-        return { level: label };
+  // When using stdio transport for MCP, we must log to a file
+  // to avoid interfering with the MCP protocol's JSON-RPC over stdio
+  const isStdioTransport = config.server.transport === 'stdio';
+
+  // In production with stdio, log to file. Otherwise use stdout with pino-pretty in dev
+  const destination = isStdioTransport
+    ? createWriteStream(join(process.cwd(), 'mcp-consultant.log'), { flags: 'a' })
+    : undefined;
+
+  return pino(
+    {
+      level: config.server.logLevel,
+      transport:
+        !isStdioTransport && process.env.NODE_ENV === 'development'
+          ? {
+              target: 'pino-pretty',
+              options: {
+                colorize: true,
+                translateTime: 'HH:MM:ss Z',
+                ignore: 'pid,hostname',
+              },
+            }
+          : undefined,
+      formatters: {
+        level: (label: string) => {
+          return { level: label };
+        },
+      },
+      base: {
+        service: config.server.name,
+        version: config.server.version,
+      },
+      redact: {
+        paths: [
+          '*.apiKey',
+          '*.token',
+          '*.password',
+          '*.secret',
+          '*.authorization',
+          'openai.apiKey',
+        ],
+        censor: '[REDACTED]',
       },
     },
-    base: {
-      service: config.server.name,
-      version: config.server.version,
-    },
-    redact: {
-      paths: ['*.apiKey', '*.token', '*.password', '*.secret', '*.authorization', 'openai.apiKey'],
-      censor: '[REDACTED]',
-    },
-  });
+    destination
+  );
 }
 
 // Logging utility functions
-export function logToolCall(logger: Logger, toolName: string, params: any): void {
+export function logToolCall(logger: Logger, toolName: string, params: unknown): void {
   logger.info(
     {
       event: 'tool_call',
@@ -90,7 +111,7 @@ export function logContextGathering(
   );
 }
 
-export function logError(logger: Logger, error: Error, context?: any): void {
+export function logError(logger: Logger, error: Error, context?: unknown): void {
   logger.error(
     {
       event: 'error',
@@ -105,23 +126,106 @@ export function logError(logger: Logger, error: Error, context?: any): void {
   );
 }
 
+// Application lifecycle logging
+export function logApplicationStart(logger: Logger, config: unknown): void {
+  logger.info(
+    {
+      event: 'application_start',
+      config: sanitizeParams(config),
+    },
+    'Application starting'
+  );
+}
+
+export function logApplicationShutdown(logger: Logger, signal?: string): void {
+  logger.info(
+    {
+      event: 'application_shutdown',
+      signal,
+    },
+    `Application shutting down${signal ? ` (${signal})` : ''}`
+  );
+}
+
+export function logMCPServerStarted(logger: Logger, transport: string): void {
+  logger.info(
+    {
+      event: 'mcp_server_started',
+      transport,
+    },
+    `MCP server started with ${transport} transport`
+  );
+}
+
+export function logConfigurationLoaded(logger: Logger): void {
+  logger.info(
+    {
+      event: 'configuration_loaded',
+    },
+    'Configuration loaded successfully'
+  );
+}
+
+// Tool execution logging
+export function logToolExecutionStart(logger: Logger, toolName: string, params: unknown): void {
+  logger.debug(
+    {
+      event: 'tool_execution_start',
+      tool: toolName,
+      params: sanitizeParams(params),
+    },
+    `Tool execution started: ${toolName}`
+  );
+}
+
+export function logToolExecutionComplete(
+  logger: Logger,
+  toolName: string,
+  durationMs: number,
+  success: boolean
+): void {
+  logger.info(
+    {
+      event: 'tool_execution_complete',
+      tool: toolName,
+      durationMs,
+      success,
+    },
+    `Tool execution ${success ? 'completed' : 'failed'}: ${toolName} (${durationMs}ms)`
+  );
+}
+
+// Type guard to check if value is a record
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 // Sanitize sensitive data from logs
-function sanitizeParams(params: any): any {
+function sanitizeParams(params: unknown): unknown {
   if (typeof params !== 'object' || params === null) {
     return params;
   }
 
   const sensitiveKeys = ['apikey', 'token', 'password', 'secret', 'authorization', 'api_key'];
-  const sanitized = Array.isArray(params) ? [...params] : { ...params };
 
-  for (const key of Object.keys(sanitized)) {
-    const lowerKey = key.toLowerCase();
-    if (sensitiveKeys.some(sk => lowerKey.includes(sk))) {
-      sanitized[key] = '[REDACTED]';
-    } else if (typeof sanitized[key] === 'object' && sanitized[key] !== null) {
-      sanitized[key] = sanitizeParams(sanitized[key]);
-    }
+  if (Array.isArray(params)) {
+    return params.map(item => sanitizeParams(item));
   }
 
-  return sanitized;
+  if (isRecord(params)) {
+    const sanitized: Record<string, unknown> = { ...params };
+
+    for (const key of Object.keys(sanitized)) {
+      const lowerKey = key.toLowerCase();
+      if (sensitiveKeys.some(sk => lowerKey.includes(sk))) {
+        sanitized[key] = '[REDACTED]';
+      } else if (typeof sanitized[key] === 'object' && sanitized[key] !== null) {
+        sanitized[key] = sanitizeParams(sanitized[key]);
+      }
+    }
+
+    return sanitized;
+  }
+
+  return params;
 }

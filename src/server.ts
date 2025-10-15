@@ -7,7 +7,15 @@ import {
   McpError,
 } from '@modelcontextprotocol/sdk/types.js';
 import { getConfig } from './config/index.js';
-import { createLogger } from './utils/logger.js';
+import {
+  createLogger,
+  logApplicationStart,
+  logApplicationShutdown,
+  logMCPServerStarted,
+  logConfigurationLoaded,
+  logToolExecutionStart,
+  logToolExecutionComplete,
+} from './utils/logger.js';
 import { OpenAIClient } from './llm/openai-client.js';
 import { ContextGatherer } from './context/gatherer.js';
 import { FileContextSource } from './context/sources/file.js';
@@ -40,6 +48,15 @@ export class MCPConsultantServer {
     // Load configuration
     this.config = getConfig();
     this.logger = createLogger(this.config);
+
+    // Log configuration loaded
+    logConfigurationLoaded(this.logger);
+    logApplicationStart(this.logger, {
+      name: this.config.server.name,
+      version: this.config.server.version,
+      logLevel: this.config.server.logLevel,
+      transport: this.config.server.transport,
+    });
 
     // Initialize core services
     this.openaiClient = new OpenAIClient(this.config, this.logger);
@@ -153,7 +170,7 @@ export class MCPConsultantServer {
                 },
                 preferredModel: {
                   type: 'string',
-                  enum: ['gpt-5', 'gpt-5-mini', 'gpt-5-nano', 'gpt-5-pro', 'gpt-5-codex'],
+                  enum: ['gpt-5', 'gpt-5-mini', 'gpt-5-nano'],
                   description: 'Preferred GPT-5 model to use',
                 },
               },
@@ -184,7 +201,7 @@ export class MCPConsultantServer {
                 },
                 preferredModel: {
                   type: 'string',
-                  enum: ['gpt-5', 'gpt-5-mini', 'gpt-5-nano', 'gpt-5-pro', 'gpt-5-codex'],
+                  enum: ['gpt-5', 'gpt-5-mini', 'gpt-5-nano'],
                   description: 'Preferred GPT-5 model to use',
                 },
               },
@@ -214,7 +231,7 @@ export class MCPConsultantServer {
                 },
                 preferredModel: {
                   type: 'string',
-                  enum: ['gpt-5', 'gpt-5-mini', 'gpt-5-nano', 'gpt-5-pro', 'gpt-5-codex'],
+                  enum: ['gpt-5', 'gpt-5-mini', 'gpt-5-nano'],
                   description: 'Preferred GPT-5 model to use',
                 },
               },
@@ -249,7 +266,7 @@ export class MCPConsultantServer {
                 },
                 preferredModel: {
                   type: 'string',
-                  enum: ['gpt-5', 'gpt-5-mini', 'gpt-5-nano', 'gpt-5-pro', 'gpt-5-codex'],
+                  enum: ['gpt-5', 'gpt-5-mini', 'gpt-5-nano'],
                   description: 'Preferred GPT-5 model to use',
                 },
               },
@@ -263,35 +280,49 @@ export class MCPConsultantServer {
     // Register tools/call handler
     this.server.setRequestHandler(CallToolRequestSchema, async request => {
       const { name, arguments: args } = request.params;
+      const startTime = Date.now();
 
-      this.logger.info({ tool: name }, 'Tool called');
+      logToolExecutionStart(this.logger, name, args);
 
       try {
+        let result;
+
         switch (name) {
           case 'think-about-plan': {
             const input = ThinkAboutPlanInputSchema.parse(args);
-            return await this.thinkAboutPlanTool.execute(input);
+            result = await this.thinkAboutPlanTool.execute(input);
+            break;
           }
 
           case 'suggest-alternative': {
             const input = SuggestAlternativeInputSchema.parse(args);
-            return await this.suggestAlternativeTool.execute(input);
+            result = await this.suggestAlternativeTool.execute(input);
+            break;
           }
 
           case 'improve-copy': {
             const input = ImproveCopyInputSchema.parse(args);
-            return await this.improveCopyTool.execute(input);
+            result = await this.improveCopyTool.execute(input);
+            break;
           }
 
           case 'solve-problem': {
             const input = SolveProblemInputSchema.parse(args);
-            return await this.solveProblemTool.execute(input);
+            result = await this.solveProblemTool.execute(input);
+            break;
           }
 
           default:
             throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
         }
+
+        const duration = Date.now() - startTime;
+        logToolExecutionComplete(this.logger, name, duration, true);
+        return result;
       } catch (error) {
+        const duration = Date.now() - startTime;
+        logToolExecutionComplete(this.logger, name, duration, false);
+
         if (error instanceof McpError) {
           throw error;
         }
@@ -327,7 +358,7 @@ export class MCPConsultantServer {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
 
-    this.logger.info('MCP server started with stdio transport');
+    logMCPServerStarted(this.logger, 'stdio');
   }
 
   /**
@@ -346,7 +377,7 @@ export class MCPConsultantServer {
    * Graceful shutdown
    */
   private async shutdown(signal: string): Promise<void> {
-    this.logger.info({ signal }, 'Shutting down gracefully');
+    logApplicationShutdown(this.logger, signal);
 
     try {
       await this.server.close();
