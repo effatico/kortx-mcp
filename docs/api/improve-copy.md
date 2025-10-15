@@ -1,82 +1,152 @@
-# improve-copy API Documentation
+# improve-copy
 
-Improve text, documentation, or user-facing messages for clarity, conciseness, tone, and accessibility.
-
----
-
-## Overview
-
-The `improve-copy` tool enhances written content including error messages, documentation, user interface text, API responses, and marketing copy. It focuses on clarity, conciseness, appropriate tone, proper structure, and accessibility.
-
-**Use this tool when:**
-
-- Writing user-facing error messages
-- Drafting documentation
-- Creating UI copy
-- Improving README files
-- Refining API responses
-- Writing release notes
+Enhance written content for clarity, conciseness, appropriate tone, and accessibility. Works with error messages, documentation, UI text, API responses, and marketing copy.
 
 ---
 
-## API Signature
+## Quick Start
 
-```typescript
-tool("improve-copy", {
-  text: string;           // The text to improve
-  context?: string;       // Where this text will be used (optional)
-  target_audience?: string; // Who will read this (optional)
-})
+Improve any text in seconds:
+
+```json
+{
+  "originalText": "Error 500: Internal server error occurred. Contact administrator.",
+  "purpose": "User-facing error message",
+  "targetAudience": "Non-technical business users"
+}
 ```
 
----
-
-## Parameters
-
-### `text` (required)
-
-The text you want to improve.
-
-- **Type**: String
-- **Required**: Yes
-
-### `context` (optional)
-
-Where this text will be used (error message, README, API docs, etc.).
-
-- **Type**: String
-- **Required**: No
-
-### `target_audience` (optional)
-
-Who will read this text (developers, end users, executives, etc.).
-
-- **Type**: String
-- **Required**: No
+The tool returns improved text with explanations of changes and reasoning.
 
 ---
 
-## Response Format
+## How to Use
 
-Returns:
+Choose your depth based on your needs:
 
-1. **Improved Version**: The enhanced text
-2. **Explanation**: What was changed and why
-3. **Reasoning**: Principles applied (clarity, tone, accessibility)
+<details open>
+<summary><strong>Minimal</strong> - Quick polish (30 seconds)</summary>
+
+**When to use**: You have decent text and need quick improvements.
+
+**Example**:
+
+```json
+{
+  "originalText": "This tool does stuff with files. It's fast and works good."
+}
+```
+
+**What you get**: Improved version with key changes highlighted.
+
+</details>
+
+<details>
+<summary><strong>Standard</strong> - Comprehensive improvement (recommended)</summary>
+
+**When to use**: Important user-facing content that needs to be polished.
+
+**Example**:
+
+```json
+{
+  "originalText": "Authentication failed. Try again or contact support.",
+  "purpose": "Error message in SaaS application",
+  "targetAudience": "Business users"
+}
+```
+
+**What you get**:
+
+- Improved version with better tone and clarity
+- Detailed explanation of what was changed
+- Reasoning based on best practices (clarity, empathy, actionability)
+- Alternative versions for different contexts
+
+</details>
+
+<details>
+<summary><strong>Advanced</strong> - Strategic content optimization</summary>
+
+**When to use**: Critical content like product launches, legal notices, or high-stakes communication.
+
+**Example**:
+
+```json
+{
+  "originalText": "Our new API is available. It has better performance and new features. Check the docs.",
+  "purpose": "Product launch announcement email",
+  "targetAudience": "Existing API customers (developers and CTOs)"
+}
+```
+
+**What you get**:
+
+- Multiple polished versions for different tones (professional, enthusiastic, technical)
+- Comprehensive analysis of tone, structure, and messaging
+- Specific improvements for target audience
+- SEO and accessibility considerations
+- Call-to-action optimization
+
+</details>
 
 ---
 
-## Example Usage
+<details>
+<summary><strong>API Reference</strong></summary>
 
-### Example 1: Error Message
+### Parameters
+
+| Parameter        | Type   | Required | Description                                                            |
+| ---------------- | ------ | -------- | ---------------------------------------------------------------------- |
+| `originalText`   | string | Yes      | The text to improve                                                    |
+| `purpose`        | string | No       | Where this text will be used (error message, README, etc.)             |
+| `targetAudience` | string | No       | Who will read this (developers, users, executives)                     |
+| `preferredModel` | enum   | No       | GPT model: `gpt-5`, `gpt-5-mini`, `gpt-5-nano` (default: `gpt-5-mini`) |
+
+### Response Structure
+
+The tool returns:
+
+1. **Improved Version** - The enhanced text
+2. **Key Changes** - What was modified and why
+3. **Reasoning** - Principles applied (clarity, tone, accessibility)
+4. **Alternative Versions** (if applicable)
+
+</details>
+
+## Common Use Cases
+
+### Error Messages
+
+Make error messages helpful, empathetic, and actionable for users.
+
+### Documentation
+
+Transform technical documentation into clear, accessible content.
+
+### UI Copy
+
+Polish button labels, form text, tooltips, and help text.
+
+### Marketing Content
+
+Refine feature descriptions, landing pages, and announcements.
+
+---
+
+## Example: Error Message
+
+<details>
+<summary>View full example</summary>
 
 **Input:**
 
 ```json
 {
-  "text": "Error 500: Internal server error occurred. Contact administrator.",
-  "context": "User-facing error message in SaaS application",
-  "target_audience": "Non-technical business users"
+  "originalText": "Error 500: Internal server error occurred. Contact administrator.",
+  "purpose": "User-facing error message in SaaS application",
+  "targetAudience": "Non-technical business users"
 }
 ```
 
@@ -113,17 +183,22 @@ Our team has been notified and is working to fix it.
 - **Professionalism**: Maintains trust while acknowledging error
 ```
 
+</details>
+
 ---
 
-### Example 2: README Section
+## Example: README Section
+
+<details>
+<summary>View full example</summary>
 
 **Input:**
 
 ```json
 {
-  "text": "This tool does stuff with files. It's fast and works good.",
-  "context": "README introduction",
-  "target_audience": "Developers evaluating the tool"
+  "originalText": "This tool does stuff with files. It's fast and works good.",
+  "purpose": "README introduction",
+  "targetAudience": "Developers evaluating the tool"
 }
 ```
 
@@ -153,11 +228,16 @@ Process thousands of files in seconds with an intuitive API and zero configurati
 - **Credibility**: Concrete claims ("thousands of files in seconds")
 ```
 
+</details>
+
 ---
 
 ## Best Practices
 
-### 1. Provide Context
+<details>
+<summary><strong>How to Get Better Results</strong></summary>
+
+### Provide Context
 
 Helps tailor tone and style appropriately:
 
@@ -182,54 +262,28 @@ If the text has specific requirements:
 
 ```json
 {
-  "context": "Must maintain professional tone, max 100 characters"
+  "purpose": "Must maintain professional tone, max 100 characters"
 }
 ```
 
----
-
-## Common Use Cases
-
-### Error Messages
-
-- API error responses
-- Validation errors
-- System failures
-- User mistakes
-
-### Documentation
-
-- README files
-- API documentation
-- User guides
-- Inline comments
-
-### UI Copy
-
-- Button labels
-- Form labels
-- Help text
-- Tooltips
-
-### Marketing
-
-- Feature descriptions
-- Landing page copy
-- Release announcements
+</details>
 
 ---
 
 ## Related Tools
 
-- **think-about-plan**: Get feedback on documentation structure
-- **solve-problem**: Debug unclear or confusing content
+- **[think-about-plan](./think-about-plan.md)** - Get feedback on documentation structure
+- **[suggest-alternative](./suggest-alternative.md)** - Explore different messaging approaches
+- **[solve-problem](./solve-problem.md)** - Debug unclear or confusing content
 
 ---
 
 ## Next Steps
 
-- 📖 [Full API Documentation](./README.md)
-- 🎯 [Example Workflows](../../examples/)
+- 📖 [think-about-plan](./think-about-plan.md) - Plan strategic implementations
+- 📖 [suggest-alternative](./suggest-alternative.md) - Explore alternatives
+- 📖 [solve-problem](./solve-problem.md) - Debug and troubleshoot
+- 🔧 [Configuration Guide](../configuration.md) - Customize behavior
 
 ---
 

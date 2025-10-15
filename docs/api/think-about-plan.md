@@ -1,129 +1,176 @@
-# think-about-plan API Documentation
+# think-about-plan
 
-Get strategic feedback on plans and approaches before implementation.
-
----
-
-## Overview
-
-The `think-about-plan` tool provides expert consultation on your implementation plans, architectural decisions, and project strategies. It analyzes clarity, feasibility, identifies risks and dependencies, and suggests alternatives.
-
-**Use this tool when:**
-
-- Planning a new feature or system
-- Making architectural decisions
-- Designing complex workflows
-- Evaluating implementation approaches
-- Seeking strategic guidance
+Get strategic feedback on plans and approaches before implementation. Analyzes clarity, feasibility, risks, dependencies, and suggests alternatives to help you make better architectural decisions.
 
 ---
 
-## API Signature
+## Quick Start
+
+Get feedback on your implementation plan in seconds:
 
 ```typescript
-tool("think-about-plan", {
-  plan: string;  // The plan or approach to evaluate
-})
+// Minimal example - paste and go
+{
+  "plan": "Migrate our REST API to GraphQL for better mobile performance. Current: 100k users, Node.js/Express, React Native app."
+}
 ```
 
----
-
-## Parameters
-
-### `plan` (required)
-
-A description of the plan, approach, or strategy you want feedback on.
-
-- **Type**: String
-- **Required**: Yes
-- **Format**: Free-form text
-- **Recommended length**: 50-500 words
-
-**What to include:**
-
-- **Context**: Current state, constraints, requirements
-- **Objective**: What you're trying to achieve
-- **Approach**: Your proposed solution or plan
-- **Timeline**: When you plan to implement (if relevant)
-- **Resources**: Team size, budget, infrastructure (if relevant)
+The tool returns a structured analysis covering clarity, feasibility, risks, dependencies, recommendations, and alternative approaches.
 
 ---
 
-## Response Format
+## How to Use
 
-The tool returns a structured analysis with the following sections:
+Choose your depth based on your needs:
 
-### 1. Clarity Assessment
+<details open>
+<summary><strong>Minimal</strong> - Quick validation (30 seconds)</summary>
 
-Evaluates how well-defined your plan is.
+**When to use**: You have a clear plan and need quick validation or risk identification.
 
-- Clear objectives
-- Specific steps
-- Missing details or ambiguities
+**Example**:
 
-### 2. Feasibility Analysis
+```json
+{
+  "plan": "Add Redis caching to reduce database load. Current: 5k req/min, PostgreSQL, 200ms average response time."
+}
+```
 
-Assesses whether the plan is realistic.
+**What you get**: Fast analysis of main risks and quick recommendations.
 
-- Technical feasibility
-- Resource requirements
-- Timeline assessment
-- Complexity evaluation
+</details>
 
-### 3. Risk Evaluation
+<details>
+<summary><strong>Standard</strong> - Comprehensive feedback (recommended)</summary>
 
-Identifies potential problems and challenges.
+**When to use**: Planning a significant change and need thorough analysis before committing.
 
-- Technical risks
-- Integration risks
-- Performance risks
-- Security risks
-- Operational risks
+**Example**:
 
-### 4. Dependencies Identification
+```json
+{
+  "plan": "Refactor authentication to OAuth 2.0 with JWT tokens. Current: session cookies, 50k users, Node.js/React stack. Timeline: 2 months, team of 3. Need backward compatibility during migration.",
+  "context": "Concerned about breaking existing sessions and token storage security",
+  "goals": ["Zero downtime migration", "Improved API security", "Better mobile support"]
+}
+```
 
-Lists prerequisites and related systems.
+**What you get**:
 
-- Technical dependencies
-- Team dependencies
-- Infrastructure requirements
-- External dependencies
+- Detailed clarity assessment identifying ambiguities
+- Realistic feasibility analysis with timeline validation
+- Comprehensive risk evaluation (technical, security, operational)
+- Full dependency mapping
+- Prioritized recommendations with phased migration plan
+- Multiple alternative approaches with trade-offs
 
-### 5. Recommendations
+</details>
 
-Provides actionable advice for improvement.
+<details>
+<summary><strong>Advanced</strong> - Strategic planning</summary>
 
-- Priority improvements
-- Risk mitigation strategies
-- Optimization opportunities
-- Best practices
+**When to use**: Complex multi-system changes, migrations, or architectural decisions with significant business impact.
 
-### 6. Alternative Approaches
+**Example**:
 
-Suggests different ways to achieve the same goal.
+```json
+{
+  "plan": "Migrate 200k LOC monolithic e-commerce platform to microservices. Current: Python monolith, 100k daily users, 500 req/sec peak. Target: 5-7 services (auth, products, orders, payments, shipping). Timeline: 6 months, team: 8 developers, budget: $50k infrastructure.",
+  "context": "Platform stability is critical - can't afford extended downtime. Team has mixed experience with microservices.",
+  "goals": ["Better scalability", "Independent deployment", "Team autonomy"],
+  "constraints": [
+    "24/7 uptime requirement",
+    "PCI compliance for payments",
+    "Limited DevOps expertise"
+  ]
+}
+```
 
-- Simpler alternatives
-- More robust alternatives
-- Faster alternatives
-- Cost-effective alternatives
+**What you get**:
+
+- Strategic assessment of approach viability
+- Detailed risk matrix with mitigation strategies
+- Infrastructure dependency planning
+- Phased implementation roadmap
+- Cost-benefit analysis
+- Multiple architectural alternatives (modular monolith, hybrid, serverless)
+- Operational readiness requirements
+
+</details>
 
 ---
 
-## Example Usage
+<details>
+<summary><strong>API Reference</strong></summary>
 
-### Example 1: Authentication System Refactor
+### Parameters
+
+| Parameter        | Type     | Required | Description                                                                   |
+| ---------------- | -------- | -------- | ----------------------------------------------------------------------------- |
+| `plan`           | string   | Yes      | Your implementation plan or approach (50-500 words recommended)               |
+| `context`        | string   | No       | Additional context, constraints, or concerns                                  |
+| `goals`          | string[] | No       | What you're trying to achieve                                                 |
+| `constraints`    | string[] | No       | Limitations (budget, time, team, technology)                                  |
+| `preferredModel` | enum     | No       | GPT model to use: `gpt-5`, `gpt-5-mini`, `gpt-5-nano` (default: `gpt-5-mini`) |
+
+### Response Structure
+
+The tool returns a structured analysis with six sections:
+
+1. **Clarity Assessment** - How well-defined is your plan?
+2. **Feasibility Analysis** - Is it realistic given your constraints?
+3. **Risk Evaluation** - What could go wrong?
+4. **Dependencies Identification** - What do you need in place?
+5. **Recommendations** - How to improve your plan
+6. **Alternative Approaches** - Different ways to achieve the goal
+
+</details>
+
+## Common Use Cases
+
+### Architecture Planning
+
+Get feedback on system design decisions before writing code. Validates your approach and identifies potential issues early.
+
+### Technology Selection
+
+Evaluate whether a technology choice fits your requirements. Understand trade-offs before committing to a stack.
+
+### Migration Strategy
+
+Plan complex migrations with risk assessment and phased approaches. Avoid common migration pitfalls.
+
+### Scaling Approach
+
+Design scaling solutions that actually work for your traffic patterns and constraints.
+
+---
+
+## Task Playbooks
+
+Jump to common scenarios:
+
+- [Refactor Authentication System](#example-authentication-system-refactor)
+- [Migrate to Microservices](#example-microservices-migration)
+- [Add Caching Layer](#quick-start)
+- [Technology Migration](#migration-strategy)
+
+---
+
+## Example: Authentication System Refactor
+
+<details>
+<summary>View full example with analysis</summary>
 
 **Input:**
 
-```
-I'm planning to refactor our authentication system to use OAuth 2.0
-with JWT tokens and refresh token rotation. Currently using session
-cookies. We have 50k users, Node.js backend, React frontend.
-Timeline: 2 months, team of 3 developers. Need to maintain backward
-compatibility during migration.
+```json
+{
+  "plan": "Refactor authentication to OAuth 2.0 with JWT tokens and refresh token rotation. Currently using session cookies. 50k users, Node.js backend, React frontend. Timeline: 2 months, team of 3 developers. Need backward compatibility during migration."
+}
 ```
 
-**Response:**
+**Response Summary:**
 
 ```markdown
 ## Clarity Assessment
@@ -196,20 +243,24 @@ compatibility during migration.
    - Trade-off: Longer migration period
 ```
 
+</details>
+
 ---
 
-### Example 2: Microservices Migration
+## Example: Microservices Migration
+
+<details>
+<summary>View full example with analysis</summary>
 
 **Input:**
 
-```
-Planning to migrate monolithic e-commerce platform to microservices.
-Current: 200k LOC Python monolith, 100k daily users, 500 req/sec peak.
-Target: 5-7 microservices (auth, products, orders, payments, shipping).
-Timeline: 6 months. Team: 8 developers. Budget: $50k infrastructure.
+```json
+{
+  "plan": "Migrate monolithic e-commerce platform to microservices. Current: 200k LOC Python monolith, 100k daily users, 500 req/sec peak. Target: 5-7 microservices (auth, products, orders, payments, shipping). Timeline: 6 months. Team: 8 developers. Budget: $50k infrastructure."
+}
 ```
 
-**Response:**
+**Response Summary:**
 
 ```markdown
 ## Clarity Assessment
@@ -287,11 +338,16 @@ Timeline: 6 months. Team: 8 developers. Budget: $50k infrastructure.
    - Trade-off: Vendor lock-in, cold starts
 ```
 
+</details>
+
 ---
 
 ## Best Practices
 
-### 1. Provide Sufficient Context
+<details>
+<summary><strong>How to Write Effective Plans</strong></summary>
+
+### Provide Sufficient Context
 
 **Good:**
 
@@ -333,94 +389,57 @@ existing K8s infrastructure.
 
 ---
 
-### 4. Ask Focused Questions
+### Ask Focused Questions
 
-Instead of open-ended "what should I do", frame as "here's my plan, what do you think":
+Frame your plan clearly rather than asking open-ended questions.
 
-**Good:**
+**Good**: "I'm planning to implement rate limiting using Redis sorted sets with a sliding window algorithm. What do you think?"
 
-```
-I'm planning to implement rate limiting using Redis sorted sets
-with a sliding window algorithm. What do you think?
-```
+**Bad**: "How should I implement rate limiting?"
 
-**Bad:**
-
-```
-How should I implement rate limiting?
-```
+</details>
 
 ---
 
-## Common Use Cases
+## Integration with AI Assistants
 
-### Architecture Planning
-
-```
-I'm designing a real-time notification system using WebSockets.
-Expected: 50k concurrent connections, 100 msg/sec/user on average.
-Plan: Node.js with Socket.io, Redis pub/sub for scaling across servers,
-PostgreSQL for persistence. What do you think?
-```
-
-### Technology Selection
+<details>
+<summary><strong>Claude Code</strong></summary>
 
 ```
-I'm evaluating GraphQL vs REST for our new API. Requirements:
-- Mobile and web clients
-- Complex nested data structures
-- Real-time updates needed
-- Team has React experience but no GraphQL
-My plan is to use GraphQL with Apollo Server. Thoughts?
-```
-
-### Migration Strategy
-
-```
-Planning to migrate from MySQL to PostgreSQL for better JSON support.
-Current: 500GB database, 24/7 uptime requirement, 10k writes/sec.
-Plan: Use logical replication, gradual cutover with read replicas.
-Timeline: 1 month. What do you think?
-```
-
-### Scaling Approach
-
-```
-Our API is hitting performance limits at 5k req/sec. Plan: Add
-horizontal scaling with load balancer, Redis caching, database
-read replicas. Current: 2 API servers, 1 DB server, no caching.
-Target: 20k req/sec. Thoughts?
-```
-
----
-
-## Integration Examples
-
-### Claude Code
-
-```
-Can you use the consultant to think about my plan to implement
+Can you use llm-consultants to think about my plan to implement
 event sourcing for our order management system?
 ```
 
-### Copliot
+</details>
+
+<details>
+<summary><strong>Copilot</strong></summary>
 
 ```
-@mcp:consultant think-about-plan
+@mcp:llm-consultants think-about-plan
 I'm planning to implement event sourcing...
 ```
 
-### Cursor
+</details>
+
+<details>
+<summary><strong>Cursor</strong></summary>
 
 ```
-@mcp:consultant I'm planning to migrate our REST API to GraphQL...
+@mcp:llm-consultants I'm planning to migrate our REST API to GraphQL...
 ```
+
+</details>
 
 ---
 
-## Response Interpretation
+## Understanding Responses
 
-### Clarity Assessment
+<details>
+<summary><strong>How to interpret the analysis</strong></summary>
+
+### Clarity Indicators
 
 - **✓ Well-defined**: Your plan is clear on this aspect
 - **⚠ Ambiguous**: Needs more detail or clarification
@@ -432,39 +451,30 @@ I'm planning to implement event sourcing...
 - **🟡 MEDIUM**: Important but manageable with proper planning
 - **🟢 LOW**: Minor concern, easy to address
 
-### Recommendations Priority
+### Recommendation Priority
 
 1. **Critical**: Must address before proceeding
 2. **Important**: Should address for better outcomes
 3. **Optional**: Nice to have, consider if time permits
 
----
-
-## Tips for Better Results
-
-1. **Write detailed plans**: More context = better feedback
-2. **Include metrics**: Quantify your requirements and constraints
-3. **State assumptions explicitly**: What are you taking for granted?
-4. **Mention tried approaches**: What have you already considered?
-5. **Be honest about limitations**: Team experience, budget, time
-6. **Ask about specific concerns**: "Particularly worried about X"
+</details>
 
 ---
 
 ## Related Tools
 
-- **suggest-alternative**: Get alternative approaches to your plan
-- **solve-problem**: Debug issues with current implementation
-- **improve-copy**: Refine documentation or user-facing text
+- **[suggest-alternative](./suggest-alternative.md)** - Get alternative approaches to your plan
+- **[solve-problem](./solve-problem.md)** - Debug issues with current implementation
+- **[improve-copy](./improve-copy.md)** - Refine documentation or user-facing text
 
 ---
 
 ## Next Steps
 
-- 📖 [suggest-alternative documentation](./suggest-alternative.md)
-- 📖 [solve-problem documentation](./solve-problem.md)
-- 🎯 [Example Workflows](../../examples/)
-- 🔧 [Configuration Guide](../configuration.md)
+- 📖 [suggest-alternative](./suggest-alternative.md) - Explore alternative approaches
+- 📖 [solve-problem](./solve-problem.md) - Debug and troubleshoot issues
+- 📖 [improve-copy](./improve-copy.md) - Enhance documentation and messaging
+- 🔧 [Configuration Guide](../configuration.md) - Customize behavior and models
 
 ---
 
@@ -472,4 +482,3 @@ I'm planning to implement event sourcing...
 
 - 💬 [GitHub Discussions](https://github.com/amsv01/llm-consultants/discussions)
 - 🐛 [Report an Issue](https://github.com/amsv01/llm-consultants/issues)
-- 📧 [Email Support](mailto:amin@effati.se)
