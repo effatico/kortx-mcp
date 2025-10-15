@@ -170,7 +170,7 @@ export class MCPConsultantServer {
                 },
                 preferredModel: {
                   type: 'string',
-                  enum: ['gpt-5', 'gpt-5-mini', 'gpt-5-nano', 'gpt-5-pro', 'gpt-5-codex'],
+                  enum: ['gpt-5', 'gpt-5-mini', 'gpt-5-nano'],
                   description: 'Preferred GPT-5 model to use',
                 },
               },
@@ -201,7 +201,7 @@ export class MCPConsultantServer {
                 },
                 preferredModel: {
                   type: 'string',
-                  enum: ['gpt-5', 'gpt-5-mini', 'gpt-5-nano', 'gpt-5-pro', 'gpt-5-codex'],
+                  enum: ['gpt-5', 'gpt-5-mini', 'gpt-5-nano'],
                   description: 'Preferred GPT-5 model to use',
                 },
               },
@@ -231,7 +231,7 @@ export class MCPConsultantServer {
                 },
                 preferredModel: {
                   type: 'string',
-                  enum: ['gpt-5', 'gpt-5-mini', 'gpt-5-nano', 'gpt-5-pro', 'gpt-5-codex'],
+                  enum: ['gpt-5', 'gpt-5-mini', 'gpt-5-nano'],
                   description: 'Preferred GPT-5 model to use',
                 },
               },
@@ -266,7 +266,7 @@ export class MCPConsultantServer {
                 },
                 preferredModel: {
                   type: 'string',
-                  enum: ['gpt-5', 'gpt-5-mini', 'gpt-5-nano', 'gpt-5-pro', 'gpt-5-codex'],
+                  enum: ['gpt-5', 'gpt-5-mini', 'gpt-5-nano'],
                   description: 'Preferred GPT-5 model to use',
                 },
               },
