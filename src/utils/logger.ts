@@ -1,36 +1,57 @@
 import { pino, type Logger as PinoLogger } from 'pino';
+import { createWriteStream } from 'fs';
+import { join } from 'path';
 import type { Config } from '../config/index.js';
 
 export type Logger = PinoLogger;
 
 export function createLogger(config: Config): Logger {
-  return pino({
-    level: config.server.logLevel,
-    transport:
-      process.env.NODE_ENV === 'development'
-        ? {
-            target: 'pino-pretty',
-            options: {
-              colorize: true,
-              translateTime: 'HH:MM:ss Z',
-              ignore: 'pid,hostname',
-            },
-          }
-        : undefined,
-    formatters: {
-      level: (label: string) => {
-        return { level: label };
+  // When using stdio transport for MCP, we must log to a file
+  // to avoid interfering with the MCP protocol's JSON-RPC over stdio
+  const isStdioTransport = config.server.transport === 'stdio';
+
+  // In production with stdio, log to file. Otherwise use stdout with pino-pretty in dev
+  const destination = isStdioTransport
+    ? createWriteStream(join(process.cwd(), 'mcp-consultant.log'), { flags: 'a' })
+    : undefined;
+
+  return pino(
+    {
+      level: config.server.logLevel,
+      transport:
+        !isStdioTransport && process.env.NODE_ENV === 'development'
+          ? {
+              target: 'pino-pretty',
+              options: {
+                colorize: true,
+                translateTime: 'HH:MM:ss Z',
+                ignore: 'pid,hostname',
+              },
+            }
+          : undefined,
+      formatters: {
+        level: (label: string) => {
+          return { level: label };
+        },
+      },
+      base: {
+        service: config.server.name,
+        version: config.server.version,
+      },
+      redact: {
+        paths: [
+          '*.apiKey',
+          '*.token',
+          '*.password',
+          '*.secret',
+          '*.authorization',
+          'openai.apiKey',
+        ],
+        censor: '[REDACTED]',
       },
     },
-    base: {
-      service: config.server.name,
-      version: config.server.version,
-    },
-    redact: {
-      paths: ['*.apiKey', '*.token', '*.password', '*.secret', '*.authorization', 'openai.apiKey'],
-      censor: '[REDACTED]',
-    },
-  });
+    destination
+  );
 }
 
 // Logging utility functions
