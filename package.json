@@ -50,7 +50,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "engines": {
-    "node": ">=22.18.0"
+    "node": ">=22.12.0"
   },
   "scripts": {
     "build": "tsc && chmod +x build/index.js",
