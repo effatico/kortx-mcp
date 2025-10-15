@@ -174,6 +174,11 @@ export function logToolExecutionComplete(
   );
 }
 
+// Type guard to check if value is a record
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 // Sanitize sensitive data from logs
 function sanitizeParams(params: unknown): unknown {
   if (typeof params !== 'object' || params === null) {
@@ -181,17 +186,25 @@ function sanitizeParams(params: unknown): unknown {
   }
 
   const sensitiveKeys = ['apikey', 'token', 'password', 'secret', 'authorization', 'api_key'];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sanitized: any = Array.isArray(params) ? [...params] : { ...params };
 
-  for (const key of Object.keys(sanitized)) {
-    const lowerKey = key.toLowerCase();
-    if (sensitiveKeys.some(sk => lowerKey.includes(sk))) {
-      sanitized[key] = '[REDACTED]';
-    } else if (typeof sanitized[key] === 'object' && sanitized[key] !== null) {
-      sanitized[key] = sanitizeParams(sanitized[key]);
-    }
+  if (Array.isArray(params)) {
+    return params.map(item => sanitizeParams(item));
   }
 
-  return sanitized;
+  if (isRecord(params)) {
+    const sanitized: Record<string, unknown> = { ...params };
+
+    for (const key of Object.keys(sanitized)) {
+      const lowerKey = key.toLowerCase();
+      if (sensitiveKeys.some(sk => lowerKey.includes(sk))) {
+        sanitized[key] = '[REDACTED]';
+      } else if (typeof sanitized[key] === 'object' && sanitized[key] !== null) {
+        sanitized[key] = sanitizeParams(sanitized[key]);
+      }
+    }
+
+    return sanitized;
+  }
+
+  return params;
 }
