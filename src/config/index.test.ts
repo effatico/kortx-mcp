@@ -38,7 +38,7 @@ describe('Configuration Management', () => {
       expect(config.openai.model).toBe('gpt-5-mini');
       expect(config.openai.reasoningEffort).toBe('minimal');
       expect(config.openai.maxTokens).toBe(1024);
-      expect(config.server.name).toBe('mcp-consultant');
+      expect(config.server.name).toBe('llm-consultants');
       expect(config.server.version).toBe('0.1.0');
       expect(config.server.port).toBe(3000);
       expect(config.server.transport).toBe('stdio');

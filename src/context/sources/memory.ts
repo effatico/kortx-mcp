@@ -16,7 +16,7 @@ export class MemoryContextSource implements ContextSource {
   private available: boolean | undefined;
   private projectContext: string;
 
-  constructor(logger: Logger, projectContext: string = 'mcp-consultant') {
+  constructor(logger: Logger, projectContext: string = 'llm-consultants') {
     this.logger = logger.child({ contextSource: 'memory' });
     this.projectContext = projectContext;
   }
