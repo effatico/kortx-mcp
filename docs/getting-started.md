@@ -6,7 +6,7 @@ This guide will walk you through setting up MCP Consultant and integrating it wi
 
 Before you begin, ensure you have:
 
-- **Node.js >= 22.20.0** - Download from [nodejs.org](https://nodejs.org)
+- **Node.js >= 22.12.0** - Download from [nodejs.org](https://nodejs.org)
 - **npm >= 9.0.0** - Comes with Node.js
 - **OpenAI API Key** - Get one from [platform.openai.com](https://platform.openai.com/api-keys)
 - **AI Assistant** - Claude Code, Copliot, VS Code with MCP extension, or Cursor
