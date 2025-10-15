@@ -19,7 +19,7 @@ AI researchers, tool builders, and platform engineers who want to enhance AI ass
 
 ## Features
 
-- **Multi-model support**: GPT-5, GPT-5-mini, and GPT-5-nano with configurable reasoning effort.
+- **Multi-model support**: GPT-5, GPT-5-mini, GPT-5-nano, and GPT-5-codex with configurable reasoning effort.
 - **Smart context gathering**: Integrates automatically with Serena, graph-memory, and cclsp MCPs to surface relevant code and metadata.
 - **Specialized tools**: Four purpose-built tools for strategic planning, alternative solutions, copy improvement, and problem solving.
 - **Docker-ready**: Containerized deployment with secure defaults.
@@ -162,7 +162,7 @@ Create a `.env` file or set environment variables:
 OPENAI_API_KEY=sk-your-api-key-here
 
 # Optional - Model Selection
-OPENAI_MODEL=gpt-5-mini              # gpt-5, gpt-5-mini, gpt-5-nano
+OPENAI_MODEL=gpt-5-mini              # gpt-5, gpt-5-mini, gpt-5-nano, gpt-5-codex
 OPENAI_REASONING_EFFORT=minimal      # minimal, low, medium, high
 OPENAI_VERBOSITY=low                 # low, medium, high
 OPENAI_MAX_TOKENS=1024               # Output token limit
@@ -183,6 +183,7 @@ MAX_CONTEXT_TOKENS=32000             # Context limit
 - **gpt-5**: Best for complex reasoning, broad world knowledge, multi-step tasks
 - **gpt-5-mini** (default): Cost-optimized, balanced speed/capability
 - **gpt-5-nano**: High-throughput, simple tasks
+- **gpt-5-codex**: Optimized for code generation, refactoring, debugging, and code explanations
 
 ### Reasoning Effort Guide
 
