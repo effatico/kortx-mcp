@@ -1,0 +1,184 @@
+import type { Config } from '../config/index.js';
+import type { Logger } from '../utils/logger.js';
+import { OpenAIClient } from '../llm/openai-client.js';
+import { ContextGatherer } from '../context/gatherer.js';
+import type { LLMRequest } from '../llm/types.js';
+import type { ConsultationResult } from './types.js';
+
+/**
+ * Base tool helper for consultation tools
+ * Handles context gathering, prompt building, and LLM invocation
+ */
+export class BaseTool {
+  protected config: Config;
+  protected logger: Logger;
+  protected openaiClient: OpenAIClient;
+  protected contextGatherer: ContextGatherer;
+
+  constructor(
+    config: Config,
+    logger: Logger,
+    openaiClient: OpenAIClient,
+    contextGatherer: ContextGatherer
+  ) {
+    this.config = config;
+    this.logger = logger.child({ component: 'base-tool' });
+    this.openaiClient = openaiClient;
+    this.contextGatherer = contextGatherer;
+  }
+
+  /**
+   * Execute a consultation with context gathering
+   */
+  protected async executeConsultation(
+    query: string,
+    systemPrompt: string,
+    options: {
+      gatherContext?: boolean;
+      preferredModel?: string;
+      additionalContext?: string;
+    } = {}
+  ): Promise<ConsultationResult> {
+    const model = options.preferredModel || this.config.openai.model;
+
+    this.logger.info({ query, model }, 'Starting consultation');
+
+    // Gather context if enabled
+    let contextText = '';
+    let contextSources: string[] = [];
+
+    if (options.gatherContext !== false) {
+      try {
+        const context = await this.contextGatherer.gatherContext(query);
+        contextText = ContextGatherer.formatContextForLLM(context);
+        contextSources = context.sourcesUsed;
+
+        this.logger.debug(
+          { contextSources, contextTokens: context.totalTokens },
+          'Context gathered'
+        );
+      } catch (error) {
+        this.logger.warn({ error }, 'Failed to gather context, proceeding without it');
+      }
+    }
+
+    // Build prompt
+    const userPrompt = this.buildUserPrompt(query, contextText, options.additionalContext);
+
+    // Call OpenAI
+    const request: LLMRequest = {
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      model,
+    };
+
+    const response = await this.openaiClient.chat(request);
+
+    // Calculate cost (approximate based on GPT-5 pricing)
+    const cost = this.calculateCost(response.tokensUsed, model);
+
+    this.logger.info(
+      {
+        model: response.model,
+        tokensUsed: response.tokensUsed.total,
+        cost,
+      },
+      'Consultation complete'
+    );
+
+    return {
+      response: response.content,
+      model: response.model,
+      tokensUsed: response.tokensUsed,
+      contextSources,
+      cost,
+    };
+  }
+
+  /**
+   * Build user prompt with context
+   */
+  private buildUserPrompt(query: string, contextText: string, additionalContext?: string): string {
+    const parts: string[] = [];
+
+    if (contextText) {
+      parts.push('# Relevant Context\n\n' + contextText);
+      parts.push('\n---\n');
+    }
+
+    if (additionalContext) {
+      parts.push('# Additional Context\n\n' + additionalContext);
+      parts.push('\n---\n');
+    }
+
+    parts.push('# Query\n\n' + query);
+
+    return parts.join('\n');
+  }
+
+  /**
+   * Calculate approximate cost based on token usage
+   * Rates as of 2025 (placeholder - update with actual rates)
+   */
+  private calculateCost(
+    tokensUsed: {
+      prompt: number;
+      completion: number;
+      total: number;
+      reasoning?: number;
+    },
+    model: string
+  ): number {
+    // Placeholder pricing (per 1M tokens)
+    const pricing: Record<string, { input: number; output: number; reasoning?: number }> = {
+      'gpt-5': { input: 2.5, output: 10.0, reasoning: 5.0 },
+      'gpt-5-mini': { input: 0.15, output: 0.6 },
+      'gpt-5-nano': { input: 0.08, output: 0.3 },
+      'gpt-5-pro': { input: 5.0, output: 15.0, reasoning: 10.0 },
+      'gpt-5-codex': { input: 3.0, output: 12.0, reasoning: 6.0 },
+    };
+
+    const rates = pricing[model] || pricing['gpt-5'];
+
+    const inputCost = (tokensUsed.prompt / 1_000_000) * rates.input;
+    const outputCost = (tokensUsed.completion / 1_000_000) * rates.output;
+    const reasoningCost = tokensUsed.reasoning
+      ? (tokensUsed.reasoning / 1_000_000) * (rates.reasoning || rates.input)
+      : 0;
+
+    return inputCost + outputCost + reasoningCost;
+  }
+
+  /**
+   * Format consultation result as MCP tool response
+   */
+  protected formatToolResponse(
+    result: ConsultationResult,
+    additionalInfo?: Record<string, unknown>
+  ) {
+    const responseText = [
+      result.response,
+      '\n---',
+      `\n**Model:** ${result.model}`,
+      `**Tokens Used:** ${result.tokensUsed.total} (prompt: ${result.tokensUsed.prompt}, completion: ${result.tokensUsed.completion}${result.tokensUsed.reasoning ? `, reasoning: ${result.tokensUsed.reasoning}` : ''})`,
+      result.cost ? `**Estimated Cost:** $${result.cost.toFixed(6)}` : null,
+      result.contextSources && result.contextSources.length > 0
+        ? `**Context Sources:** ${result.contextSources.join(', ')}`
+        : null,
+      additionalInfo ? `\n**Additional Info:**\n${JSON.stringify(additionalInfo, null, 2)}` : null,
+    ]
+      .filter(Boolean)
+      .join('\n');
+
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: responseText,
+        },
+      ],
+    };
+  }
+}
