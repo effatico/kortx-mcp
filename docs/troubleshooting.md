@@ -432,10 +432,10 @@ This guide helps you diagnose and resolve common issues with MCP Consultant.
 1. Tools validate input with Zod schemas
 
 2. Check required fields:
-   - think-about-plan: `plan`, `context`
-   - suggest-alternative: `current_approach`, `problem`, `context`
-   - improve-copy: `text`, `context`, `purpose`
-   - solve-problem: `problem`, `attempts`, `error_messages`
+   - think-about-plan: `plan`
+   - suggest-alternative: `current_approach`
+   - improve-copy: `text`
+   - solve-problem: `problem`
 
 3. Ensure all fields are strings
 
