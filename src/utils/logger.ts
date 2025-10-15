@@ -105,6 +105,75 @@ export function logError(logger: Logger, error: Error, context?: any): void {
   );
 }
 
+// Application lifecycle logging
+export function logApplicationStart(logger: Logger, config: any): void {
+  logger.info(
+    {
+      event: 'application_start',
+      config: sanitizeParams(config),
+    },
+    'Application starting'
+  );
+}
+
+export function logApplicationShutdown(logger: Logger, signal?: string): void {
+  logger.info(
+    {
+      event: 'application_shutdown',
+      signal,
+    },
+    `Application shutting down${signal ? ` (${signal})` : ''}`
+  );
+}
+
+export function logMCPServerStarted(logger: Logger, transport: string): void {
+  logger.info(
+    {
+      event: 'mcp_server_started',
+      transport,
+    },
+    `MCP server started with ${transport} transport`
+  );
+}
+
+export function logConfigurationLoaded(logger: Logger): void {
+  logger.info(
+    {
+      event: 'configuration_loaded',
+    },
+    'Configuration loaded successfully'
+  );
+}
+
+// Tool execution logging
+export function logToolExecutionStart(logger: Logger, toolName: string, params: any): void {
+  logger.debug(
+    {
+      event: 'tool_execution_start',
+      tool: toolName,
+      params: sanitizeParams(params),
+    },
+    `Tool execution started: ${toolName}`
+  );
+}
+
+export function logToolExecutionComplete(
+  logger: Logger,
+  toolName: string,
+  durationMs: number,
+  success: boolean
+): void {
+  logger.info(
+    {
+      event: 'tool_execution_complete',
+      tool: toolName,
+      durationMs,
+      success,
+    },
+    `Tool execution ${success ? 'completed' : 'failed'}: ${toolName} (${durationMs}ms)`
+  );
+}
+
 // Sanitize sensitive data from logs
 function sanitizeParams(params: any): any {
   if (typeof params !== 'object' || params === null) {
