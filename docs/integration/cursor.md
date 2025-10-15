@@ -7,7 +7,7 @@ This guide will help you set up MCP Consultant with Cursor, the AI-first code ed
 ## Prerequisites
 
 - Cursor installed ([Download here](https://cursor.sh))
-- Node.js >= 22.18.0
+- Node.js >= 22.20.0
 - OpenAI API key ([Get one here](https://platform.openai.com/api-keys))
 
 ---
@@ -393,7 +393,7 @@ Use them in chat:
 npx -y mcp-consultant --help
 
 # Verify Node.js version
-node --version  # Should be >= 22.18.0
+node --version  # Should be >= 22.20.0
 ```
 
 ### API Key Errors

@@ -52,7 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Technical Details
 
-- **Node.js**: Requires >=22.18.0
+- **Node.js**: Requires >=22.20.0
 - **Performance**: Optimized defaults (gpt-5-mini, minimal reasoning, 1024 tokens) to prevent MCP timeouts
 - **Security**: Non-root Docker execution, sensitive data redaction, no secrets in images
 

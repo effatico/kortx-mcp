@@ -8,7 +8,7 @@ This guide will help you set up MCP Consultant with VS Code using the MCP Extens
 
 - Visual Studio Code
 - [MCP Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=mcp.vscode-mcp) installed
-- Node.js >= 22.18.0
+- Node.js >= 22.20.0
 - OpenAI API key ([Get one here](https://platform.openai.com/api-keys))
 
 ---
@@ -374,7 +374,7 @@ which npx
 npx -y mcp-consultant --help
 
 # Check Node.js version
-node --version  # Should be >= 22.18.0
+node --version  # Should be >= 22.20.0
 ```
 
 ---

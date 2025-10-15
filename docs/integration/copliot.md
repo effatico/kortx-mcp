@@ -7,7 +7,7 @@ This guide will help you set up MCP Consultant with Copliot, the AI-powered codi
 ## Prerequisites
 
 - Copliot installed
-- Node.js >= 22.18.0
+- Node.js >= 22.20.0
 - OpenAI API key ([Get one here](https://platform.openai.com/api-keys))
 
 ---

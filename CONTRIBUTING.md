@@ -22,7 +22,7 @@ This project adheres to a code of conduct. By participating, you are expected to
 
 ### Prerequisites
 
-- Node.js >= 22.18.0
+- Node.js >= 22.20.0
 - npm >= 9.0.0
 - OpenAI API key (for testing)
 - Git
@@ -309,7 +309,7 @@ What actually happened
 **Environment**
 
 - OS: [e.g., macOS 13.0]
-- Node.js: [e.g., 22.18.0]
+- Node.js: [e.g., 22.20.0]
 - Package version: [e.g., 1.0.0]
 
 **Additional Context**
