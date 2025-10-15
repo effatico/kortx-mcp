@@ -18,53 +18,51 @@ The fastest way to add MCP Consultant to Claude Code:
 
 ```bash
 # Using npx (recommended - no installation required)
-claude mcp add consultant -- npx -y mcp-consultant
+claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- npx -y mcp-consultant
 
 # Using global install
 npm install -g mcp-consultant
-claude mcp add consultant -- mcp-consultant
+claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- mcp-consultant
 ```
 
 That's it! Claude Code will now have access to MCP Consultant's tools.
 
 ---
 
-## Manual Configuration
+## Advanced Configuration
 
-If you prefer manual configuration or need more control:
+The recommended way to configure MCP servers is using the `claude mcp add` command shown above. However, if you need to understand the underlying configuration or manually edit settings, here's how the configuration is structured.
 
-### 1. Locate Your MCP Config File
-
-The MCP configuration file location depends on your operating system:
+Claude Code stores MCP server configurations in JSON format. When you use `claude mcp add`, it automatically manages this configuration for you. The configuration file location depends on your operating system:
 
 - **macOS/Linux**: `~/.config/claude/mcp.json`
 - **Windows**: `%APPDATA%\Claude\mcp.json`
 
-### 2. Add MCP Consultant Configuration
-
-Edit the config file and add the consultant server:
+After running the `claude mcp add` command, your configuration will look like this:
 
 ```json
 {
   "mcpServers": {
     "consultant": {
+      "type": "stdio",
       "command": "npx",
       "args": ["-y", "mcp-consultant"],
       "env": {
-        "OPENAI_API_KEY": "sk-your-api-key-here",
-        "OPENAI_MODEL": "gpt-5-mini",
-        "OPENAI_REASONING_EFFORT": "minimal",
-        "LOG_LEVEL": "info"
+        "OPENAI_API_KEY": "your-key-here"
       }
     }
   }
 }
 ```
 
-### 3. Restart Claude Code
+You can verify your configuration using:
 
 ```bash
-# No restart needed - changes are picked up automatically
+# List all configured MCP servers
+claude mcp list
+
+# Get details for a specific server
+claude mcp get consultant
 ```
 
 ---
@@ -73,20 +71,10 @@ Edit the config file and add the consultant server:
 
 ### Basic Configuration (Recommended)
 
-For most users, this minimal configuration works best:
+For most users, the basic setup command works best:
 
-```json
-{
-  "mcpServers": {
-    "consultant": {
-      "command": "npx",
-      "args": ["-y", "mcp-consultant"],
-      "env": {
-        "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
-      }
-    }
-  }
-}
+```bash
+claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- npx -y mcp-consultant
 ```
 
 This uses:
@@ -97,52 +85,36 @@ This uses:
 
 ### Advanced Configuration
 
-For more control over behavior:
+For more control over behavior, you can add multiple environment variables:
 
-```json
-{
-  "mcpServers": {
-    "consultant": {
-      "command": "npx",
-      "args": ["-y", "mcp-consultant"],
-      "env": {
-        "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
-        "OPENAI_MODEL": "gpt-5",
-        "OPENAI_REASONING_EFFORT": "high",
-        "OPENAI_VERBOSITY": "high",
-        "OPENAI_MAX_TOKENS": "4096",
-        "LOG_LEVEL": "debug",
-        "ENABLE_SERENA": "true",
-        "ENABLE_MEMORY": "true",
-        "ENABLE_CCLSP": "true",
-        "MAX_CONTEXT_TOKENS": "32000"
-      }
-    }
-  }
-}
+```bash
+claude mcp add --transport stdio consultant \
+  --env OPENAI_API_KEY=YOUR_KEY \
+  --env OPENAI_MODEL=gpt-5 \
+  --env OPENAI_REASONING_EFFORT=high \
+  --env OPENAI_VERBOSITY=high \
+  --env OPENAI_MAX_TOKENS=4096 \
+  --env LOG_LEVEL=debug \
+  --env ENABLE_SERENA=true \
+  --env ENABLE_MEMORY=true \
+  --env ENABLE_CCLSP=true \
+  --env MAX_CONTEXT_TOKENS=32000 \
+  -- npx -y mcp-consultant
 ```
 
 ### Using Environment Variables
 
-For better security, reference environment variables:
+For better security, set environment variables in your shell profile and reference them:
 
 ```bash
 # Add to your ~/.bashrc, ~/.zshrc, or equivalent
 export OPENAI_API_KEY="sk-your-api-key-here"
 ```
 
-```json
-{
-  "mcpServers": {
-    "consultant": {
-      "command": "npx",
-      "args": ["-y", "mcp-consultant"],
-      "env": {
-        "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
-      }
-    }
-  }
-}
+Then use the basic command without exposing the key:
+
+```bash
+claude mcp add --transport stdio consultant --env OPENAI_API_KEY=$OPENAI_API_KEY -- npx -y mcp-consultant
 ```
 
 ---
@@ -254,29 +226,22 @@ Choose the right model for your use case:
 
 ### Configuration Example
 
-```json
-{
-  "mcpServers": {
-    "consultant-mini": {
-      "command": "npx",
-      "args": ["-y", "mcp-consultant"],
-      "env": {
-        "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
-        "OPENAI_MODEL": "gpt-5-mini",
-        "OPENAI_REASONING_EFFORT": "minimal"
-      }
-    },
-    "consultant-pro": {
-      "command": "npx",
-      "args": ["-y", "mcp-consultant"],
-      "env": {
-        "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
-        "OPENAI_MODEL": "gpt-5",
-        "OPENAI_REASONING_EFFORT": "high"
-      }
-    }
-  }
-}
+You can set up multiple consultant configurations with different models:
+
+```bash
+# Fast consultant for quick tasks
+claude mcp add --transport stdio consultant-mini \
+  --env OPENAI_API_KEY=$OPENAI_API_KEY \
+  --env OPENAI_MODEL=gpt-5-mini \
+  --env OPENAI_REASONING_EFFORT=minimal \
+  -- npx -y mcp-consultant
+
+# Deep consultant for complex tasks
+claude mcp add --transport stdio consultant-pro \
+  --env OPENAI_API_KEY=$OPENAI_API_KEY \
+  --env OPENAI_MODEL=gpt-5 \
+  --env OPENAI_REASONING_EFFORT=high \
+  -- npx -y mcp-consultant
 ```
 
 Now you can choose which consultant to use based on the task complexity!
@@ -317,14 +282,13 @@ Control how much reasoning GPT-5 performs:
 
 ### Configuration Example
 
-```json
-{
-  "env": {
-    "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
-    "OPENAI_MODEL": "gpt-5-mini",
-    "OPENAI_REASONING_EFFORT": "minimal" // Change to low, medium, or high
-  }
-}
+```bash
+# Change OPENAI_REASONING_EFFORT to low, medium, or high as needed
+claude mcp add --transport stdio consultant \
+  --env OPENAI_API_KEY=$OPENAI_API_KEY \
+  --env OPENAI_MODEL=gpt-5-mini \
+  --env OPENAI_REASONING_EFFORT=minimal \
+  -- npx -y mcp-consultant
 ```
 
 ---
@@ -345,17 +309,16 @@ When enabled, the consultant can access:
 
 ### Configuration
 
-```json
-{
-  "env": {
-    "ENABLE_SERENA": "true", // Semantic search
-    "ENABLE_MEMORY": "true", // Knowledge graph
-    "ENABLE_CCLSP": "true", // Language server
-    "INCLUDE_FILE_CONTENT": "true", // Send file contents
-    "INCLUDE_GIT_HISTORY": "false", // Send git history
-    "MAX_CONTEXT_TOKENS": "32000" // Context limit
-  }
-}
+```bash
+claude mcp add --transport stdio consultant \
+  --env OPENAI_API_KEY=$OPENAI_API_KEY \
+  --env ENABLE_SERENA=true \
+  --env ENABLE_MEMORY=true \
+  --env ENABLE_CCLSP=true \
+  --env INCLUDE_FILE_CONTENT=true \
+  --env INCLUDE_GIT_HISTORY=false \
+  --env MAX_CONTEXT_TOKENS=32000 \
+  -- npx -y mcp-consultant
 ```
 
 ### Privacy Considerations
@@ -366,15 +329,16 @@ Be aware that enabling context gathering sends code to OpenAI's API:
 - ⚠️ **Consider disabling** for sensitive codebases
 - 🔒 **Always disable** for compliance-restricted projects (HIPAA, PCI-DSS, etc.)
 
-```json
-{
-  "env": {
-    "ENABLE_SERENA": "false",
-    "ENABLE_MEMORY": "false",
-    "ENABLE_CCLSP": "false",
-    "INCLUDE_FILE_CONTENT": "false"
-  }
-}
+To disable context gathering:
+
+```bash
+claude mcp add --transport stdio consultant \
+  --env OPENAI_API_KEY=$OPENAI_API_KEY \
+  --env ENABLE_SERENA=false \
+  --env ENABLE_MEMORY=false \
+  --env ENABLE_CCLSP=false \
+  --env INCLUDE_FILE_CONTENT=false \
+  -- npx -y mcp-consultant
 ```
 
 ---
@@ -428,14 +392,15 @@ curl https://api.openai.com/v1/models \
 3. Reduce `MAX_CONTEXT_TOKENS`
 4. Disable unnecessary context gathering
 
-```json
-{
-  "env": {
-    "OPENAI_MODEL": "gpt-5-mini",
-    "OPENAI_REASONING_EFFORT": "minimal",
-    "MAX_CONTEXT_TOKENS": "8000"
-  }
-}
+```bash
+# Reconfigure for faster responses
+claude mcp remove consultant
+claude mcp add --transport stdio consultant \
+  --env OPENAI_API_KEY=$OPENAI_API_KEY \
+  --env OPENAI_MODEL=gpt-5-mini \
+  --env OPENAI_REASONING_EFFORT=minimal \
+  --env MAX_CONTEXT_TOKENS=8000 \
+  -- npx -y mcp-consultant
 ```
 
 ### Context Gathering Errors
@@ -448,14 +413,15 @@ curl https://api.openai.com/v1/models \
 2. Disable context gathering if not needed
 3. Check logs for specific errors
 
-```json
-{
-  "env": {
-    "ENABLE_SERENA": "false",
-    "ENABLE_MEMORY": "false",
-    "ENABLE_CCLSP": "false"
-  }
-}
+```bash
+# Reconfigure without context gathering
+claude mcp remove consultant
+claude mcp add --transport stdio consultant \
+  --env OPENAI_API_KEY=$OPENAI_API_KEY \
+  --env ENABLE_SERENA=false \
+  --env ENABLE_MEMORY=false \
+  --env ENABLE_CCLSP=false \
+  -- npx -y mcp-consultant
 ```
 
 ### High API Costs
@@ -469,17 +435,18 @@ curl https://api.openai.com/v1/models \
 3. Reduce max tokens
 4. Disable context gathering
 
-```json
-{
-  "env": {
-    "OPENAI_MODEL": "gpt-5-nano",
-    "OPENAI_REASONING_EFFORT": "minimal",
-    "OPENAI_MAX_TOKENS": "512",
-    "ENABLE_SERENA": "false",
-    "ENABLE_MEMORY": "false",
-    "ENABLE_CCLSP": "false"
-  }
-}
+```bash
+# Reconfigure for minimal costs
+claude mcp remove consultant
+claude mcp add --transport stdio consultant \
+  --env OPENAI_API_KEY=$OPENAI_API_KEY \
+  --env OPENAI_MODEL=gpt-5-nano \
+  --env OPENAI_REASONING_EFFORT=minimal \
+  --env OPENAI_MAX_TOKENS=512 \
+  --env ENABLE_SERENA=false \
+  --env ENABLE_MEMORY=false \
+  --env ENABLE_CCLSP=false \
+  -- npx -y mcp-consultant
 ```
 
 ---
@@ -498,63 +465,42 @@ npm install
 npm run build
 
 # Configure Claude Code to use local version
-```
-
-```json
-{
-  "mcpServers": {
-    "consultant": {
-      "command": "node",
-      "args": ["/path/to/mcp-consultant/build/index.js"],
-      "env": {
-        "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
-        "LOG_LEVEL": "debug"
-      }
-    }
-  }
-}
+claude mcp add --transport stdio consultant-dev \
+  --env OPENAI_API_KEY=$OPENAI_API_KEY \
+  --env LOG_LEVEL=debug \
+  -- node /path/to/mcp-consultant/build/index.js
 ```
 
 ### Multiple Consultant Configurations
 
 Run different configurations for different purposes:
 
-```json
-{
-  "mcpServers": {
-    "consultant-fast": {
-      "command": "npx",
-      "args": ["-y", "mcp-consultant"],
-      "env": {
-        "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
-        "OPENAI_MODEL": "gpt-5-nano",
-        "OPENAI_REASONING_EFFORT": "minimal"
-      }
-    },
-    "consultant-deep": {
-      "command": "npx",
-      "args": ["-y", "mcp-consultant"],
-      "env": {
-        "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
-        "OPENAI_MODEL": "gpt-5",
-        "OPENAI_REASONING_EFFORT": "high"
-      }
-    }
-  }
-}
+```bash
+# Fast consultant for quick tasks
+claude mcp add --transport stdio consultant-fast \
+  --env OPENAI_API_KEY=$OPENAI_API_KEY \
+  --env OPENAI_MODEL=gpt-5-nano \
+  --env OPENAI_REASONING_EFFORT=minimal \
+  -- npx -y mcp-consultant
+
+# Deep consultant for complex analysis
+claude mcp add --transport stdio consultant-deep \
+  --env OPENAI_API_KEY=$OPENAI_API_KEY \
+  --env OPENAI_MODEL=gpt-5 \
+  --env OPENAI_REASONING_EFFORT=high \
+  -- npx -y mcp-consultant
 ```
 
 ### Custom Logging
 
 For debugging or monitoring:
 
-```json
-{
-  "env": {
-    "LOG_LEVEL": "debug",
-    "LOG_FILE": "/custom/path/mcp-consultant.log"
-  }
-}
+```bash
+claude mcp add --transport stdio consultant \
+  --env OPENAI_API_KEY=$OPENAI_API_KEY \
+  --env LOG_LEVEL=debug \
+  --env LOG_FILE=/custom/path/mcp-consultant.log \
+  -- npx -y mcp-consultant
 ```
 
 ---
