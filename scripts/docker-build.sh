@@ -6,18 +6,18 @@ set -e
 echo "Building MCP Consultant Docker image..."
 
 # Build the image
-docker build -t mcp-consultant:latest .
+docker build -t llm-consultants:latest .
 
 # Tag with git commit hash
 GIT_HASH=$(git rev-parse --short HEAD 2>/dev/null || echo "dev")
-docker tag mcp-consultant:latest mcp-consultant:$GIT_HASH
+docker tag llm-consultants:latest llm-consultants:$GIT_HASH
 
 echo "✅ Build complete!"
 echo "Images tagged:"
-echo "  - mcp-consultant:latest"
-echo "  - mcp-consultant:$GIT_HASH"
+echo "  - llm-consultants:latest"
+echo "  - llm-consultants:$GIT_HASH"
 
 # Show image size
 echo ""
 echo "Image size:"
-docker images mcp-consultant:latest --format "{{.Size}}"
+docker images llm-consultants:latest --format "{{.Size}}"

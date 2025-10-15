@@ -1,8 +1,8 @@
-# MCP Consultant
+# LLM Consultants
 
-[![npm version](https://badge.fury.io/js/mcp-consultant.svg)](https://www.npmjs.com/package/mcp-consultant)
+[![npm version](https://badge.fury.io/js/llm-consultants.svg)](https://www.npmjs.com/package/llm-consultants)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://github.com/amsv01/mcp-consultant/workflows/Test/badge.svg)](https://github.com/amsv01/mcp-consultant/actions)
+[![Build Status](https://github.com/amsv01/llm-consultants/workflows/Test/badge.svg)](https://github.com/amsv01/llm-consultants/actions)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.12.0-brightgreen)](https://nodejs.org)
 
 A lightweight, open-source MCP server that lets AI assistants like Claude Code consult GPT-5 models for specialized tasks and automatically gathers relevant context from your codebase.
@@ -36,7 +36,7 @@ AI researchers, tool builders, and platform engineers who want to enhance AI ass
 Get started in seconds with a single command:
 
 ```bash
-npx mcp-consultant
+npx llm-consultants
 ```
 
 ### Installation Options
@@ -44,20 +44,20 @@ npx mcp-consultant
 **NPX (Recommended)**
 
 ```bash
-npx mcp-consultant
+npx llm-consultants
 ```
 
 **NPM Global Install**
 
 ```bash
-npm install -g mcp-consultant
-mcp-consultant
+npm install -g llm-consultants
+llm-consultants
 ```
 
 **Docker**
 
 ```bash
-docker run -e OPENAI_API_KEY=your-key ghcr.io/amsv01/mcp-consultant:latest
+docker run -e OPENAI_API_KEY=your-key ghcr.io/amsv01/llm-consultants:latest
 ```
 
 ---
@@ -70,11 +70,11 @@ docker run -e OPENAI_API_KEY=your-key ghcr.io/amsv01/mcp-consultant:latest
 
 ```bash
 # Using npx (recommended)
-claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- npx -y mcp-consultant
+claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- npx -y llm-consultants
 
 # Using global install
-npm install -g mcp-consultant
-claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- mcp-consultant
+npm install -g llm-consultants
+claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- llm-consultants
 ```
 
 **Optional Configuration:**
@@ -86,7 +86,7 @@ claude mcp add --transport stdio consultant \
   --env OPENAI_API_KEY=YOUR_KEY \
   --env OPENAI_MODEL=gpt-5-mini \
   --env LOG_LEVEL=info \
-  -- npx -y mcp-consultant
+  -- npx -y llm-consultants
 ```
 
 [Detailed Claude Code setup guide →](./docs/integration/claude-code.md)
@@ -101,7 +101,7 @@ Add to your Copliot configuration:
     "servers": {
       "consultant": {
         "command": "npx",
-        "args": ["-y", "mcp-consultant"],
+        "args": ["-y", "llm-consultants"],
         "env": {
           "OPENAI_API_KEY": "your-api-key-here"
         }
@@ -122,7 +122,7 @@ Add to your Copliot configuration:
 {
   "consultant": {
     "command": "npx",
-    "args": ["-y", "mcp-consultant"],
+    "args": ["-y", "llm-consultants"],
     "env": {
       "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
     }
@@ -140,7 +140,7 @@ Add to Cursor's MCP settings:
 {
   "mcp-servers": {
     "consultant": {
-      "command": "npx -y mcp-consultant",
+      "command": "npx -y llm-consultants",
       "env": {
         "OPENAI_API_KEY": "your-api-key-here"
       }
@@ -334,8 +334,8 @@ Error: Request Entity Too Large, ETIMEDOUT: Socket timeout"
 
 ```bash
 # Clone the repository
-git clone https://github.com/amsv01/mcp-consultant.git
-cd mcp-consultant
+git clone https://github.com/amsv01/llm-consultants.git
+cd llm-consultants
 
 # Install dependencies
 npm install
@@ -380,7 +380,7 @@ npm run inspector        # Debug with MCP Inspector
 ## Project Structure
 
 ```
-mcp-consultant/
+llm-consultants/
 ├── src/
 │   ├── index.ts              # Entry point with shebang
 │   ├── server.ts             # Main MCP server setup
@@ -415,8 +415,8 @@ mcp-consultant/
 
 We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for details.
 
-- 🐛 [Report a Bug](https://github.com/amsv01/mcp-consultant/issues/new?template=bug_report.md)
-- 💡 [Request a Feature](https://github.com/amsv01/mcp-consultant/issues/new?template=feature_request.md)
+- 🐛 [Report a Bug](https://github.com/amsv01/llm-consultants/issues/new?template=bug_report.md)
+- 💡 [Request a Feature](https://github.com/amsv01/llm-consultants/issues/new?template=feature_request.md)
 - 📖 [Improve Documentation](./CONTRIBUTING.md#documentation)
 - 🔧 [Submit a Pull Request](./CONTRIBUTING.md#pull-requests)
 
@@ -482,8 +482,8 @@ This project is actively maintained and production-ready:
 ## Support
 
 - 📖 [Documentation](./docs)
-- 💬 [GitHub Discussions](https://github.com/amsv01/mcp-consultant/discussions)
-- 🐛 [Issue Tracker](https://github.com/amsv01/mcp-consultant/issues)
+- 💬 [GitHub Discussions](https://github.com/amsv01/llm-consultants/discussions)
+- 🐛 [Issue Tracker](https://github.com/amsv01/llm-consultants/issues)
 - 📧 [Email Support](mailto:amin@effati.se)
 
 ---
@@ -492,4 +492,4 @@ This project is actively maintained and production-ready:
 
 If you find this project useful, please consider giving it a star on GitHub!
 
-[![Star History Chart](https://api.star-history.com/svg?repos=amsv01/mcp-consultant&type=Date)](https://star-history.com/#amsv01/mcp-consultant&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=amsv01/llm-consultants&type=Date)](https://star-history.com/#amsv01/llm-consultants&Date)

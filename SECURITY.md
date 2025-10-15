@@ -73,7 +73,7 @@ OPENAI_API_KEY=sk-your-actual-api-key-here
   "mcpServers": {
     "consultant": {
       "command": "npx",
-      "args": ["-y", "mcp-consultant"],
+      "args": ["-y", "llm-consultants"],
       "env": {
         "OPENAI_API_KEY": "${env:OPENAI_API_KEY}" // Reference from environment
       }
@@ -92,14 +92,14 @@ The official Docker image follows security best practices:
 
 ```bash
 # Run with non-root user (built-in)
-docker run -e OPENAI_API_KEY=your-key ghcr.io/amsv01/mcp-consultant:latest
+docker run -e OPENAI_API_KEY=your-key ghcr.io/amsv01/llm-consultants:latest
 
 # Use Docker secrets (recommended for production)
 echo "your-api-key" | docker secret create openai_api_key -
 docker service create \
-  --name mcp-consultant \
+  --name llm-consultants \
   --secret openai_api_key \
-  ghcr.io/amsv01/mcp-consultant:latest
+  ghcr.io/amsv01/llm-consultants:latest
 ```
 
 ### Security Features
@@ -168,14 +168,14 @@ LOG_LEVEL=debug # Verbose - DO NOT use in production with sensitive data
 
 Logs are written to:
 
-- `~/.mcp-consultant/logs/mcp-consultant.log` (global install)
-- `./logs/mcp-consultant.log` (local development)
+- `~/.llm-consultants/logs/llm-consultants.log` (global install)
+- `./logs/llm-consultants.log` (local development)
 
 **Secure your log files:**
 
 ```bash
 # Set restrictive permissions
-chmod 600 ~/.mcp-consultant/logs/mcp-consultant.log
+chmod 600 ~/.llm-consultants/logs/llm-consultants.log
 
 # Rotate logs regularly
 # Use logrotate or similar tools to prevent log files from growing indefinitely
@@ -331,7 +331,7 @@ Subscribe to security updates:
 
 For security-related questions that are not vulnerabilities, please:
 
-- Open a [GitHub Discussion](https://github.com/amsv01/mcp-consultant/discussions)
+- Open a [GitHub Discussion](https://github.com/amsv01/llm-consultants/discussions)
 - Email amin@effati.se with subject "Security Question: [Your Topic]"
 
 Thank you for helping keep MCP Consultant secure! 🔒

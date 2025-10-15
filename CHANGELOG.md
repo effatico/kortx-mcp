@@ -48,7 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Non-root user execution (nodejs:1001)
   - Docker Compose with resource limits
   - Automated build/run scripts (275MB final image)
-- **NPX Distribution**: Ready for `npx mcp-consultant` execution
+- **NPX Distribution**: Ready for `npx llm-consultants` execution
 
 #### Development
 
