@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  mcp-consultant:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mcp-consultant:latest
+    container_name: mcp-consultant
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-5}
+      - OPENAI_REASONING_EFFORT=${OPENAI_REASONING_EFFORT:-medium}
+      - NODE_ENV=production
+      - TRANSPORT=${TRANSPORT:-stdio}
+    # For stdio transport, use interactive mode
+    stdin_open: true
+    tty: true
+    # Optional: Mount project directory for file context
+    volumes:
+      - ${PROJECT_DIR:-.}:/workspace:ro
+    networks:
+      - mcp-network
+    restart: unless-stopped
+    # Resource limits for production
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+networks:
+  mcp-network:
+    driver: bridge
