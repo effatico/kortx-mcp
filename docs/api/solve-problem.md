@@ -1,106 +1,181 @@
-# solve-problem API Documentation
+# solve-problem
 
-Debug and problem-solving assistance with root cause analysis and solutions.
-
----
-
-## Overview
-
-The `solve-problem` tool provides expert debugging and problem-solving assistance. It performs root cause analysis, provides diagnosis steps, proposes solutions, and suggests prevention strategies.
-
-**Use this tool when:**
-
-- Debugging production issues
-- Investigating errors or failures
-- Performance problems
-- Unexpected behavior
-- System outages
+Expert debugging and problem-solving assistance with root cause analysis, diagnosis steps, proposed solutions, and prevention strategies.
 
 ---
 
-## API Signature
+## Quick Start
 
-```typescript
-tool("solve-problem", {
-  problem: string;        // Description of the problem
-  context?: string;       // System context, error messages, logs (optional)
-  tried_solutions?: string; // What you've already tried (optional)
-})
+Get debugging help in seconds:
+
+```json
+{
+  "problem": "Users experiencing intermittent 500 errors when uploading large files (>10MB)",
+  "errorMessages": ["Request Entity Too Large", "ETIMEDOUT: Socket timeout"],
+  "relevantCode": "Node.js Express API behind nginx reverse proxy"
+}
 ```
 
----
-
-## Parameters
-
-### `problem` (required)
-
-Description of the problem you're experiencing.
-
-- **Type**: String
-- **Required**: Yes
-- **Recommended length**: 50-500 words
-
-### `context` (optional)
-
-Additional context: error messages, logs, system information.
-
-- **Type**: String
-- **Required**: No
-
-### `tried_solutions` (optional)
-
-What you've already tried to fix the problem.
-
-- **Type**: String
-- **Required**: No
+The tool returns root cause analysis, diagnosis steps, solutions, testing guidance, and prevention strategies.
 
 ---
 
-## Response Format
+## How to Use
 
-Returns a structured problem analysis:
+Choose your depth based on your needs:
 
-1. **Root Cause Analysis**
-   - Likely causes
-   - Contributing factors
-   - Why it's happening
+<details open>
+<summary><strong>Minimal</strong> - Quick diagnosis (30 seconds)</summary>
 
-2. **Diagnosis Steps**
-   - How to verify the root cause
-   - What to check
-   - Commands to run
+**When to use**: You have a clear error and need quick troubleshooting steps.
 
-3. **Proposed Solutions**
-   - Immediate fixes
-   - Long-term solutions
-   - Priority order
+**Example**:
 
-4. **Testing Guidance**
-   - How to verify the fix
-   - What to monitor
+```json
+{
+  "problem": "Database queries timing out after 5 seconds"
+}
+```
 
-5. **Prevention Strategies**
-   - How to prevent recurrence
-   - Monitoring recommendations
-   - Process improvements
+**What you get**: Likely causes and immediate debugging steps.
+
+</details>
+
+<details>
+<summary><strong>Standard</strong> - Comprehensive debugging (recommended)</summary>
+
+**When to use**: Production issues that need thorough investigation.
+
+**Example**:
+
+```json
+{
+  "problem": "Memory usage growing continuously until server crashes",
+  "errorMessages": ["JavaScript heap out of memory"],
+  "relevantCode": "Node.js API server, runs fine for 2-3 hours then crashes",
+  "attemptedSolutions": [
+    "Increased heap size to 4GB",
+    "Added memory profiling",
+    "Checked for event listener leaks"
+  ]
+}
+```
+
+**What you get**:
+
+- Root cause analysis with contributing factors
+- Step-by-step diagnosis commands
+- Immediate and long-term solutions
+- Testing and verification guidance
+- Prevention strategies
+
+</details>
+
+<details>
+<summary><strong>Advanced</strong> - Complex system debugging</summary>
+
+**When to use**: Distributed system issues, performance problems, or critical production outages.
+
+**Example**:
+
+```json
+{
+  "problem": "Microservices experiencing cascading failures during high load, some requests timeout while others succeed",
+  "errorMessages": [
+    "Connection pool exhausted",
+    "Circuit breaker open",
+    "Downstream service unavailable"
+  ],
+  "relevantCode": "5 microservices (auth, products, orders, payments, shipping) on Kubernetes, using gRPC, Redis cache, PostgreSQL",
+  "attemptedSolutions": [
+    "Increased connection pool sizes",
+    "Added circuit breakers with Hystrix",
+    "Scaled pods horizontally",
+    "Added Redis caching layer"
+  ]
+}
+```
+
+**What you get**:
+
+- Comprehensive distributed systems analysis
+- Detailed dependency chain investigation
+- Multiple solution approaches (immediate fixes, architectural improvements)
+- Load testing and chaos engineering recommendations
+- Full observability and monitoring setup
+- SRE-grade prevention strategies
+
+</details>
 
 ---
 
-## Example Usage
+<details>
+<summary><strong>API Reference</strong></summary>
 
-### Example 1: File Upload Errors
+### Parameters
+
+| Parameter            | Type     | Required | Description                                                            |
+| -------------------- | -------- | -------- | ---------------------------------------------------------------------- |
+| `problem`            | string   | Yes      | Description of the problem (50-500 words recommended)                  |
+| `errorMessages`      | string[] | No       | Exact error messages or stack traces                                   |
+| `relevantCode`       | string   | No       | Code snippets, system architecture, tech stack                         |
+| `attemptedSolutions` | string[] | No       | What you've already tried                                              |
+| `preferredModel`     | enum     | No       | GPT model: `gpt-5`, `gpt-5-mini`, `gpt-5-nano` (default: `gpt-5-mini`) |
+
+### Response Structure
+
+The tool returns structured debugging assistance:
+
+1. **Root Cause Analysis** - Why it's happening
+2. **Diagnosis Steps** - How to verify the cause
+3. **Proposed Solutions** - Immediate and long-term fixes
+4. **Testing Guidance** - How to verify the fix works
+5. **Prevention Strategies** - How to avoid recurrence
+
+</details>
+
+## Common Use Cases
+
+### Production Errors
+
+Debug live issues with root cause analysis and immediate fixes.
+
+### Performance Problems
+
+Identify bottlenecks and optimize system performance.
+
+### Integration Failures
+
+Troubleshoot issues between services and external systems.
+
+### Memory Leaks
+
+Find and fix memory issues before they crash your system.
+
+---
+
+## Example: File Upload Errors
+
+<details>
+<summary>View full example with solutions</summary>
 
 **Input:**
 
 ```json
 {
   "problem": "Users experiencing intermittent 500 errors when uploading large files (>10MB)",
-  "context": "Error: Request Entity Too Large, ETIMEDOUT: Socket timeout. Node.js Express API, nginx reverse proxy",
-  "tried_solutions": "Increased server memory to 8GB, checked disk space (plenty available), increased nginx timeout to 60s, app timeout to 30s"
+  "errorMessages": ["Request Entity Too Large", "ETIMEDOUT: Socket timeout"],
+  "relevantCode": "Node.js Express API behind nginx reverse proxy",
+  "attemptedSolutions": [
+    "Increased server memory to 8GB",
+    "Checked disk space (plenty available)",
+    "Increased nginx timeout to 60s",
+    "App timeout to 30s"
+  ]
 }
 ```
 
-**Response:**
+**Response Summary:**
 
 ````markdown
 ## Root Cause Analysis
@@ -276,11 +351,16 @@ server.timeout = 120000; // 2 minutes
 
 ````
 
+</details>
+
 ---
 
 ## Best Practices
 
-### 1. Include Error Messages
+<details>
+<summary><strong>How to Get Better Debugging Help</strong></summary>
+
+### Include Error Messages
 
 Exact error messages help identify the issue:
 
@@ -307,34 +387,28 @@ Helps understand constraints:
 
 ```json
 {
-  "context": "AWS RDS PostgreSQL db.t3.medium (2 vCPU, 4GB RAM), ~1000 req/min, 50GB data"
+  "relevantCode": "AWS RDS PostgreSQL db.t3.medium (2 vCPU, 4GB RAM), ~1000 req/min, 50GB data"
 }
 ```
 
----
-
-## Common Use Cases
-
-- Production errors and outages
-- Performance degradation
-- Memory leaks
-- Database issues
-- Network problems
-- Integration failures
+</details>
 
 ---
 
 ## Related Tools
 
-- **think-about-plan**: Plan fixes or improvements
-- **suggest-alternative**: Explore different solutions
+- **[think-about-plan](./think-about-plan.md)** - Plan fixes or architectural improvements
+- **[suggest-alternative](./suggest-alternative.md)** - Explore different solution approaches
+- **[improve-copy](./improve-copy.md)** - Refine error messages and documentation
 
 ---
 
 ## Next Steps
 
-- 📖 [Full API Documentation](./README.md)
-- 🎯 [Example Workflows](../../examples/)
+- 📖 [think-about-plan](./think-about-plan.md) - Plan strategic implementations
+- 📖 [suggest-alternative](./suggest-alternative.md) - Explore alternatives
+- 📖 [improve-copy](./improve-copy.md) - Polish your messaging
+- 🔧 [Configuration Guide](../configuration.md) - Customize behavior
 
 ---
 
