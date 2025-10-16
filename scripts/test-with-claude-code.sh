@@ -17,11 +17,10 @@ BUILD_PATH="$PROJECT_DIR/build/index.js"
 
 # Check if OPENAI_API_KEY is set
 if [ -z "$OPENAI_API_KEY" ]; then
-  echo "⚠️  Warning: OPENAI_API_KEY environment variable is not set"
-  echo "   The MCP server will fail to start without a valid API key"
-  echo ""
+  echo "❌ OPENAI_API_KEY environment variable is not set."
   echo "   Set it with: export OPENAI_API_KEY='your-api-key-here'"
-  echo ""
+  echo "   and rerun this script."
+  exit 1
 fi
 
 echo "🔧 Adding MCP server to Claude Code..."
@@ -34,7 +33,7 @@ claude mcp remove llm-consultant-test 2>/dev/null || true
 
 # Add the MCP server to Claude Code
 claude mcp add --transport stdio llm-consultant-test \
-  --env OPENAI_API_KEY="${OPENAI_API_KEY:-sk-placeholder}" \
+  --env OPENAI_API_KEY="$OPENAI_API_KEY" \
   --env OPENAI_MODEL="${OPENAI_MODEL:-gpt-5-mini}" \
   --env OPENAI_REASONING_EFFORT="${OPENAI_REASONING_EFFORT:-minimal}" \
   --env LOG_LEVEL="${LOG_LEVEL:-debug}" \

@@ -226,16 +226,16 @@ logger.info({ request }, 'Processing consultation request');
 
 ### Node.js Version
 
-**Don't**: Use Node.js < 22.12.0
+**Don't**: Use Node.js < 22.18.0
 
-- Type stripping requires Node.js 22.12+
-- Some ES module features need recent Node.js
+- Type stripping requires Node.js 22.18+
+- Some ES module features need the latest LTS
 
 **Do**: Specify in package.json and verify
 
 ```json
 "engines": {
-  "node": ">=22.12.0"
+  "node": ">=22.18.0"
 }
 ```
 

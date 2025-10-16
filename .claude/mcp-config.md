@@ -343,7 +343,7 @@ See `scripts/test-with-claude-code.sh` for details.
 1. Build succeeded: `npm run build`
 2. Environment variables are set correctly
 3. OpenAI API key is valid
-4. Node.js version >= 22.12.0: `node --version`
+4. Node.js version >= 22.18.0: `node --version`
 
 ### Tools Not Showing Up
 
