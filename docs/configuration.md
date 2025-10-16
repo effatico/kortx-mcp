@@ -161,23 +161,16 @@ OPENAI_MAX_TOKENS=4096
 
 ## Context Gathering
 
-Context gathering allows the consultant to access information from your codebase.
+Context gathering allows the consultant to access information from your codebase automatically.
 
 ### `ENABLE_SERENA`
 
-Enable Serena MCP for semantic code search and symbol navigation.
+Enable Serena MCP for semantic code search and symbol navigation. When enabled, this provides semantic code search, symbol definitions and references, code structure understanding, and function or class navigation.
 
 - **Required**: No
 - **Default**: `true`
 - **Valid values**: `true`, `false`
 - **Example**: `ENABLE_SERENA=true`
-
-**What it provides:**
-
-- Semantic code search
-- Symbol definitions and references
-- Code structure understanding
-- Function/class navigation
 
 ```bash
 # Enable Serena (recommended if installed)
@@ -191,19 +184,12 @@ ENABLE_SERENA=false
 
 ### `ENABLE_MEMORY`
 
-Enable graph-memory MCP for knowledge graph and project memory.
+Enable graph-memory MCP for knowledge graph and project memory. This provides a project knowledge graph, entity relationships, historical context, and persistent memory across sessions.
 
 - **Required**: No
 - **Default**: `true`
 - **Valid values**: `true`, `false`
 - **Example**: `ENABLE_MEMORY=true`
-
-**What it provides:**
-
-- Project knowledge graph
-- Entity relationships
-- Historical context
-- Persistent memory across sessions
 
 ```bash
 # Enable memory (recommended if installed)
@@ -217,19 +203,12 @@ ENABLE_MEMORY=false
 
 ### `ENABLE_CCLSP`
 
-Enable CCLSP MCP for language server protocol features.
+Enable CCLSP MCP for language server protocol features including type information, code intelligence, and diagnostics.
 
 - **Required**: No
 - **Default**: `true`
 - **Valid values**: `true`, `false`
 - **Example**: `ENABLE_CCLSP=true`
-
-**What it provides:**
-
-- Language server features
-- Type information
-- Code intelligence
-- Diagnostics
 
 ```bash
 # Enable CCLSP (recommended if installed)
@@ -264,19 +243,12 @@ INCLUDE_FILE_CONTENT=false
 
 ### `INCLUDE_GIT_HISTORY`
 
-Include recent git commit history in context.
+Include recent git commit history in context, providing recent commits, change history, author information, and commit messages.
 
 - **Required**: No
 - **Default**: `false`
 - **Valid values**: `true`, `false`
 - **Example**: `INCLUDE_GIT_HISTORY=true`
-
-**What it provides:**
-
-- Recent commits
-- Change history
-- Author information
-- Commit messages
 
 ```bash
 # Include git history
@@ -631,60 +603,11 @@ LOG_LEVEL=debug
 
 ## Best Practices
 
-### 1. Start with Defaults
+Begin with the recommended defaults (`gpt-5-mini` with `minimal` reasoning) and adjust based on your needs. Never hardcode API keys - always use environment variables or secrets management.
 
-Begin with the recommended defaults and adjust based on your needs:
+Monitor API costs through the [OpenAI Dashboard](https://platform.openai.com/usage). For quick feedback, use `gpt-5-mini` with `minimal` reasoning. For complex analysis, use `gpt-5` with `high` reasoning. When cost-sensitive, choose `gpt-5-nano` with `minimal` reasoning.
 
-```bash
-OPENAI_API_KEY=sk-your-key
-OPENAI_MODEL=gpt-5-mini
-OPENAI_REASONING_EFFORT=minimal
-```
-
-### 2. Use Environment Variables
-
-Never hardcode API keys:
-
-```bash
-# In ~/.bashrc or ~/.zshrc
-export OPENAI_API_KEY="sk-your-key"
-
-# In configuration
-OPENAI_API_KEY=${env:OPENAI_API_KEY}
-```
-
-### 3. Monitor API Costs
-
-Track usage in the [OpenAI Dashboard](https://platform.openai.com/usage).
-
-### 4. Optimize for Your Workflow
-
-- **Quick feedback**: Use `gpt-5-mini` + `minimal`
-- **Complex analysis**: Use `gpt-5` + `high`
-- **Cost-sensitive**: Use `gpt-5-nano` + `minimal`
-
-### 5. Review Privacy Settings
-
-Be mindful of what context is sent to OpenAI:
-
-```bash
-# For sensitive projects
-INCLUDE_FILE_CONTENT=false
-INCLUDE_GIT_HISTORY=false
-```
-
-### 6. Use Appropriate Log Levels
-
-```bash
-# Development
-LOG_LEVEL=debug
-
-# Production
-LOG_LEVEL=info
-
-# High-traffic production
-LOG_LEVEL=warn
-```
+Be mindful of what context gets sent to OpenAI. For sensitive projects, disable file content and git history inclusion. Use `debug` logging during development, `info` for production, and `warn` for high-traffic production environments.
 
 ---
 
