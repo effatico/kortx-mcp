@@ -45,6 +45,14 @@ describe('OpenAIClient', () => {
           cclsp: { enabled: true },
         },
       },
+      security: {
+        enableRateLimiting: true,
+        maxRequestsPerHour: 100,
+        maxTokensPerRequest: 50000,
+        maxTokensPerHour: 500000,
+        requestTimeoutMs: 60000,
+        maxInputSize: 100000,
+      },
     } as Config;
 
     // Create mock logger
