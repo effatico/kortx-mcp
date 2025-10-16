@@ -88,10 +88,22 @@ export function loadConfig(): Config {
 }
 
 // Validate model-specific constraints
-export function validateModelConstraints(_config: Config): void {
-  // GPT-5 models support all reasoning efforts (minimal, low, medium, high)
-  // and all verbosity levels (low, medium, high)
-  // No specific constraints needed per the OpenAI documentation
+export function validateModelConstraints(config: Config): void {
+  // Model-specific reasoning effort support:
+  // - gpt-5, gpt-5-mini, gpt-5-nano: support 'minimal', 'low', 'medium', 'high'
+  // - gpt-5-codex: supports 'low', 'medium', 'high' (NOT 'minimal')
+  //
+  // Note: The OpenAI client will automatically adjust 'minimal' to 'low' for gpt-5-codex
+  // to prevent API errors. This is handled at runtime rather than config validation
+  // to allow dynamic model selection via tool parameters.
+
+  if (config.openai.model === 'gpt-5-codex' && config.openai.reasoningEffort === 'minimal') {
+    console.warn(
+      '⚠️  Warning: gpt-5-codex does not support "minimal" reasoning effort.\n' +
+        '   The client will automatically adjust to "low" at runtime.\n' +
+        '   Consider setting OPENAI_REASONING_EFFORT=low in your .env file.\n'
+    );
+  }
 }
 
 // Export singleton instance

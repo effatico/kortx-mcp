@@ -22,9 +22,18 @@ export class OpenAIClient {
 
   async chat(request: LLMRequest): Promise<LLMResponse> {
     const model = request.model || this.config.openai.model;
-    const reasoningEffort = request.reasoningEffort || this.config.openai.reasoningEffort;
+    let reasoningEffort = request.reasoningEffort || this.config.openai.reasoningEffort;
     const maxTokens = request.maxTokens || this.config.openai.maxTokens;
     const verbosity = this.config.openai.verbosity;
+
+    // gpt-5-codex doesn't support 'minimal' reasoning effort
+    if (model === 'gpt-5-codex' && reasoningEffort === 'minimal') {
+      reasoningEffort = 'low';
+      this.logger.debug(
+        { model, originalEffort: 'minimal', adjustedEffort: 'low' },
+        'Adjusted reasoning effort for gpt-5-codex'
+      );
+    }
 
     const startTime = Date.now();
 
@@ -58,9 +67,18 @@ export class OpenAIClient {
 
   async chatStream(request: LLMRequest, onChunk: (chunk: string) => void): Promise<LLMResponse> {
     const model = request.model || this.config.openai.model;
-    const reasoningEffort = request.reasoningEffort || this.config.openai.reasoningEffort;
+    let reasoningEffort = request.reasoningEffort || this.config.openai.reasoningEffort;
     const maxTokens = request.maxTokens || this.config.openai.maxTokens;
     const verbosity = this.config.openai.verbosity;
+
+    // gpt-5-codex doesn't support 'minimal' reasoning effort
+    if (model === 'gpt-5-codex' && reasoningEffort === 'minimal') {
+      reasoningEffort = 'low';
+      this.logger.debug(
+        { model, originalEffort: 'minimal', adjustedEffort: 'low' },
+        'Adjusted reasoning effort for gpt-5-codex'
+      );
+    }
 
     const startTime = Date.now();
 
