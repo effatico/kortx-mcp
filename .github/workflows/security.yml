@@ -29,13 +29,13 @@ jobs:
 
       - name: Run npm audit
         run: npm audit --audit-level=high
-        continue-on-error: true
+        continue-on-error: ${{ github.event_name == 'schedule' }}
 
       - name: Check for secrets in code
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
-          base: ${{ github.event.repository.default_branch }}
+          base: ${{ github.event_name == 'pull_request' && github.event.repository.default_branch || github.ref_name }}
           head: HEAD
 
       - name: Dependency Review

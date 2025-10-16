@@ -14,8 +14,8 @@ ENV HUSKY=0
 RUN npm ci --ignore-scripts && \
     npm cache clean --force
 
-# Security: Run npm audit to check for vulnerabilities
-RUN npm audit --audit-level=moderate || true
+# Security: Run npm audit to check for vulnerabilities (fail on high-severity)
+RUN npm audit --audit-level=high
 
 # Copy source and build
 COPY tsconfig.json ./

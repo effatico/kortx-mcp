@@ -270,8 +270,8 @@ For production issues:
 
 - Review logs at `llm-consultants.log`
 - Check [SECURITY.md](../SECURITY.md) for security guidance
-- Open issues at https://github.com/amsv01/llm-consultants/issues
-- Email security concerns to amin@effati.se
+- Open issues at [GitHub Issues](https://github.com/amsv01/llm-consultants/issues)
+- Email security concerns to [amin@effati.se](mailto:amin@effati.se)
 
 ## Additional Resources
 
