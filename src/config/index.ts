@@ -32,11 +32,22 @@ const ContextConfigSchema = z.object({
   includeGitHistory: z.boolean().default(false),
 });
 
+// Security configuration
+const SecurityConfigSchema = z.object({
+  enableRateLimiting: z.boolean().default(true),
+  maxRequestsPerHour: z.number().int().positive().default(100),
+  maxTokensPerRequest: z.number().int().positive().default(50000),
+  maxTokensPerHour: z.number().int().positive().default(500000),
+  requestTimeoutMs: z.number().int().positive().default(60000),
+  maxInputSize: z.number().int().positive().default(100000), // 100KB
+});
+
 // Complete configuration schema
 const ConfigSchema = z.object({
   openai: OpenAIConfigSchema,
   server: ServerConfigSchema,
   context: ContextConfigSchema,
+  security: SecurityConfigSchema,
 });
 
 export type Config = z.infer<typeof ConfigSchema>;
@@ -70,6 +81,24 @@ export function loadConfig(): Config {
           : undefined,
         includeFileContent: process.env.INCLUDE_FILE_CONTENT === 'false' ? false : undefined,
         includeGitHistory: process.env.INCLUDE_GIT_HISTORY === 'true' ? true : undefined,
+      },
+      security: {
+        enableRateLimiting: process.env.ENABLE_RATE_LIMITING === 'false' ? false : undefined,
+        maxRequestsPerHour: process.env.MAX_REQUESTS_PER_HOUR
+          ? parseInt(process.env.MAX_REQUESTS_PER_HOUR, 10)
+          : undefined,
+        maxTokensPerRequest: process.env.MAX_TOKENS_PER_REQUEST
+          ? parseInt(process.env.MAX_TOKENS_PER_REQUEST, 10)
+          : undefined,
+        maxTokensPerHour: process.env.MAX_TOKENS_PER_HOUR
+          ? parseInt(process.env.MAX_TOKENS_PER_HOUR, 10)
+          : undefined,
+        requestTimeoutMs: process.env.REQUEST_TIMEOUT_MS
+          ? parseInt(process.env.REQUEST_TIMEOUT_MS, 10)
+          : undefined,
+        maxInputSize: process.env.MAX_INPUT_SIZE
+          ? parseInt(process.env.MAX_INPUT_SIZE, 10)
+          : undefined,
       },
     });
   } catch (error) {

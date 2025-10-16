@@ -16,7 +16,7 @@ export class OpenAIClient {
     this.client = new OpenAI({
       apiKey: config.openai.apiKey,
       maxRetries: 3,
-      timeout: 60000, // 60 seconds
+      timeout: config.security.requestTimeoutMs,
     });
   }
 
