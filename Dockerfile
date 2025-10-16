@@ -14,6 +14,9 @@ ENV HUSKY=0
 RUN npm ci --ignore-scripts && \
     npm cache clean --force
 
+# Security: Run npm audit to check for vulnerabilities (fail on high-severity)
+RUN npm audit --audit-level=high
+
 # Copy source and build
 COPY tsconfig.json ./
 COPY src ./src
@@ -22,6 +25,9 @@ RUN npm run build
 # Install production dependencies only (skip scripts to avoid husky)
 RUN npm ci --only=production --ignore-scripts && \
     npm cache clean --force
+
+# Security: Audit production dependencies
+RUN npm audit --production --audit-level=high
 
 # Production stage
 FROM node:22.12-alpine

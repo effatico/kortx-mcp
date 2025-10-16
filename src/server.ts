@@ -29,6 +29,7 @@ import {
 } from './tools/suggest-alternative.js';
 import { ImproveCopyTool, ImproveCopyInputSchema } from './tools/improve-copy.js';
 import { SolveProblemTool, SolveProblemInputSchema } from './tools/solve-problem.js';
+import { RateLimiter } from './middleware/rate-limiter.js';
 
 /**
  * Main MCP server for GPT-5 consultation
@@ -39,6 +40,7 @@ export class MCPConsultantServer {
   private logger: ReturnType<typeof createLogger>;
   private openaiClient: OpenAIClient;
   private contextGatherer: ContextGatherer;
+  private rateLimiter: RateLimiter | null;
   private thinkAboutPlanTool: ThinkAboutPlanTool;
   private suggestAlternativeTool: SuggestAlternativeTool;
   private improveCopyTool: ImproveCopyTool;
@@ -61,6 +63,21 @@ export class MCPConsultantServer {
     // Initialize core services
     this.openaiClient = new OpenAIClient(this.config, this.logger);
     this.contextGatherer = new ContextGatherer(this.config, this.logger);
+
+    // Initialize rate limiter if enabled
+    this.rateLimiter = this.config.security.enableRateLimiting
+      ? new RateLimiter({
+          maxRequestsPerHour: this.config.security.maxRequestsPerHour,
+          maxTokensPerRequest: this.config.security.maxTokensPerRequest,
+          maxTokensPerHour: this.config.security.maxTokensPerHour,
+        })
+      : null;
+
+    if (this.rateLimiter) {
+      this.logger.info('Rate limiting enabled');
+      // Run cleanup periodically
+      setInterval(() => this.rateLimiter?.cleanup(), 300000); // Every 5 minutes
+    }
 
     // Register context sources
     this.registerContextSources();
@@ -281,6 +298,32 @@ export class MCPConsultantServer {
     this.server.setRequestHandler(CallToolRequestSchema, async request => {
       const { name, arguments: args } = request.params;
       const startTime = Date.now();
+
+      // Generate client ID (in production, this could be based on session/user info)
+      const clientId = 'default-client';
+
+      // Check rate limits
+      if (this.rateLimiter) {
+        // Validate input size
+        const inputSize = JSON.stringify(args).length;
+        if (inputSize > this.config.security.maxInputSize) {
+          throw new McpError(
+            ErrorCode.InvalidRequest,
+            `Input size (${inputSize} bytes) exceeds maximum allowed (${this.config.security.maxInputSize} bytes)`
+          );
+        }
+
+        // Estimate tokens (rough approximation: 1 token ≈ 4 characters)
+        const estimatedTokens = Math.ceil(inputSize / 4);
+
+        if (!this.rateLimiter.checkLimit(clientId, estimatedTokens)) {
+          const limitInfo = this.rateLimiter.getClientInfo(clientId);
+          throw new McpError(
+            ErrorCode.InvalidRequest,
+            `Rate limit exceeded. Current usage: ${limitInfo?.count ?? 0}/${this.config.security.maxRequestsPerHour} requests, ${limitInfo?.tokens ?? 0}/${this.config.security.maxTokensPerHour} tokens`
+          );
+        }
+      }
 
       logToolExecutionStart(this.logger, name, args);
 
