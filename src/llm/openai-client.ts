@@ -22,18 +22,12 @@ export class OpenAIClient {
 
   async chat(request: LLMRequest): Promise<LLMResponse> {
     const model = request.model || this.config.openai.model;
-    let reasoningEffort = request.reasoningEffort || this.config.openai.reasoningEffort;
+    const reasoningEffort = this.adjustReasoningEffort(
+      model,
+      request.reasoningEffort || this.config.openai.reasoningEffort
+    );
     const maxTokens = request.maxTokens || this.config.openai.maxTokens;
     const verbosity = this.config.openai.verbosity;
-
-    // gpt-5-codex doesn't support 'minimal' reasoning effort
-    if (model === 'gpt-5-codex' && reasoningEffort === 'minimal') {
-      reasoningEffort = 'low';
-      this.logger.debug(
-        { model, originalEffort: 'minimal', adjustedEffort: 'low' },
-        'Adjusted reasoning effort for gpt-5-codex'
-      );
-    }
 
     const startTime = Date.now();
 
@@ -67,18 +61,12 @@ export class OpenAIClient {
 
   async chatStream(request: LLMRequest, onChunk: (chunk: string) => void): Promise<LLMResponse> {
     const model = request.model || this.config.openai.model;
-    let reasoningEffort = request.reasoningEffort || this.config.openai.reasoningEffort;
+    const reasoningEffort = this.adjustReasoningEffort(
+      model,
+      request.reasoningEffort || this.config.openai.reasoningEffort
+    );
     const maxTokens = request.maxTokens || this.config.openai.maxTokens;
     const verbosity = this.config.openai.verbosity;
-
-    // gpt-5-codex doesn't support 'minimal' reasoning effort
-    if (model === 'gpt-5-codex' && reasoningEffort === 'minimal') {
-      reasoningEffort = 'low';
-      this.logger.debug(
-        { model, originalEffort: 'minimal', adjustedEffort: 'low' },
-        'Adjusted reasoning effort for gpt-5-codex'
-      );
-    }
 
     const startTime = Date.now();
 
@@ -144,6 +132,17 @@ export class OpenAIClient {
       logError(this.logger, error as Error, { model, request });
       throw this.handleError(error);
     }
+  }
+
+  private adjustReasoningEffort(model: string, reasoningEffort: string): string {
+    if (model === 'gpt-5-codex' && reasoningEffort === 'minimal') {
+      this.logger.debug(
+        { model, originalEffort: 'minimal', adjustedEffort: 'low' },
+        'Adjusted reasoning effort for gpt-5-codex'
+      );
+      return 'low';
+    }
+    return reasoningEffort;
   }
 
   private parseResponse(completion: OpenAI.Chat.Completions.ChatCompletion): LLMResponse {
