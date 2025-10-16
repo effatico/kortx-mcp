@@ -5,29 +5,25 @@
 [![Build Status](https://github.com/amsv01/llm-consultants/workflows/Test/badge.svg)](https://github.com/amsv01/llm-consultants/actions)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.12.0-brightgreen)](https://nodejs.org)
 
-A lightweight, open-source MCP server that lets AI assistants like Claude Code consult GPT-5 models for specialized tasks and automatically gathers relevant context from your codebase.
+A lightweight, open-source MCP server that enables AI assistants like Claude Code to consult GPT-5 models for specialized tasks while automatically gathering relevant context from your codebase.
 
-[Quick Start](#-quick-start) • [Documentation](./docs) • [Examples](./examples) • [Contributing](./CONTRIBUTING.md)
+[Quick Start](#quick-start) • [Documentation](./docs) • [Examples](./examples) • [Contributing](./CONTRIBUTING.md)
 
 ---
 
 ## Who Should Use This
 
-AI researchers, tool builders, and platform engineers who want to enhance AI assistants with specialized consultation capabilities and intelligent context gathering from codebases.
+This tool is designed for AI researchers, tool builders, and platform engineers who want to add specialized consultation capabilities to AI assistants and enable intelligent, automated context gathering from codebases.
 
 ---
 
 ## Features
 
-- **Multi-model support**: GPT-5, GPT-5-mini, GPT-5-nano, and GPT-5-codex with configurable reasoning effort.
-- **Smart context gathering**: Integrates automatically with Serena, graph-memory, and cclsp MCPs to surface relevant code and metadata.
-- **Specialized tools**: Four purpose-built tools for strategic planning, alternative solutions, copy improvement, and problem solving.
-- **Docker-ready**: Containerized deployment with secure defaults.
-- **NPX support**: Install and run with a single command.
-- **Production-secure**: Non-root execution, sensitive-data redaction, and comprehensive logging.
-- **Observable**: Structured Pino logs with request/response tracking.
-- **Optimized defaults**: Fast time-to-first-token using gpt-5-mini and minimal reasoning settings.
-- **Well tested**: 46 passing unit tests with 80%+ coverage.
+The server supports multiple GPT-5 models (including mini, nano, and codex variants) with configurable reasoning effort. It automatically integrates with Serena, graph-memory, and cclsp MCPs to surface relevant code and metadata through smart context gathering.
+
+Four specialized tools handle strategic planning, alternative solutions, copy improvement, and problem solving. The server ships production-ready with Docker support, non-root execution, sensitive-data redaction, and comprehensive structured logging via Pino.
+
+You can install and run it with a single npx command. The defaults optimize for fast time-to-first-token using gpt-5-mini with minimal reasoning. The codebase maintains 80%+ test coverage with 46 passing unit tests.
 
 ---
 
@@ -39,26 +35,7 @@ Get started in seconds with a single command:
 npx llm-consultants
 ```
 
-### Installation Options
-
-**NPX (Recommended)**
-
-```bash
-npx llm-consultants
-```
-
-**NPM Global Install**
-
-```bash
-npm install -g llm-consultants
-llm-consultants
-```
-
-**Docker**
-
-```bash
-docker run -e OPENAI_API_KEY=your-key ghcr.io/amsv01/llm-consultants:latest
-```
+You can also install globally via npm or run it in Docker. For a global installation, use `npm install -g llm-consultants` and then run `llm-consultants`. To run in Docker, use `docker run -e OPENAI_API_KEY=your-key ghcr.io/amsv01/llm-consultants:latest`.
 
 ---
 
@@ -66,28 +43,13 @@ docker run -e OPENAI_API_KEY=your-key ghcr.io/amsv01/llm-consultants:latest
 
 ### Claude Code
 
-**Quick Setup:**
+The simplest setup uses npx:
 
 ```bash
-# Using npx (recommended)
 claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- npx -y llm-consultants
-
-# Using global install
-npm install -g llm-consultants
-claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- llm-consultants
 ```
 
-**Optional Configuration:**
-
-You can add additional environment variables to customize the server:
-
-```bash
-claude mcp add --transport stdio consultant \
-  --env OPENAI_API_KEY=YOUR_KEY \
-  --env OPENAI_MODEL=gpt-5-mini \
-  --env LOG_LEVEL=info \
-  -- npx -y llm-consultants
-```
+If you've installed the package globally, replace `npx -y llm-consultants` with just `llm-consultants`. You can customize the server by adding environment variables like `OPENAI_MODEL=gpt-5-mini` or `LOG_LEVEL=info` to the command above.
 
 [Detailed Claude Code setup guide →](./docs/integration/claude-code.md)
 
@@ -180,17 +142,11 @@ MAX_CONTEXT_TOKENS=32000             # Context limit
 
 ### Model Selection Guide
 
-- **gpt-5**: Best for complex reasoning, broad world knowledge, multi-step tasks
-- **gpt-5-mini** (default): Cost-optimized, balanced speed/capability
-- **gpt-5-nano**: High-throughput, simple tasks
-- **gpt-5-codex**: Optimized for code generation, refactoring, debugging, and code explanations
+The default **gpt-5-mini** offers cost-optimized performance with balanced speed and capability. Choose **gpt-5** for complex reasoning, broad world knowledge, and multi-step tasks. For high-throughput simple tasks, use **gpt-5-nano**. When working on code generation, refactoring, debugging, or code explanations, **gpt-5-codex** provides optimized results.
 
 ### Reasoning Effort Guide
 
-- **minimal** (default): Very few reasoning tokens, fastest time-to-first-token
-- **low**: Favors speed and fewer tokens
-- **medium**: Balanced reasoning and speed
-- **high**: Thorough reasoning for complex tasks
+The default **minimal** setting uses very few reasoning tokens for fastest time-to-first-token. Set to **low** when you favor speed with fewer tokens, **medium** for balanced reasoning and speed, or **high** for thorough reasoning on complex tasks.
 
 [Full configuration reference →](./docs/configuration.md)
 
@@ -200,7 +156,7 @@ MAX_CONTEXT_TOKENS=32000             # Context limit
 
 ### 1. think-about-plan
 
-Get strategic feedback on plans and approaches. Analyzes clarity, feasibility, risks, dependencies, and suggests alternatives.
+Get strategic feedback on plans and approaches. The tool analyzes clarity, feasibility, risks, and dependencies while suggesting alternatives and providing actionable recommendations.
 
 **Example Usage:**
 
@@ -209,20 +165,13 @@ Get strategic feedback on plans and approaches. Analyzes clarity, feasibility, r
 with JWT tokens and refresh token rotation. What do you think?"
 ```
 
-**Returns:**
-
-- Clarity assessment
-- Feasibility analysis
-- Risk evaluation
-- Dependencies identification
-- Recommendations
-- Alternative approaches
+The response includes a clarity assessment, feasibility analysis, risk evaluation, dependencies identification, recommendations, and alternative approaches.
 
 [API documentation →](./docs/api/think-about-plan.md)
 
 ### 2. suggest-alternative
 
-Request alternative approaches or solutions. Considers different paradigms, simpler solutions, proven patterns, and trade-offs.
+Request alternative approaches or solutions. The tool considers different paradigms, simpler solutions, proven patterns, and trade-offs to provide multiple viable options.
 
 **Example Usage:**
 
@@ -231,18 +180,13 @@ Request alternative approaches or solutions. Considers different paradigms, simp
 Can you suggest better approaches considering battery life and intermittent connectivity?"
 ```
 
-**Returns:**
-
-- Multiple alternative approaches
-- Pros and cons for each
-- Trade-off analysis
-- Recommendations
+The response presents multiple alternative approaches with pros and cons for each, trade-off analysis, and specific recommendations.
 
 [API documentation →](./docs/api/suggest-alternative.md)
 
 ### 3. improve-copy
 
-Improve text, documentation, or user-facing messages. Focuses on clarity, conciseness, tone, structure, and accessibility.
+Improve text, documentation, or user-facing messages with a focus on clarity, conciseness, appropriate tone, logical structure, and accessibility.
 
 **Example Usage:**
 
@@ -251,17 +195,13 @@ Improve text, documentation, or user-facing messages. Focuses on clarity, concis
 'Error 500: Internal server error occurred. Contact administrator.'"
 ```
 
-**Returns:**
-
-- Improved version
-- Explanation of changes
-- Reasoning for improvements
+The response provides an improved version with an explanation of changes and reasoning for each improvement.
 
 [API documentation →](./docs/api/improve-copy.md)
 
 ### 4. solve-problem
 
-Debug and problem-solving assistance. Performs root cause analysis, provides diagnosis steps, solutions, and prevention strategies.
+Get debugging and problem-solving assistance. The tool performs root cause analysis and provides diagnosis steps, proposed solutions, testing guidance, and prevention strategies.
 
 **Example Usage:**
 
@@ -271,13 +211,7 @@ I've increased server memory and checked disk space, but it still happens.
 Error: Request Entity Too Large, ETIMEDOUT: Socket timeout"
 ```
 
-**Returns:**
-
-- Root cause analysis
-- Diagnosis steps
-- Proposed solutions
-- Testing guidance
-- Prevention strategies
+The response includes root cause analysis, diagnosis steps, proposed solutions, testing guidance, and prevention strategies.
 
 [API documentation →](./docs/api/solve-problem.md)
 
@@ -413,25 +347,15 @@ llm-consultants/
 
 ## Contributing
 
-We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for details.
-
-- 🐛 [Report a Bug](https://github.com/amsv01/llm-consultants/issues/new?template=bug_report.md)
-- 💡 [Request a Feature](https://github.com/amsv01/llm-consultants/issues/new?template=feature_request.md)
-- 📖 [Improve Documentation](./CONTRIBUTING.md#documentation)
-- 🔧 [Submit a Pull Request](./CONTRIBUTING.md#pull-requests)
+We welcome contributions. Please see our [Contributing Guide](./CONTRIBUTING.md) for details on reporting bugs, requesting features, improving documentation, and submitting pull requests.
 
 ---
 
 ## Security
 
-Security is a top priority. See our [Security Policy](./SECURITY.md) for:
+Security is a top priority. See our [Security Policy](./SECURITY.md) for details on reporting vulnerabilities, security best practices, API key management, and Docker security.
 
-- Reporting vulnerabilities
-- Security best practices
-- API key management
-- Docker security
-
-**⚠️ Important:** Never commit your OpenAI API key to version control! Always use environment variables or secrets management.
+Never commit your OpenAI API key to version control. Always use environment variables or secrets management.
 
 ---
 
@@ -466,14 +390,7 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 
 **Current Version**: 1.0.0
 
-This project is actively maintained and production-ready:
-
-- ✅ Core functionality complete
-- ✅ Comprehensive testing (46 tests passing)
-- ✅ CI/CD pipeline configured
-- ✅ Docker containerization
-- ✅ NPX distribution ready
-- 🚧 Additional model support (gpt-5-pro, gpt-5-codex) planned
+This project is actively maintained and production-ready. Core functionality is complete with comprehensive testing (46 tests passing), CI/CD pipeline configured, Docker containerization, and NPX distribution ready. Additional model support including gpt-5-pro and gpt-5-codex is planned.
 
 [View roadmap →](https://linear.app/effati/project/llm-consultant-mcp-server-ca23faa6a9e9)
 

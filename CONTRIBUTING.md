@@ -1,18 +1,6 @@
 # Contributing to MCP Consultant
 
-Thank you for your interest in contributing to MCP Consultant! This document provides guidelines and instructions for contributing.
-
-## Table of Contents
-
-- [Code of Conduct](#code-of-conduct)
-- [Getting Started](#getting-started)
-- [Development Workflow](#development-workflow)
-- [Pull Request Process](#pull-request-process)
-- [Coding Standards](#coding-standards)
-- [Testing Guidelines](#testing-guidelines)
-- [Documentation](#documentation)
-- [Reporting Bugs](#reporting-bugs)
-- [Requesting Features](#requesting-features)
+Thank you for your interest in contributing to MCP Consultant. This document provides guidelines and instructions for contributing, including the code of conduct, getting started steps, development workflow, pull request process, coding standards, testing guidelines, documentation, bug reporting, and feature requests.
 
 ## Code of Conduct
 
@@ -29,19 +17,7 @@ This project adheres to a code of conduct. By participating, you are expected to
 
 ### Fork and Clone
 
-1. Fork the repository on GitHub
-2. Clone your fork locally:
-
-```bash
-git clone https://github.com/YOUR_USERNAME/llm-consultants.git
-cd llm-consultants
-```
-
-3. Add the upstream repository:
-
-```bash
-git remote add upstream https://github.com/amsv01/llm-consultants.git
-```
+Fork the repository on GitHub, then clone your fork locally with `git clone https://github.com/YOUR_USERNAME/llm-consultants.git` and `cd llm-consultants`. Add the upstream repository with `git remote add upstream https://github.com/amsv01/llm-consultants.git`.
 
 ### Initial Setup
 
@@ -82,12 +58,7 @@ Branch naming conventions:
 
 ### Making Changes
 
-1. Make your changes in your feature branch
-2. Write or update tests as needed
-3. Update documentation if required
-4. Ensure all tests pass: `npm test`
-5. Ensure code quality: `npm run lint` and `npm run format:check`
-6. Build successfully: `npm run build`
+Make your changes in your feature branch, write or update tests as needed, and update documentation if required. Ensure all tests pass with `npm test`, check code quality with `npm run lint` and `npm run format:check`, and verify the build succeeds with `npm run build`.
 
 ### Commit Messages
 
@@ -131,16 +102,7 @@ Improves error messages when required env vars are not set.
 
 ### Before Submitting
 
-Ensure your PR:
-
-- [ ] Passes all tests (`npm test`)
-- [ ] Passes linting (`npm run lint`)
-- [ ] Is properly formatted (`npm run format:check`)
-- [ ] Builds successfully (`npm run build`)
-- [ ] Includes tests for new functionality
-- [ ] Updates relevant documentation
-- [ ] Has a clear, descriptive title
-- [ ] References any related issues
+Ensure your PR passes all tests, linting, and formatting checks. Verify it builds successfully, includes tests for new functionality, updates relevant documentation, has a clear descriptive title, and references any related issues.
 
 ### Submitting a Pull Request
 
