@@ -4,47 +4,73 @@ import { config as dotenvConfig } from 'dotenv';
 // Load environment variables
 dotenvConfig();
 
+// Boolean coercion helper that handles "true"/"false" strings correctly
+const booleanSchema = (defaultValue: boolean) =>
+  z
+    .union([z.boolean(), z.string()])
+    .transform(val => {
+      if (typeof val === 'boolean') return val;
+      if (val === 'true') return true;
+      if (val === 'false') return false;
+      return defaultValue;
+    })
+    .default(defaultValue);
+
 // OpenAI configuration schema
 const OpenAIConfigSchema = z.object({
   apiKey: z.string().min(1, 'OPENAI_API_KEY is required'),
   model: z.enum(['gpt-5', 'gpt-5-mini', 'gpt-5-nano', 'gpt-5-codex']).default('gpt-5-mini'),
   reasoningEffort: z.enum(['minimal', 'low', 'medium', 'high']).default('minimal'),
   verbosity: z.enum(['low', 'medium', 'high']).default('low'),
-  maxTokens: z.number().int().positive().default(1024),
+  maxTokens: z.coerce.number().int().positive().default(1024),
+});
+
+// Perplexity configuration schema
+const PerplexityConfigSchema = z.object({
+  apiKey: z.string().min(1, 'PERPLEXITY_API_KEY is required'),
+  model: z
+    .enum(['sonar', 'sonar-pro', 'sonar-deep-research', 'sonar-reasoning', 'sonar-reasoning-pro'])
+    .default('sonar'),
+  temperature: z.coerce.number().min(0).max(2).default(0.2),
+  maxTokens: z.coerce.number().int().positive().default(4096),
+  searchMode: z.enum(['academic', 'sec', 'web']).default('web'),
+  returnImages: booleanSchema(false),
+  returnRelatedQuestions: booleanSchema(false),
 });
 
 // MCP Server configuration schema
 const ServerConfigSchema = z.object({
   name: z.string().default('kortx-mcp'),
   version: z.string().default('0.1.0'),
-  port: z.number().int().positive().default(3000),
+  port: z.coerce.number().int().positive().default(3000),
   transport: z.enum(['stdio', 'streaming']).default('stdio'),
   logLevel: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
 });
 
 // Context gathering configuration
 const ContextConfigSchema = z.object({
-  enableSerena: z.boolean().default(true),
-  enableMemory: z.boolean().default(true),
-  enableCclsp: z.boolean().default(true),
-  maxContextTokens: z.number().int().positive().default(32000),
-  includeFileContent: z.boolean().default(true),
-  includeGitHistory: z.boolean().default(false),
+  enableSerena: booleanSchema(true),
+  enableMemory: booleanSchema(true),
+  enableCclsp: booleanSchema(true),
+  maxContextTokens: z.coerce.number().int().positive().default(32000),
+  includeFileContent: booleanSchema(true),
+  includeGitHistory: booleanSchema(false),
 });
 
 // Security configuration
 const SecurityConfigSchema = z.object({
-  enableRateLimiting: z.boolean().default(true),
-  maxRequestsPerHour: z.number().int().positive().default(100),
-  maxTokensPerRequest: z.number().int().positive().default(50000),
-  maxTokensPerHour: z.number().int().positive().default(500000),
-  requestTimeoutMs: z.number().int().positive().default(60000),
-  maxInputSize: z.number().int().positive().default(100000), // 100KB
+  enableRateLimiting: booleanSchema(true),
+  maxRequestsPerHour: z.coerce.number().int().positive().default(100),
+  maxTokensPerRequest: z.coerce.number().int().positive().default(50000),
+  maxTokensPerHour: z.coerce.number().int().positive().default(500000),
+  requestTimeoutMs: z.coerce.number().int().positive().default(60000),
+  maxInputSize: z.coerce.number().int().positive().default(100000), // 100KB
 });
 
 // Complete configuration schema
 const ConfigSchema = z.object({
   openai: OpenAIConfigSchema,
+  perplexity: PerplexityConfigSchema,
   server: ServerConfigSchema,
   context: ContextConfigSchema,
   security: SecurityConfigSchema,
@@ -61,44 +87,39 @@ export function loadConfig(): Config {
         model: process.env.OPENAI_MODEL,
         reasoningEffort: process.env.OPENAI_REASONING_EFFORT,
         verbosity: process.env.OPENAI_VERBOSITY,
-        maxTokens: process.env.OPENAI_MAX_TOKENS
-          ? parseInt(process.env.OPENAI_MAX_TOKENS, 10)
-          : undefined,
+        maxTokens: process.env.OPENAI_MAX_TOKENS,
+      },
+      perplexity: {
+        apiKey: process.env.PERPLEXITY_API_KEY,
+        model: process.env.PERPLEXITY_MODEL,
+        temperature: process.env.PERPLEXITY_TEMPERATURE,
+        maxTokens: process.env.PERPLEXITY_MAX_TOKENS,
+        searchMode: process.env.PERPLEXITY_SEARCH_MODE,
+        returnImages: process.env.PERPLEXITY_RETURN_IMAGES,
+        returnRelatedQuestions: process.env.PERPLEXITY_RETURN_RELATED_QUESTIONS,
       },
       server: {
         name: process.env.SERVER_NAME,
         version: process.env.SERVER_VERSION,
-        port: process.env.PORT ? parseInt(process.env.PORT, 10) : undefined,
-        transport: process.env.TRANSPORT as 'stdio' | 'streaming' | undefined,
-        logLevel: process.env.LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error' | undefined,
+        port: process.env.PORT,
+        transport: process.env.TRANSPORT,
+        logLevel: process.env.LOG_LEVEL,
       },
       context: {
-        enableSerena: process.env.ENABLE_SERENA === 'false' ? false : undefined,
-        enableMemory: process.env.ENABLE_MEMORY === 'false' ? false : undefined,
-        enableCclsp: process.env.ENABLE_CCLSP === 'false' ? false : undefined,
-        maxContextTokens: process.env.MAX_CONTEXT_TOKENS
-          ? parseInt(process.env.MAX_CONTEXT_TOKENS, 10)
-          : undefined,
-        includeFileContent: process.env.INCLUDE_FILE_CONTENT === 'false' ? false : undefined,
-        includeGitHistory: process.env.INCLUDE_GIT_HISTORY === 'true' ? true : undefined,
+        enableSerena: process.env.ENABLE_SERENA,
+        enableMemory: process.env.ENABLE_MEMORY,
+        enableCclsp: process.env.ENABLE_CCLSP,
+        maxContextTokens: process.env.MAX_CONTEXT_TOKENS,
+        includeFileContent: process.env.INCLUDE_FILE_CONTENT,
+        includeGitHistory: process.env.INCLUDE_GIT_HISTORY,
       },
       security: {
-        enableRateLimiting: process.env.ENABLE_RATE_LIMITING === 'false' ? false : undefined,
-        maxRequestsPerHour: process.env.MAX_REQUESTS_PER_HOUR
-          ? parseInt(process.env.MAX_REQUESTS_PER_HOUR, 10)
-          : undefined,
-        maxTokensPerRequest: process.env.MAX_TOKENS_PER_REQUEST
-          ? parseInt(process.env.MAX_TOKENS_PER_REQUEST, 10)
-          : undefined,
-        maxTokensPerHour: process.env.MAX_TOKENS_PER_HOUR
-          ? parseInt(process.env.MAX_TOKENS_PER_HOUR, 10)
-          : undefined,
-        requestTimeoutMs: process.env.REQUEST_TIMEOUT_MS
-          ? parseInt(process.env.REQUEST_TIMEOUT_MS, 10)
-          : undefined,
-        maxInputSize: process.env.MAX_INPUT_SIZE
-          ? parseInt(process.env.MAX_INPUT_SIZE, 10)
-          : undefined,
+        enableRateLimiting: process.env.ENABLE_RATE_LIMITING,
+        maxRequestsPerHour: process.env.MAX_REQUESTS_PER_HOUR,
+        maxTokensPerRequest: process.env.MAX_TOKENS_PER_REQUEST,
+        maxTokensPerHour: process.env.MAX_TOKENS_PER_HOUR,
+        requestTimeoutMs: process.env.REQUEST_TIMEOUT_MS,
+        maxInputSize: process.env.MAX_INPUT_SIZE,
       },
     });
   } catch (error) {
