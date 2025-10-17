@@ -2,7 +2,7 @@
 
 [![npm version](https://badge.fury.io/js/kortx-mcp.svg)](https://www.npmjs.com/package/kortx-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://github.com/amsv01/kortx-mcp/workflows/Test/badge.svg)](https://github.com/amsv01/kortx-mcp/actions)
+[![Build Status](https://github.com/effatico/kortx-mcp/workflows/Test/badge.svg)](https://github.com/effatico/kortx-mcp/actions)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.12.0-brightgreen)](https://nodejs.org)
 
 A lightweight, open-source MCP server that enables AI assistants like Claude Code to consult GPT-5 models for specialized tasks while automatically gathering relevant context from your codebase.
@@ -35,7 +35,7 @@ Get started in seconds with a single command:
 npx kortx-mcp
 ```
 
-You can also install globally via npm or run it in Docker. For a global installation, use `npm install -g kortx-mcp` and then run `kortx-mcp`. To run in Docker, use `docker run -e OPENAI_API_KEY=your-key ghcr.io/amsv01/kortx-mcp:latest`.
+You can also install globally via npm or run it in Docker. For a global installation, use `npm install -g kortx-mcp` and then run `kortx-mcp`. To run in Docker, use `docker run -e OPENAI_API_KEY=your-key ghcr.io/effatico/kortx-mcp:latest`.
 
 ---
 
@@ -408,7 +408,7 @@ The response includes root cause analysis, diagnosis steps, proposed solutions, 
 
 ```bash
 # Clone the repository
-git clone https://github.com/amsv01/kortx-mcp.git
+git clone https://github.com/effatico/kortx-mcp.git
 cd kortx-mcp
 
 # Install dependencies
@@ -539,8 +539,8 @@ This project is actively maintained and production-ready. Core functionality is 
 ## Support
 
 - 📖 [Documentation](./docs)
-- 💬 [GitHub Discussions](https://github.com/amsv01/kortx-mcp/discussions)
-- 🐛 [Issue Tracker](https://github.com/amsv01/kortx-mcp/issues)
+- 💬 [GitHub Discussions](https://github.com/effatico/kortx-mcp/discussions)
+- 🐛 [Issue Tracker](https://github.com/effatico/kortx-mcp/issues)
 - 📧 [Email Support](mailto:amin@effati.se)
 
 ---

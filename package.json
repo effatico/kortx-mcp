@@ -40,12 +40,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/amsv01/kortx-mcp.git"
+    "url": "https://github.com/effatico/kortx-mcp.git"
   },
   "bugs": {
-    "url": "https://github.com/amsv01/kortx-mcp/issues"
+    "url": "https://github.com/effatico/kortx-mcp/issues"
   },
-  "homepage": "https://github.com/amsv01/kortx-mcp#readme",
+  "homepage": "https://github.com/effatico/kortx-mcp#readme",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
