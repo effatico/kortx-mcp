@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/effatico-kortx-mcp-badge.png)](https://mseep.ai/app/effatico-kortx-mcp)
+
 # Kortx
 
 [![npm version](https://badge.fury.io/js/%40effatico%2Fkortx-mcp.svg)](https://www.npmjs.com/package/@effatico/kortx-mcp)
