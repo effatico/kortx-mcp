@@ -17,7 +17,7 @@ Before you begin, ensure you have Node.js 22.12 or higher, npm or yarn, Git, and
 Fork the repository and clone your fork to your local machine. Navigate to the project directory and install dependencies. Copy the `.env.example` file to `.env` and add your OpenAI API key. Build the project and verify everything works by running tests.
 
 ```bash
-git clone https://github.com/your-username/kortx-mcp.git
+git clone https://github.com/YOUR_USERNAME/kortx-mcp.git
 cd kortx-mcp
 npm install
 cp .env.example .env
