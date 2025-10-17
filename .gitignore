@@ -49,6 +49,9 @@ tmp/
 temp/
 *.tmp
 
+# Posts and drafts
+hackernews-post.txt
+
 # OS
 .DS_Store
 .DS_Store?
