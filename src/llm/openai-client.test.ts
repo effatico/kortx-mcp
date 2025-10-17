@@ -73,7 +73,17 @@ describe('OpenAIClient', () => {
   describe('chat', () => {
     it('should call OpenAI Responses API with correct parameters', async () => {
       const mockResponse = {
-        output_text: 'Test response',
+        output: [
+          {
+            type: 'message',
+            content: [
+              {
+                type: 'output_text',
+                text: 'Test response',
+              },
+            ],
+          },
+        ],
         model: 'gpt-5-mini',
         usage: {
           input_tokens: 100,
@@ -112,7 +122,17 @@ describe('OpenAIClient', () => {
 
     it('should use custom model from request', async () => {
       const mockResponse = {
-        output_text: 'Test response',
+        output: [
+          {
+            type: 'message',
+            content: [
+              {
+                type: 'output_text',
+                text: 'Test response',
+              },
+            ],
+          },
+        ],
         model: 'gpt-5',
         usage: {
           input_tokens: 100,
@@ -139,7 +159,17 @@ describe('OpenAIClient', () => {
 
     it('should use custom reasoning effort from request', async () => {
       const mockResponse = {
-        output_text: 'Test response',
+        output: [
+          {
+            type: 'message',
+            content: [
+              {
+                type: 'output_text',
+                text: 'Test response',
+              },
+            ],
+          },
+        ],
         model: 'gpt-5-mini',
         usage: {
           input_tokens: 100,
@@ -168,7 +198,17 @@ describe('OpenAIClient', () => {
 
     it('should use custom max tokens from request', async () => {
       const mockResponse = {
-        output_text: 'Test response',
+        output: [
+          {
+            type: 'message',
+            content: [
+              {
+                type: 'output_text',
+                text: 'Test response',
+              },
+            ],
+          },
+        ],
         model: 'gpt-5-mini',
         usage: {
           input_tokens: 100,
@@ -195,7 +235,17 @@ describe('OpenAIClient', () => {
 
     it('should handle reasoning tokens in response', async () => {
       const mockResponse = {
-        output_text: 'Test response',
+        output: [
+          {
+            type: 'message',
+            content: [
+              {
+                type: 'output_text',
+                text: 'Test response',
+              },
+            ],
+          },
+        ],
         model: 'gpt-5',
         usage: {
           input_tokens: 100,

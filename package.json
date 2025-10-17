@@ -4,7 +4,7 @@
   "description": "Kortx: MCP server for AI-driven code consultation with GPT-5 and intelligent context gathering",
   "type": "module",
   "bin": {
-    "@effatico/kortx-mcp": "./build/index.js"
+    "kortx-mcp": "./build/index.js"
   },
   "main": "./build/server.js",
   "types": "./build/server.d.ts",
