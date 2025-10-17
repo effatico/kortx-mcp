@@ -8,7 +8,7 @@ We take the security of MCP Consultant seriously. If you discover a security vul
 
 **Please DO NOT open public issues for security vulnerabilities.**
 
-Instead, please email security reports to: **amin@effati.se**
+Instead, please email security reports to: **info@effati.se**
 
 Include the following information in your report:
 
@@ -332,6 +332,6 @@ Subscribe to security updates:
 For security-related questions that are not vulnerabilities, please:
 
 - Open a [GitHub Discussion](https://github.com/effatico/kortx-mcp/discussions)
-- Email amin@effati.se with subject "Security Question: [Your Topic]"
+- Email info@effati.se with subject "Security Question: [Your Topic]"
 
 Thank you for helping keep MCP Consultant secure! 🔒

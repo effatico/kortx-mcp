@@ -549,4 +549,4 @@ Be mindful of what code you're sending to OpenAI's API.
 - 📖 [Troubleshooting Guide](../troubleshooting.md)
 - 💬 [GitHub Discussions](https://github.com/effatico/kortx-mcp/discussions)
 - 🐛 [Report an Issue](https://github.com/effatico/kortx-mcp/issues)
-- 📧 [Email Support](mailto:amin@effati.se)
+- 📧 [Email Support](mailto:info@effati.se)

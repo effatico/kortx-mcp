@@ -577,7 +577,7 @@ This project is actively maintained and production-ready. Core functionality is 
 - 📖 [Documentation](./docs)
 - 💬 [GitHub Discussions](https://github.com/effatico/kortx-mcp/discussions)
 - 🐛 [Issue Tracker](https://github.com/effatico/kortx-mcp/issues)
-- 📧 [Email Support](mailto:amin@effati.se)
+- 📧 [Email Support](mailto:info@effati.se)
 
 ---
 

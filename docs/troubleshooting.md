@@ -694,7 +694,7 @@ Create a new issue: [github.com/effatico/kortx-mcp/issues/new](https://github.co
 Or reach out:
 
 - 💬 [GitHub Discussions](https://github.com/effatico/kortx-mcp/discussions)
-- 📧 [Email Support](mailto:amin@effati.se)
+- 📧 [Email Support](mailto:info@effati.se)
 
 ### 4. Community Help
 

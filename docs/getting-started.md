@@ -285,7 +285,7 @@ If you need assistance:
 - 📖 [Full Documentation](../README.md#-documentation)
 - 🐛 [Report an Issue](https://github.com/effatico/kortx-mcp/issues)
 - 💬 [GitHub Discussions](https://github.com/effatico/kortx-mcp/discussions)
-- 📧 [Email Support](mailto:amin@effati.se)
+- 📧 [Email Support](mailto:info@effati.se)
 
 ## What's Next?
 
