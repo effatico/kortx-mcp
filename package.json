@@ -65,7 +65,6 @@
     "format:check": "prettier --check \"**/*.{ts,js,json,md}\"",
     "type-check": "tsc --noEmit",
     "prepublishOnly": "npm run lint && npm run format:check && npm run build && npm run test:ci",
-    "postpublish": "git tag v$npm_package_version -m \"Release v$npm_package_version\" && git push --tags",
     "version": "npm run changelog && git add CHANGELOG.md",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "inspector": "npx @modelcontextprotocol/inspector build/index.js",
