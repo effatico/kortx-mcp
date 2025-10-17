@@ -165,6 +165,7 @@ Build and run the Docker image:
 docker build -t llm-consultants .
 
 # Run with environment variables
+# Note: -i flag is required for stdio transport
 docker run -i --rm \
   -e OPENAI_API_KEY=your-api-key \
   llm-consultants
@@ -245,11 +246,11 @@ The Dockerfile implements security best practices:
 
 ### Troubleshooting Docker
 
-**Container exits immediately:** This is expected behavior for stdio transport. The MCP server requires an active stdin connection. Use `-i` flag for interactive mode or connect via MCP client.
+**Container exits immediately:** This is expected behavior for stdio transport. The MCP server requires an active stdin connection. Use the `-i` flag for interactive mode or connect via MCP client.
 
 **Permission errors:** Ensure files are readable by the nodejs user (UID 1001). The Dockerfile sets proper ownership with `--chown=nodejs:nodejs`.
 
-**Image size concerns:** The base Node.js 22 Alpine image is ~226MB. Production dependencies add ~46MB. Total size of ~273MB is optimized for a full-featured Node.js application.
+**Image size concerns:** The base Node.js 22 Alpine image contributes ~226MB (necessary for full runtime features). Production dependencies add ~46MB, resulting in a total size of ~273MB. This exceeds the original 200MB optimization target but remains practical for a full-featured MCP server with comprehensive Node.js capabilities.
 
 ---
 

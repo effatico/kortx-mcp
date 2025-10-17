@@ -1,6 +1,18 @@
 #!/bin/bash
 # Comprehensive Docker testing script for llm-consultants MCP server
 # Tests: build, security, size, user config, container startup, and shutdown
+#
+# Usage: ./scripts/test-docker.sh
+#
+# This script:
+# - Builds the Docker image
+# - Runs 12 automated tests covering security, performance, and functionality
+# - Reports results with color-coded output
+# - Cleans up test artifacts on exit
+#
+# Prerequisites: Docker (or Docker Desktop), docker-compose
+#
+# Exit codes: 0 (success), 1 (critical test failure)
 
 set -e  # Exit on any error
 
@@ -64,14 +76,18 @@ fi
 
 # Test 3: Image Size Check
 print_header "Test 3: Image Size Verification"
-IMAGE_SIZE=$(docker images "$IMAGE_NAME" --format "{{.Size}}" | sed 's/MB//' | sed 's/GB/*1024/' | bc 2>/dev/null || docker images "$IMAGE_NAME" --format "{{.Size}}")
+IMAGE_SIZE=$(docker images "$IMAGE_NAME" --format "{{.Size}}" | awk '
+    /GB/ { val=$1; sub(/GB/,"",val); printf "%.0f", val*1024; next }
+    /MB/ { val=$1; sub(/MB/,"",val); printf "%.0f", val; next }
+    { print $1 }
+')
 IMAGE_SIZE_NUM=$(echo "$IMAGE_SIZE" | grep -oE '[0-9]+' | head -1)
 
-echo "Image size: ${IMAGE_SIZE}MB"
+echo "Image size: ${IMAGE_SIZE_NUM}MB"
 if [ "$IMAGE_SIZE_NUM" -lt "$SIZE_LIMIT_MB" ]; then
-    print_success "Image size (${IMAGE_SIZE}MB) is under ${SIZE_LIMIT_MB}MB target"
+    print_success "Image size (${IMAGE_SIZE_NUM}MB) is under ${SIZE_LIMIT_MB}MB target"
 else
-    print_warning "Image size (${IMAGE_SIZE}MB) exceeds ${SIZE_LIMIT_MB}MB target"
+    print_warning "Image size (${IMAGE_SIZE_NUM}MB) exceeds ${SIZE_LIMIT_MB}MB target"
     echo "Note: Node.js 22 Alpine base image contributes ~226MB"
 fi
 
@@ -102,16 +118,16 @@ print_header "Test 6: Container Startup & STDIO Transport"
 echo "Testing container startup (stdio transport exits without input - this is expected)..."
 
 # Run container briefly to check for startup errors
-STARTUP_OUTPUT=$(docker run --rm -i \
+STARTUP_OUTPUT=$(echo '{"jsonrpc": "2.0", "method": "quit", "id": 1}' | docker run --rm -i \
     -e OPENAI_API_KEY=sk-test-key \
     -e NODE_ENV=production \
-    "$IMAGE_NAME" <<< '{"jsonrpc": "2.0", "method": "quit", "id": 1}' 2>&1 | head -20 || true)
+    "$IMAGE_NAME" 2>&1 | head -20 || true)
 
 # Check if container started without critical errors
-if echo "$STARTUP_OUTPUT" | grep -qiE "(error loading|cannot find module|failed to start)" ; then
+if echo "$STARTUP_OUTPUT" | grep -qiE "(error|fail|cannot|exception)" ; then
     print_error "Container has startup errors: $STARTUP_OUTPUT"
 elif [ -z "$STARTUP_OUTPUT" ]; then
-    print_warning "Container started but no output received (may need proper MCP input)"
+    print_warning "Container started but produced no output (stdio may not be configured)"
 else
     print_success "Container started successfully (stdio transport working)"
     echo "Note: Container exits when stdin closes - this is expected for stdio transport"
