@@ -35,7 +35,7 @@ export class OpenAIClient {
 
     try {
       // GPT-5 uses the Responses API, not Chat Completions
-      const response = await this.client.responses.create({
+      const response = (await this.client.responses.create({
         model,
         input: request.messages,
         max_output_tokens: maxTokens,
@@ -45,7 +45,8 @@ export class OpenAIClient {
         text: {
           verbosity,
         },
-      } as any); // Type assertion due to potential SDK version differences
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any)) as any;
 
       const duration = Date.now() - startTime;
       const llmResponse = this.parseResponsesAPIResponse(response);
@@ -74,6 +75,7 @@ export class OpenAIClient {
 
     try {
       // GPT-5 uses the Responses API with streaming
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const stream = (await this.client.responses.create({
         model,
         input: request.messages,
@@ -85,6 +87,7 @@ export class OpenAIClient {
         text: {
           verbosity,
         },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any)) as unknown as AsyncIterable<any>;
 
       let fullContent = '';
@@ -156,20 +159,24 @@ export class OpenAIClient {
         prompt: usage?.prompt_tokens || 0,
         completion: usage?.completion_tokens || 0,
         total: usage?.total_tokens || 0,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...((usage as any)?.reasoning_tokens && {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           reasoning: (usage as any).reasoning_tokens,
         }),
       },
       finishReason: completion.choices[0]?.finish_reason || 'stop',
-      ...((message as any)?.reasoning_content && {
-        reasoningContent: (message as any).reasoning_content,
-      }),
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private parseResponsesAPIResponse(response: any): LLMResponse {
     // Parse Responses API response format
-    const outputText = response.output_text || '';
+    const outputText =
+      response.output?.[0]?.type === 'message' &&
+      response.output[0].content?.[0]?.type === 'output_text'
+        ? response.output[0].content[0].text
+        : '';
     const usage = response.usage;
 
     return {
@@ -187,25 +194,26 @@ export class OpenAIClient {
     };
   }
 
-  private handleError(error: any): LLMError {
-    const llmError = new Error(error.message || 'OpenAI API error') as LLMError;
+  private handleError(error: unknown): LLMError {
+    const errorObj = error as { message?: string; status?: number; code?: string };
+    const llmError = new Error(errorObj.message || 'OpenAI API error') as LLMError;
     llmError.name = 'LLMError';
 
-    if (error.status) {
-      llmError.status = error.status;
+    if (errorObj.status) {
+      llmError.status = errorObj.status;
     }
 
-    if (error.code) {
-      llmError.code = error.code;
+    if (errorObj.code) {
+      llmError.code = errorObj.code;
     }
 
     // Determine if error is retryable
     llmError.retryable =
-      error.status === 429 || // Rate limit
-      error.status === 503 || // Service unavailable
-      error.status === 500 || // Internal server error
-      error.code === 'ECONNRESET' ||
-      error.code === 'ETIMEDOUT';
+      errorObj.status === 429 || // Rate limit
+      errorObj.status === 503 || // Service unavailable
+      errorObj.status === 500 || // Internal server error
+      errorObj.code === 'ECONNRESET' ||
+      errorObj.code === 'ETIMEDOUT';
 
     return llmError;
   }

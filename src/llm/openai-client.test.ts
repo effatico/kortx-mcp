@@ -15,6 +15,9 @@ vi.mock('openai', () => {
   };
 });
 
+// Type for accessing private client property in tests
+type OpenAIClientWithPrivate = OpenAIClient & { client: { responses: { create: unknown } } };
+
 describe('OpenAIClient', () => {
   let client: OpenAIClient;
   let mockConfig: Config;
@@ -62,7 +65,7 @@ describe('OpenAIClient', () => {
       debug: vi.fn(),
       warn: vi.fn(),
       error: vi.fn(),
-    } as any;
+    } as unknown as Logger;
 
     client = new OpenAIClient(mockConfig, mockLogger);
   });
@@ -80,7 +83,7 @@ describe('OpenAIClient', () => {
       };
 
       const mockCreate = vi.fn().mockResolvedValue(mockResponse);
-      (client as any).client.responses.create = mockCreate;
+      (client as OpenAIClientWithPrivate).client.responses.create = mockCreate;
 
       const request: LLMRequest = {
         messages: [{ role: 'user', content: 'Test message' }],
@@ -118,7 +121,7 @@ describe('OpenAIClient', () => {
       };
 
       const mockCreate = vi.fn().mockResolvedValue(mockResponse);
-      (client as any).client.responses.create = mockCreate;
+      (client as OpenAIClientWithPrivate).client.responses.create = mockCreate;
 
       const request: LLMRequest = {
         messages: [{ role: 'user', content: 'Test message' }],
@@ -145,7 +148,7 @@ describe('OpenAIClient', () => {
       };
 
       const mockCreate = vi.fn().mockResolvedValue(mockResponse);
-      (client as any).client.responses.create = mockCreate;
+      (client as OpenAIClientWithPrivate).client.responses.create = mockCreate;
 
       const request: LLMRequest = {
         messages: [{ role: 'user', content: 'Test message' }],
@@ -174,7 +177,7 @@ describe('OpenAIClient', () => {
       };
 
       const mockCreate = vi.fn().mockResolvedValue(mockResponse);
-      (client as any).client.responses.create = mockCreate;
+      (client as OpenAIClientWithPrivate).client.responses.create = mockCreate;
 
       const request: LLMRequest = {
         messages: [{ role: 'user', content: 'Test message' }],
@@ -202,7 +205,7 @@ describe('OpenAIClient', () => {
       };
 
       const mockCreate = vi.fn().mockResolvedValue(mockResponse);
-      (client as any).client.responses.create = mockCreate;
+      (client as OpenAIClientWithPrivate).client.responses.create = mockCreate;
 
       const request: LLMRequest = {
         messages: [{ role: 'user', content: 'Test message' }],
@@ -215,11 +218,11 @@ describe('OpenAIClient', () => {
     });
 
     it('should handle API errors gracefully', async () => {
-      const mockError = new Error('API Error');
-      (mockError as any).status = 500;
+      const mockError = new Error('API Error') as Error & { status: number };
+      mockError.status = 500;
 
       const mockCreate = vi.fn().mockRejectedValue(mockError);
-      (client as any).client.responses.create = mockCreate;
+      (client as OpenAIClientWithPrivate).client.responses.create = mockCreate;
 
       const request: LLMRequest = {
         messages: [{ role: 'user', content: 'Test message' }],
@@ -229,11 +232,11 @@ describe('OpenAIClient', () => {
     });
 
     it('should mark rate limit errors as retryable', async () => {
-      const mockError = new Error('Rate limit exceeded');
-      (mockError as any).status = 429;
+      const mockError = new Error('Rate limit exceeded') as Error & { status: number };
+      mockError.status = 429;
 
       const mockCreate = vi.fn().mockRejectedValue(mockError);
-      (client as any).client.responses.create = mockCreate;
+      (client as OpenAIClientWithPrivate).client.responses.create = mockCreate;
 
       const request: LLMRequest = {
         messages: [{ role: 'user', content: 'Test message' }],
@@ -241,9 +244,10 @@ describe('OpenAIClient', () => {
 
       try {
         await client.chat(request);
-      } catch (error: any) {
-        expect(error.retryable).toBe(true);
-        expect(error.status).toBe(429);
+      } catch (error: unknown) {
+        const llmError = error as { retryable?: boolean; status?: number };
+        expect(llmError.retryable).toBe(true);
+        expect(llmError.status).toBe(429);
       }
     });
   });
@@ -272,7 +276,7 @@ describe('OpenAIClient', () => {
       })();
 
       const mockCreate = vi.fn().mockResolvedValue(mockStream);
-      (client as any).client.responses.create = mockCreate;
+      (client as OpenAIClientWithPrivate).client.responses.create = mockCreate;
 
       const chunks: string[] = [];
       const onChunk = (chunk: string) => chunks.push(chunk);
@@ -312,7 +316,7 @@ describe('OpenAIClient', () => {
       })();
 
       const mockCreate = vi.fn().mockResolvedValue(mockStream);
-      (client as any).client.responses.create = mockCreate;
+      (client as OpenAIClientWithPrivate).client.responses.create = mockCreate;
 
       const chunks: string[] = [];
       const onChunk = (chunk: string) => chunks.push(chunk);

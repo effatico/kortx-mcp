@@ -181,7 +181,7 @@ describe('Configuration Management', () => {
       const config: Config = {
         openai: {
           apiKey: 'test-key',
-          model: 'gpt-5-pro' as any,
+          model: 'gpt-5-pro' as never,
           reasoningEffort: 'medium',
           maxTokens: 4096,
         },
@@ -211,7 +211,7 @@ describe('Configuration Management', () => {
       const config: Config = {
         openai: {
           apiKey: 'test-key',
-          model: 'gpt-5-codex' as any,
+          model: 'gpt-5-codex' as never,
           reasoningEffort: 'minimal',
           maxTokens: 4096,
         },
@@ -241,7 +241,7 @@ describe('Configuration Management', () => {
       const config: Config = {
         openai: {
           apiKey: 'test-key',
-          model: 'gpt-5-pro' as any,
+          model: 'gpt-5-pro' as never,
           reasoningEffort: 'high',
           maxTokens: 4096,
         },
@@ -271,7 +271,7 @@ describe('Configuration Management', () => {
       const config: Config = {
         openai: {
           apiKey: 'test-key',
-          model: 'gpt-5-codex' as any,
+          model: 'gpt-5-codex' as never,
           reasoningEffort: 'low',
           maxTokens: 4096,
         },
@@ -306,8 +306,8 @@ describe('Configuration Management', () => {
           const config: Config = {
             openai: {
               apiKey: 'test-key',
-              model: model as any,
-              reasoningEffort: effort as any,
+              model: model as never,
+              reasoningEffort: effort as never,
               maxTokens: 4096,
             },
             server: {
