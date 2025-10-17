@@ -2,7 +2,7 @@
 
 [![npm version](https://badge.fury.io/js/kortx-mcp.svg)](https://www.npmjs.com/package/kortx-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://github.com/effatico/kortx-mcp/workflows/Test/badge.svg)](https://github.com/effatico/kortx-mcp/actions)
+[![Build Status](https://github.com/effatico/kortx-mcp/workflows/CI/badge.svg)](https://github.com/effatico/kortx-mcp/actions)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.12.0-brightgreen)](https://nodejs.org)
 
 A lightweight, open-source MCP server that enables AI assistants like Claude Code to consult GPT-5 models for specialized tasks while automatically gathering relevant context from your codebase.
@@ -549,4 +549,4 @@ This project is actively maintained and production-ready. Core functionality is 
 
 If you find this project useful, please consider giving it a star on GitHub!
 
-[![Star History Chart](https://api.star-history.com/svg?repos=amsv01/kortx-mcp&type=Date)](https://star-history.com/#amsv01/kortx-mcp&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=effatico/kortx-mcp&type=Date)](https://star-history.com/#effatico/kortx-mcp&Date)
