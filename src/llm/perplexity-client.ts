@@ -48,9 +48,7 @@ export class PerplexityClient {
       web_search_options: request.webSearchOptions
         ? {
             search_context_size: request.webSearchOptions.context_size,
-            user_location: request.webSearchOptions.user_location
-              ? { country: request.webSearchOptions.user_location }
-              : undefined,
+            user_location: request.webSearchOptions.user_location,
           }
         : undefined,
       reasoning_effort: request.reasoningEffort,

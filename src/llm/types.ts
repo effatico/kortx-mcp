@@ -63,7 +63,13 @@ export interface PerplexityRequest {
   languagePreference?: string;
   webSearchOptions?: {
     context_size?: 'low' | 'medium' | 'high';
-    user_location?: string;
+    user_location?: {
+      country?: string;
+      region?: string;
+      city?: string;
+      latitude?: number;
+      longitude?: number;
+    };
   };
   mediaResponse?: {
     overrides?: {
