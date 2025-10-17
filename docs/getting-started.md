@@ -12,7 +12,7 @@ The fastest way to get started uses npx with no installation required. Run `npx 
 
 For regular use, install globally with `npm install -g kortx-mcp` and then run `kortx-mcp` anytime.
 
-For containerized deployments, pull the Docker image with `docker pull ghcr.io/amsv01/kortx-mcp:latest` and run it with `docker run -e OPENAI_API_KEY=sk-your-key ghcr.io/amsv01/kortx-mcp:latest`.
+For containerized deployments, pull the Docker image with `docker pull ghcr.io/effatico/kortx-mcp:latest` and run it with `docker run -e OPENAI_API_KEY=sk-your-key ghcr.io/effatico/kortx-mcp:latest`.
 
 ## Configuration
 
@@ -283,8 +283,8 @@ For more detailed troubleshooting, see the [Troubleshooting Guide](./troubleshoo
 If you need assistance:
 
 - 📖 [Full Documentation](../README.md#-documentation)
-- 🐛 [Report an Issue](https://github.com/amsv01/kortx-mcp/issues)
-- 💬 [GitHub Discussions](https://github.com/amsv01/kortx-mcp/discussions)
+- 🐛 [Report an Issue](https://github.com/effatico/kortx-mcp/issues)
+- 💬 [GitHub Discussions](https://github.com/effatico/kortx-mcp/discussions)
 - 📧 [Email Support](mailto:amin@effati.se)
 
 ## What's Next?

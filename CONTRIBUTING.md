@@ -17,7 +17,7 @@ This project adheres to a code of conduct. By participating, you are expected to
 
 ### Fork and Clone
 
-Fork the repository on GitHub, then clone your fork locally with `git clone https://github.com/YOUR_USERNAME/llm-consultants.git` and `cd llm-consultants`. Add the upstream repository with `git remote add upstream https://github.com/amsv01/llm-consultants.git`.
+Fork the repository on GitHub, then clone your fork locally with `git clone https://github.com/YOUR_USERNAME/llm-consultants.git` and `cd llm-consultants`. Add the upstream repository with `git remote add upstream https://github.com/effatico/kortx-mcp.git`.
 
 ### Initial Setup
 
@@ -302,7 +302,7 @@ Any other relevant information
 ## Questions?
 
 - 📖 Check the [documentation](./docs)
-- 💬 Ask in [GitHub Discussions](https://github.com/amsv01/llm-consultants/discussions)
+- 💬 Ask in [GitHub Discussions](https://github.com/effatico/kortx-mcp/discussions)
 - 📧 Email: amin@effati.se
 
 Thank you for contributing to MCP Consultant! 🎉

@@ -635,7 +635,7 @@ This provides a web UI to test tools interactively.
 
    ```bash
    docker run -e OPENAI_API_KEY=sk-your-key \
-     ghcr.io/amsv01/kortx-mcp:latest
+     ghcr.io/effatico/kortx-mcp:latest
    ```
 
 2. View container logs:
@@ -647,7 +647,7 @@ This provides a web UI to test tools interactively.
 3. Try interactive mode:
    ```bash
    docker run -it -e OPENAI_API_KEY=sk-key \
-     ghcr.io/amsv01/kortx-mcp:latest
+     ghcr.io/effatico/kortx-mcp:latest
    ```
 
 ### "Image not found" errors
@@ -659,7 +659,7 @@ This provides a web UI to test tools interactively.
 1. Pull explicitly:
 
    ```bash
-   docker pull ghcr.io/amsv01/kortx-mcp:latest
+   docker pull ghcr.io/effatico/kortx-mcp:latest
    ```
 
 2. Check image name spelling
@@ -672,7 +672,7 @@ If none of these solutions help:
 
 ### 1. Check GitHub Issues
 
-Search existing issues: [github.com/amsv01/kortx-mcp/issues](https://github.com/amsv01/kortx-mcp/issues)
+Search existing issues: [github.com/effatico/kortx-mcp/issues](https://github.com/effatico/kortx-mcp/issues)
 
 ### 2. Gather Diagnostic Information
 
@@ -689,11 +689,11 @@ When reporting issues, include:
 
 ### 3. Report the Issue
 
-Create a new issue: [github.com/amsv01/kortx-mcp/issues/new](https://github.com/amsv01/kortx-mcp/issues/new)
+Create a new issue: [github.com/effatico/kortx-mcp/issues/new](https://github.com/effatico/kortx-mcp/issues/new)
 
 Or reach out:
 
-- 💬 [GitHub Discussions](https://github.com/amsv01/kortx-mcp/discussions)
+- 💬 [GitHub Discussions](https://github.com/effatico/kortx-mcp/discussions)
 - 📧 [Email Support](mailto:amin@effati.se)
 
 ### 4. Community Help

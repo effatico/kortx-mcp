@@ -459,7 +459,7 @@ For testing changes or development:
 
 ```bash
 # Clone and build
-git clone https://github.com/amsv01/kortx-mcp.git
+git clone https://github.com/effatico/kortx-mcp.git
 cd kortx-mcp
 npm install
 npm run build
@@ -540,13 +540,13 @@ Be mindful of what code you're sending to OpenAI's API.
 - 📖 Read the [API Documentation](../api/) for detailed tool usage
 - 🎯 Check out [Example Workflows](../../examples/)
 - 🔧 Explore [Configuration Options](../configuration.md)
-- 💬 Join the [GitHub Discussions](https://github.com/amsv01/kortx-mcp/discussions)
+- 💬 Join the [GitHub Discussions](https://github.com/effatico/kortx-mcp/discussions)
 
 ---
 
 ## Getting Help
 
 - 📖 [Troubleshooting Guide](../troubleshooting.md)
-- 💬 [GitHub Discussions](https://github.com/amsv01/kortx-mcp/discussions)
-- 🐛 [Report an Issue](https://github.com/amsv01/kortx-mcp/issues)
+- 💬 [GitHub Discussions](https://github.com/effatico/kortx-mcp/discussions)
+- 🐛 [Report an Issue](https://github.com/effatico/kortx-mcp/issues)
 - 📧 [Email Support](mailto:amin@effati.se)

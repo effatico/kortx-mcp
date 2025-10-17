@@ -270,7 +270,7 @@ For production issues:
 
 - Review logs at `kortx-mcp.log`
 - Check [SECURITY.md](../SECURITY.md) for security guidance
-- Open issues at [GitHub Issues](https://github.com/amsv01/kortx-mcp/issues)
+- Open issues at [GitHub Issues](https://github.com/effatico/kortx-mcp/issues)
 - Email security concerns to [amin@effati.se](mailto:amin@effati.se)
 
 ## Additional Resources

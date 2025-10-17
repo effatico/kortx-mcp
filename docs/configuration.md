@@ -679,6 +679,6 @@ MCP Consultant validates configuration on startup:
 ## Getting Help
 
 - 📖 [Troubleshooting Guide](./troubleshooting.md)
-- 💬 [GitHub Discussions](https://github.com/amsv01/kortx-mcp/discussions)
-- 🐛 [Report an Issue](https://github.com/amsv01/kortx-mcp/issues)
+- 💬 [GitHub Discussions](https://github.com/effatico/kortx-mcp/discussions)
+- 🐛 [Report an Issue](https://github.com/effatico/kortx-mcp/issues)
 - 📧 [Email Support](mailto:amin@effati.se)

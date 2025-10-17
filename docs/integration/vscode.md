@@ -514,13 +514,13 @@ Add to `.vscode/keybindings.json`:
 - 📖 Read the [API Documentation](../api/)
 - 🎯 Check out [Example Workflows](../../examples/)
 - 🔧 Explore [Configuration Options](../configuration.md)
-- 💬 Join [GitHub Discussions](https://github.com/amsv01/kortx-mcp/discussions)
+- 💬 Join [GitHub Discussions](https://github.com/effatico/kortx-mcp/discussions)
 
 ---
 
 ## Getting Help
 
 - 📖 [Troubleshooting Guide](../troubleshooting.md)
-- 💬 [GitHub Discussions](https://github.com/amsv01/kortx-mcp/discussions)
-- 🐛 [Report an Issue](https://github.com/amsv01/kortx-mcp/issues)
+- 💬 [GitHub Discussions](https://github.com/effatico/kortx-mcp/discussions)
+- 🐛 [Report an Issue](https://github.com/effatico/kortx-mcp/issues)
 - 📧 [Email Support](mailto:amin@effati.se)

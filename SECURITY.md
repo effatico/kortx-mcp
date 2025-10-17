@@ -92,14 +92,14 @@ The official Docker image follows security best practices:
 
 ```bash
 # Run with non-root user (built-in)
-docker run -e OPENAI_API_KEY=your-key ghcr.io/amsv01/llm-consultants:latest
+docker run -e OPENAI_API_KEY=your-key ghcr.io/effatico/kortx-mcp:latest
 
 # Use Docker secrets (recommended for production)
 echo "your-api-key" | docker secret create openai_api_key -
 docker service create \
   --name llm-consultants \
   --secret openai_api_key \
-  ghcr.io/amsv01/llm-consultants:latest
+  ghcr.io/effatico/kortx-mcp:latest
 ```
 
 ### Security Features
@@ -331,7 +331,7 @@ Subscribe to security updates:
 
 For security-related questions that are not vulnerabilities, please:
 
-- Open a [GitHub Discussion](https://github.com/amsv01/llm-consultants/discussions)
+- Open a [GitHub Discussion](https://github.com/effatico/kortx-mcp/discussions)
 - Email amin@effati.se with subject "Security Question: [Your Topic]"
 
 Thank you for helping keep MCP Consultant secure! 🔒
