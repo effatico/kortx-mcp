@@ -31,7 +31,7 @@ describe('OpenAIClient', () => {
         maxTokens: 1024,
       },
       server: {
-        name: 'llm-consultants',
+        name: 'kortx-mcp',
         version: '1.0.0',
         logLevel: 'info',
         transport: 'stdio',

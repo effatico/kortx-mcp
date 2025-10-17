@@ -389,5 +389,5 @@ battery more than push notifications.
 
 ## Getting Help
 
-- 💬 [GitHub Discussions](https://github.com/amsv01/llm-consultants/discussions)
-- 🐛 [Report an Issue](https://github.com/amsv01/llm-consultants/issues)
+- 💬 [GitHub Discussions](https://github.com/amsv01/kortx-mcp/discussions)
+- 🐛 [Report an Issue](https://github.com/amsv01/kortx-mcp/issues)

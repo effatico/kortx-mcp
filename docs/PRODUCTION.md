@@ -1,6 +1,6 @@
 # Production Deployment Guide
 
-This guide covers security best practices and production configuration for deploying LLM Consultants MCP Server.
+This guide covers security best practices and production configuration for deploying Kortx MCP Server.
 
 ## Security Configuration
 
@@ -70,7 +70,7 @@ INCLUDE_GIT_HISTORY=false
 
 ```bash
 # Build with security audit
-docker build -t llm-consultants:latest .
+docker build -t kortx-mcp:latest .
 
 # The build will fail if high-severity vulnerabilities are found
 ```
@@ -80,11 +80,11 @@ docker build -t llm-consultants:latest .
 ```bash
 # Run with environment file
 docker run -d \
-  --name llm-consultants \
+  --name kortx-mcp \
   --env-file .env.production \
   --read-only \
   --security-opt=no-new-privileges:true \
-  llm-consultants:latest
+  kortx-mcp:latest
 ```
 
 ### Docker Compose
@@ -93,7 +93,7 @@ docker run -d \
 version: '3.8'
 
 services:
-  llm-consultants:
+  kortx-mcp:
     build: .
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
@@ -117,10 +117,10 @@ echo "your-api-key" | docker secret create openai_api_key -
 
 # Deploy with secrets
 docker service create \
-  --name llm-consultants \
+  --name kortx-mcp \
   --secret openai_api_key \
   --env OPENAI_API_KEY_FILE=/run/secrets/openai_api_key \
-  llm-consultants:latest
+  kortx-mcp:latest
 ```
 
 ## Performance Optimization
@@ -155,15 +155,15 @@ MAX_CONTEXT_TOKENS=8000
 
 ### Log Files
 
-Logs are written to `llm-consultants.log` in the working directory.
+Logs are written to `kortx-mcp.log` in the working directory.
 
 ```bash
 # Set restrictive permissions
-chmod 600 llm-consultants.log
+chmod 600 kortx-mcp.log
 
 # Configure log rotation (example with logrotate)
-cat > /etc/logrotate.d/llm-consultants << EOF
-/path/to/llm-consultants.log {
+cat > /etc/logrotate.d/kortx-mcp << EOF
+/path/to/kortx-mcp.log {
     daily
     rotate 7
     compress
@@ -268,9 +268,9 @@ OPENAI_MAX_TOKENS=512
 
 For production issues:
 
-- Review logs at `llm-consultants.log`
+- Review logs at `kortx-mcp.log`
 - Check [SECURITY.md](../SECURITY.md) for security guidance
-- Open issues at [GitHub Issues](https://github.com/amsv01/llm-consultants/issues)
+- Open issues at [GitHub Issues](https://github.com/amsv01/kortx-mcp/issues)
 - Email security concerns to [amin@effati.se](mailto:amin@effati.se)
 
 ## Additional Resources
