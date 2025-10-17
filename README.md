@@ -5,7 +5,7 @@
 [![Build Status](https://github.com/effatico/kortx-mcp/workflows/CI/badge.svg)](https://github.com/effatico/kortx-mcp/actions)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.12.0-brightgreen)](https://nodejs.org)
 
-A lightweight, open-source MCP server that enables AI assistants like Claude Code to consult GPT-5 models for specialized tasks while automatically gathering relevant context from your codebase.
+A lightweight, open-source MCP server that enables AI assistants like Claude Code to consult GPT-5 models for strategic planning, code improvement, and problem-solving, plus real-time web search with Perplexity Sonar, while automatically gathering relevant context from your codebase.
 
 [Quick Start](#quick-start) • [Documentation](./docs) • [Examples](./examples) • [Contributing](./CONTRIBUTING.md)
 
@@ -46,10 +46,15 @@ You can also install globally via npm or run it in Docker. For a global installa
 The simplest setup uses npx:
 
 ```bash
-claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- npx -y @effatico/kortx-mcp
+claude mcp add --transport stdio kortx-consultant \
+  --env OPENAI_API_KEY=YOUR_KEY \
+  --env PERPLEXITY_API_KEY=YOUR_PERPLEXITY_KEY \
+  -- npx -y @effatico/kortx-mcp@latest
 ```
 
-If you've installed the package globally, replace `npx -y @effatico/kortx-mcp` with just `kortx-mcp`. You can customize the server by adding environment variables like `OPENAI_MODEL=gpt-5-mini` or `LOG_LEVEL=info` to the command above.
+If you've installed the package globally, replace `npx -y @effatico/kortx-mcp@latest` with just `kortx-mcp`. You can customize the server by adding environment variables like `OPENAI_MODEL=gpt-5-mini` or `LOG_LEVEL=info` to the command above.
+
+Note: The `PERPLEXITY_API_KEY` is optional but required for the `search-content` tool. You can obtain one from [Perplexity AI](https://www.perplexity.ai/settings/api).
 
 [Detailed Claude Code setup guide →](./docs/integration/claude-code.md)
 
