@@ -1,3 +1,9 @@
+## [1.1.2](https://github.com/effatico/kortx-mcp/compare/v1.1.1...v1.1.2) (2025-10-17)
+
+### Bug Fixes
+
+- remove coverage threshold enforcement from release workflow ([c0f93e6](https://github.com/effatico/kortx-mcp/commit/c0f93e6d76a7e591866d777d369b158d2973428f))
+
 ## [1.1.1](https://github.com/effatico/kortx-mcp/compare/v1.1.0...v1.1.1) (2025-10-17)
 
 ### Bug Fixes
