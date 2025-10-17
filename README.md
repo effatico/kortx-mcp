@@ -152,6 +152,107 @@ The default **minimal** setting uses very few reasoning tokens for fastest time-
 
 ---
 
+## Docker Deployment
+
+The server ships production-ready with a multi-stage Docker build optimized for security and size. The image runs as a non-root user (nodejs:1001) with comprehensive security scanning during build.
+
+### Quick Docker Start
+
+Build and run the Docker image:
+
+```bash
+# Build the image
+docker build -t llm-consultants .
+
+# Run with environment variables
+docker run -i --rm \
+  -e OPENAI_API_KEY=your-api-key \
+  llm-consultants
+```
+
+### Using Docker Compose
+
+The project includes a tested docker-compose.yml with resource limits and volume mounting support:
+
+```bash
+# Copy environment configuration
+cp .env.example .env.docker
+# Edit .env.docker with your API key
+
+# Run with docker-compose
+docker-compose up
+```
+
+### Docker Configuration
+
+Environment variables can be passed to the container:
+
+```yaml
+services:
+  llm-consultants:
+    image: llm-consultants:latest
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-5-mini}
+      - NODE_ENV=production
+      - LOG_LEVEL=info
+    volumes:
+      - ./workspace:/workspace:ro # Optional: mount project files
+    stdin_open: true
+    tty: true
+```
+
+### Resource Limits
+
+Production deployment includes sensible resource limits:
+
+- **CPU**: 1 core limit, 0.5 core reservation
+- **Memory**: 512MB limit, 256MB reservation
+- **Image Size**: ~273MB (optimized Node.js 22 Alpine base)
+
+### Testing Docker Setup
+
+Run the comprehensive test suite:
+
+```bash
+# Run automated Docker tests
+chmod +x scripts/test-docker.sh
+./scripts/test-docker.sh
+```
+
+The test script verifies:
+
+- Multi-stage build process
+- Image size optimization
+- Non-root user configuration (nodejs:1001)
+- Security audit execution
+- Container startup and stdio transport
+- Environment variable handling
+- File permissions and ownership
+- Docker Compose configuration
+- Resource limits
+
+### Docker Security
+
+The Dockerfile implements security best practices:
+
+- Multi-stage build to minimize attack surface
+- Runs as non-root user (nodejs:1001)
+- Security audits during build (npm audit --audit-level=high)
+- Production-only dependencies in final image
+- Alpine Linux base for minimal footprint
+- No unnecessary packages or build tools in production image
+
+### Troubleshooting Docker
+
+**Container exits immediately:** This is expected behavior for stdio transport. The MCP server requires an active stdin connection. Use `-i` flag for interactive mode or connect via MCP client.
+
+**Permission errors:** Ensure files are readable by the nodejs user (UID 1001). The Dockerfile sets proper ownership with `--chown=nodejs:nodejs`.
+
+**Image size concerns:** The base Node.js 22 Alpine image is ~226MB. Production dependencies add ~46MB. Total size of ~273MB is optimized for a full-featured Node.js application.
+
+---
+
 ## Available Tools
 
 ### 1. think-about-plan
