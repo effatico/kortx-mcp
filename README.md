@@ -19,9 +19,9 @@ This tool is designed for AI researchers, tool builders, and platform engineers 
 
 ## Features
 
-The server supports multiple GPT-5 models (including mini, nano, and codex variants) with configurable reasoning effort. It automatically integrates with Serena, graph-memory, and cclsp MCPs to surface relevant code and metadata through smart context gathering.
+The server supports multiple GPT-5 models (gpt-5, gpt-5-mini, gpt-5-nano, gpt-5-pro, gpt-5-codex) with dynamic model selection. AI assistants can automatically choose the most appropriate model variant for each consultation based on task complexity and requirements. It automatically integrates with Serena, graph-memory, and cclsp MCPs to surface relevant code and metadata through smart context gathering.
 
-Four specialized tools handle strategic planning, alternative solutions, copy improvement, and problem solving. The server ships production-ready with Docker support, non-root execution, sensitive-data redaction, and comprehensive structured logging via Pino.
+Four specialized tools handle strategic planning, alternative solutions, copy improvement, and problem solving. Each tool accepts an optional `preferredModel` parameter, allowing the AI assistant to optimize model selection per task. The server ships production-ready with Docker support, non-root execution, sensitive-data redaction, and comprehensive structured logging via Pino.
 
 You can install and run it with a single npx command. The defaults optimize for fast time-to-first-token using gpt-5-mini with minimal reasoning. The codebase maintains 80%+ test coverage with 46 passing unit tests.
 
@@ -142,7 +142,15 @@ MAX_CONTEXT_TOKENS=32000             # Context limit
 
 ### Model Selection Guide
 
-The default **gpt-5-mini** offers cost-optimized performance with balanced speed and capability. Choose **gpt-5** for complex reasoning, broad world knowledge, and multi-step tasks. For high-throughput simple tasks, use **gpt-5-nano**. When working on code generation, refactoring, debugging, or code explanations, **gpt-5-codex** provides optimized results.
+The server defaults to **gpt-5-mini** for cost-optimized performance with balanced speed and capability. AI assistants can override this default by specifying a `preferredModel` parameter in each tool invocation:
+
+- **gpt-5**: Complex reasoning, broad world knowledge, and multi-step tasks
+- **gpt-5-mini**: Balanced performance and cost (default)
+- **gpt-5-nano**: High-throughput simple tasks
+- **gpt-5-pro**: Advanced reasoning and specialized domains
+- **gpt-5-codex**: Code generation, refactoring, debugging, and code explanations
+
+The AI assistant automatically selects the most appropriate model based on task complexity when no preference is specified.
 
 ### Reasoning Effort Guide
 
@@ -256,9 +264,17 @@ The Dockerfile implements security best practices:
 
 ## Available Tools
 
+All tools support dynamic model selection through an optional `preferredModel` parameter. The AI assistant can automatically choose the most appropriate GPT-5 model variant (gpt-5, gpt-5-mini, gpt-5-nano, gpt-5-pro, or gpt-5-codex) based on task complexity and requirements.
+
 ### 1. think-about-plan
 
 Get strategic feedback on plans and approaches. The tool analyzes clarity, feasibility, risks, and dependencies while suggesting alternatives and providing actionable recommendations.
+
+**Parameters:**
+
+- `plan` (required): Description of the plan to analyze
+- `context` (optional): Additional context about the plan
+- `preferredModel` (optional): GPT-5 model variant to use
 
 **Example Usage:**
 
@@ -275,6 +291,13 @@ The response includes a clarity assessment, feasibility analysis, risk evaluatio
 
 Request alternative approaches or solutions. The tool considers different paradigms, simpler solutions, proven patterns, and trade-offs to provide multiple viable options.
 
+**Parameters:**
+
+- `currentApproach` (required): Description of the current approach
+- `constraints` (optional): List of constraints or limitations
+- `goals` (optional): List of goals or objectives
+- `preferredModel` (optional): GPT-5 model variant to use
+
 **Example Usage:**
 
 ```
@@ -290,6 +313,13 @@ The response presents multiple alternative approaches with pros and cons for eac
 
 Improve text, documentation, or user-facing messages with a focus on clarity, conciseness, appropriate tone, logical structure, and accessibility.
 
+**Parameters:**
+
+- `originalText` (required): The text to improve
+- `purpose` (required): Purpose of the text (e.g., "technical documentation", "error message")
+- `targetAudience` (optional): Target audience (e.g., "developers", "end users")
+- `preferredModel` (optional): GPT-5 model variant to use
+
 **Example Usage:**
 
 ```
@@ -304,6 +334,14 @@ The response provides an improved version with an explanation of changes and rea
 ### 4. solve-problem
 
 Get debugging and problem-solving assistance. The tool performs root cause analysis and provides diagnosis steps, proposed solutions, testing guidance, and prevention strategies.
+
+**Parameters:**
+
+- `problem` (required): Description of the problem
+- `attemptedSolutions` (optional): List of solutions that have been tried
+- `errorMessages` (optional): List of error messages or stack traces
+- `relevantCode` (optional): Relevant code snippets
+- `preferredModel` (optional): GPT-5 model variant to use
 
 **Example Usage:**
 
