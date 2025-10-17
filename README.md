@@ -217,7 +217,7 @@ Production deployment includes sensible resource limits:
 
 - **CPU**: 1 core limit, 0.5 core reservation
 - **Memory**: 512MB limit, 256MB reservation
-- **Image Size**: ~273MB (optimized Node.js 22 Alpine base)
+- **Image Size**: ~273MB (Node.js 22 Alpine base required for full MCP runtime)
 
 ### Testing Docker Setup
 
@@ -258,7 +258,7 @@ The Dockerfile implements security best practices:
 
 **Permission errors:** Ensure files are readable by the nodejs user (UID 1001). The Dockerfile sets proper ownership with `--chown=nodejs:nodejs`.
 
-**Image size concerns:** The base Node.js 22 Alpine image contributes ~226MB (necessary for full runtime features). Production dependencies add ~46MB, resulting in a total size of ~273MB. This exceeds the original 200MB optimization target but remains practical for a full-featured MCP server with comprehensive Node.js capabilities.
+**Image size concerns:** The final image size (~273MB) exceeds the original 200MB optimization target. This is a deliberate trade-off: the Node.js 22 Alpine base contributes ~226MB (required for full MCP runtime capabilities), and production dependencies add ~46MB. While larger than initially targeted, this remains practical and necessary for comprehensive Node.js MCP server functionality.
 
 ---
 

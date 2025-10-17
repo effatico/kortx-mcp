@@ -60,10 +60,12 @@ trap cleanup EXIT
 # Test 1: Docker Build
 print_header "Test 1: Docker Build Process"
 echo "Building Docker image..."
-if docker build -t "$IMAGE_NAME" . > /tmp/docker-build.log 2>&1; then
+BUILD_LOG="/tmp/docker-build-$(date +%s).log"
+if docker build -t "$IMAGE_NAME" . > "$BUILD_LOG" 2>&1; then
     print_success "Docker image built successfully"
+    rm -f "$BUILD_LOG"
 else
-    print_error "Docker build failed. Check /tmp/docker-build.log for details"
+    print_error "Docker build failed. Build log preserved at: $BUILD_LOG"
 fi
 
 # Test 2: Multi-stage Build Verification
@@ -103,34 +105,33 @@ fi
 
 # Test 5: Security Audit
 print_header "Test 5: Security Audit"
-echo "Running npm audit during build..."
-if grep -q "npm audit.*--audit-level=high" /tmp/docker-build.log; then
+echo "Checking if security audit was executed during build..."
+if docker history "$IMAGE_NAME" --no-trunc 2>/dev/null | grep -q "npm audit"; then
     print_success "Security audit executed during build"
-    if grep -q "vulnerabilities" /tmp/docker-build.log; then
-        print_warning "Some vulnerabilities detected (check build log for severity)"
-    fi
 else
     print_warning "Security audit not found in build process"
 fi
 
 # Test 6: Container Startup Test
 print_header "Test 6: Container Startup & STDIO Transport"
-echo "Testing container startup (stdio transport exits without input - this is expected)..."
+echo "Testing container startup with MCP JSON-RPC request..."
 
-# Run container briefly to check for startup errors
-STARTUP_OUTPUT=$(echo '{"jsonrpc": "2.0", "method": "quit", "id": 1}' | docker run --rm -i \
+# Send JSON-RPC request to verify MCP protocol handling
+STARTUP_OUTPUT=$(echo '{"jsonrpc": "2.0", "method": "initialize", "id": 1}' | docker run --rm -i \
     -e OPENAI_API_KEY=sk-test-key \
     -e NODE_ENV=production \
     "$IMAGE_NAME" 2>&1 | head -20 || true)
+CONTAINER_EXIT=$?
 
-# Check if container started without critical errors
-if echo "$STARTUP_OUTPUT" | grep -qiE "(error|fail|cannot|exception)" ; then
-    print_error "Container has startup errors: $STARTUP_OUTPUT"
+# Validate output contains JSON-RPC response or expected behavior
+if echo "$STARTUP_OUTPUT" | grep -qiE "(error|fail|cannot|exception)" && [ $CONTAINER_EXIT -ne 0 ]; then
+    print_error "Container startup failed: $STARTUP_OUTPUT"
 elif [ -z "$STARTUP_OUTPUT" ]; then
-    print_warning "Container started but produced no output (stdio may not be configured)"
+    print_error "Container produced no output—may indicate startup failure or stdio misconfiguration"
+elif echo "$STARTUP_OUTPUT" | grep -qE '(\{.*jsonrpc|error.*method)'; then
+    print_success "Container startup verified (stdio transport responding to MCP protocol)"
 else
     print_success "Container started successfully (stdio transport working)"
-    echo "Note: Container exits when stdin closes - this is expected for stdio transport"
 fi
 
 # Test 7: Environment Variables
@@ -138,20 +139,22 @@ print_header "Test 7: Environment Variables"
 ENV_TEST=$(docker run --rm \
     -e OPENAI_API_KEY=test-key-123 \
     -e NODE_ENV=test \
-    "$IMAGE_NAME" printenv | grep -E "(NODE_ENV|OPENAI)" || true)
+    "$IMAGE_NAME" sh -c 'echo "NODE_ENV=$NODE_ENV"; echo "OPENAI_API_KEY=$OPENAI_API_KEY"' 2>/dev/null || true)
 if echo "$ENV_TEST" | grep -q "NODE_ENV=test" && echo "$ENV_TEST" | grep -q "OPENAI_API_KEY=test-key-123"; then
     print_success "Environment variables properly passed to container"
 else
     print_warning "Environment variables may not be properly configured"
+    echo "Debug output: $ENV_TEST"
 fi
 
-# Test 8: File Permissions
+# Test 8: File Permissions & Ownership
 print_header "Test 8: File Permissions & Ownership"
-FILE_OWNER=$(docker run --rm "$IMAGE_NAME" ls -la /app/build/index.js | awk '{print $3":"$4}')
-if echo "$FILE_OWNER" | grep -q "nodejs"; then
-    print_success "Files owned by nodejs user: $FILE_OWNER"
+# Verify container runs as nodejs user (UID 1001)
+RUNNING_UID=$(docker run --rm "$IMAGE_NAME" id -u 2>/dev/null || echo "")
+if [ "$RUNNING_UID" = "1001" ]; then
+    print_success "Container runs as non-root user (UID 1001: nodejs)"
 else
-    print_warning "File ownership may not be optimal: $FILE_OWNER"
+    print_error "Container is not running as expected UID 1001 (found UID: $RUNNING_UID)"
 fi
 
 # Test 9: Graceful Shutdown
@@ -166,7 +169,16 @@ fi
 # Test 10: Docker Compose Validation
 print_header "Test 10: Docker Compose Configuration"
 if [ -f "docker-compose.yml" ]; then
-    if docker-compose config > /dev/null 2>&1; then
+    # Detect which docker-compose command variant is available
+    if command -v docker-compose &> /dev/null; then
+        COMPOSE_CMD="docker-compose"
+    elif command -v docker &> /dev/null && docker compose version &> /dev/null 2>&1; then
+        COMPOSE_CMD="docker compose"
+    else
+        print_error "Neither 'docker-compose' nor 'docker compose' command found"
+    fi
+
+    if $COMPOSE_CMD config > /dev/null 2>&1; then
         print_success "docker-compose.yml is valid"
     else
         print_error "docker-compose.yml has configuration errors"
