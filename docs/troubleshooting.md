@@ -15,22 +15,22 @@ This guide helps you diagnose and resolve common issues with MCP Consultant.
 
 ## Installation Issues
 
-### "command not found: kortx-mcp"
+### "command not found: llm-consultants"
 
-**Symptoms**: Running `kortx-mcp` shows "command not found"
+**Symptoms**: Running `llm-consultants` shows "command not found"
 
 **Solutions**:
 
 1. Install globally:
 
    ```bash
-   npm install -g kortx-mcp
+   npm install -g llm-consultants
    ```
 
 2. Use npx instead (no installation needed):
 
    ```bash
-   npx -y kortx-mcp
+   npx -y llm-consultants
    ```
 
 3. Check your PATH includes npm global bin:
@@ -89,7 +89,7 @@ This guide helps you diagnose and resolve common issues with MCP Consultant.
 
 2. Use npx instead (recommended):
    ```bash
-   npx -y kortx-mcp
+   npx -y llm-consultants
    ```
 
 ## Configuration Problems
@@ -176,7 +176,7 @@ This guide helps you diagnose and resolve common issues with MCP Consultant.
 2. Test server manually:
 
    ```bash
-   OPENAI_API_KEY=sk-your-key npx -y kortx-mcp
+   OPENAI_API_KEY=sk-your-key npx -y llm-consultants
    ```
 
 3. Verify JSON syntax in MCP config:
@@ -226,7 +226,7 @@ This guide helps you diagnose and resolve common issues with MCP Consultant.
 
 4. Verify npx is using latest version:
    ```bash
-   npx -y kortx-mcp --version
+   npx -y llm-consultants --version
    ```
 
 ## API and Authentication
@@ -392,7 +392,7 @@ This guide helps you diagnose and resolve common issues with MCP Consultant.
 4. Check for memory leaks by monitoring:
    ```bash
    # Watch memory usage
-   ps aux | grep kortx-mcp
+   ps aux | grep llm-consultants
    ```
 
 ## Tool Execution Issues
@@ -580,7 +580,7 @@ Or in your MCP config:
 
 ```bash
 # Logs to stderr
-OPENAI_API_KEY=sk-key npx -y kortx-mcp 2> debug.log
+OPENAI_API_KEY=sk-key npx -y llm-consultants 2> debug.log
 ```
 
 ### Understanding log output
@@ -604,7 +604,7 @@ export OPENAI_API_KEY="sk-your-key"
 export LOG_LEVEL="debug"
 
 # Run server
-npx -y kortx-mcp
+npx -y llm-consultants
 ```
 
 The server will wait for stdio input (MCP protocol messages).
@@ -618,7 +618,7 @@ npm install -g @modelcontextprotocol/inspector
 
 # Run inspector
 npx @modelcontextprotocol/inspector \
-  npx -y kortx-mcp
+  npx -y llm-consultants
 ```
 
 This provides a web UI to test tools interactively.
@@ -635,7 +635,7 @@ This provides a web UI to test tools interactively.
 
    ```bash
    docker run -e OPENAI_API_KEY=sk-your-key \
-     ghcr.io/amsv01/kortx-mcp:latest
+     ghcr.io/amsv01/llm-consultants:latest
    ```
 
 2. View container logs:
@@ -647,7 +647,7 @@ This provides a web UI to test tools interactively.
 3. Try interactive mode:
    ```bash
    docker run -it -e OPENAI_API_KEY=sk-key \
-     ghcr.io/amsv01/kortx-mcp:latest
+     ghcr.io/amsv01/llm-consultants:latest
    ```
 
 ### "Image not found" errors
@@ -659,7 +659,7 @@ This provides a web UI to test tools interactively.
 1. Pull explicitly:
 
    ```bash
-   docker pull ghcr.io/amsv01/kortx-mcp:latest
+   docker pull ghcr.io/amsv01/llm-consultants:latest
    ```
 
 2. Check image name spelling
@@ -672,7 +672,7 @@ If none of these solutions help:
 
 ### 1. Check GitHub Issues
 
-Search existing issues: [github.com/amsv01/kortx-mcp/issues](https://github.com/amsv01/kortx-mcp/issues)
+Search existing issues: [github.com/amsv01/llm-consultants/issues](https://github.com/amsv01/llm-consultants/issues)
 
 ### 2. Gather Diagnostic Information
 
@@ -680,7 +680,7 @@ When reporting issues, include:
 
 - Node.js version: `node --version`
 - npm version: `npm --version`
-- Package version: `npx -y kortx-mcp --version`
+- Package version: `npx -y llm-consultants --version`
 - Operating system
 - AI assistant (Claude Code, Copliot, etc.)
 - Full error messages
@@ -689,11 +689,11 @@ When reporting issues, include:
 
 ### 3. Report the Issue
 
-Create a new issue: [github.com/amsv01/kortx-mcp/issues/new](https://github.com/amsv01/kortx-mcp/issues/new)
+Create a new issue: [github.com/amsv01/llm-consultants/issues/new](https://github.com/amsv01/llm-consultants/issues/new)
 
 Or reach out:
 
-- 💬 [GitHub Discussions](https://github.com/amsv01/kortx-mcp/discussions)
+- 💬 [GitHub Discussions](https://github.com/amsv01/llm-consultants/discussions)
 - 📧 [Email Support](mailto:amin@effati.se)
 
 ### 4. Community Help
@@ -702,7 +702,7 @@ Join the discussion:
 
 - MCP Community Discord
 - GitHub Discussions
-- Stack Overflow (tag: kortx-mcp)
+- Stack Overflow (tag: llm-consultants)
 
 ## Related Documentation
 

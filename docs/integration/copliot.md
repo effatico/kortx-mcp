@@ -32,7 +32,7 @@ Edit the config file and add the consultant server:
     "servers": {
       "consultant": {
         "command": "npx",
-        "args": ["-y", "kortx-mcp"],
+        "args": ["-y", "llm-consultants"],
         "env": {
           "OPENAI_API_KEY": "sk-your-api-key-here"
         }
@@ -58,7 +58,7 @@ Restart Copliot to load the new configuration.
     "servers": {
       "consultant": {
         "command": "npx",
-        "args": ["-y", "kortx-mcp"],
+        "args": ["-y", "llm-consultants"],
         "env": {
           "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
         }
@@ -76,7 +76,7 @@ Restart Copliot to load the new configuration.
     "servers": {
       "consultant": {
         "command": "npx",
-        "args": ["-y", "kortx-mcp"],
+        "args": ["-y", "llm-consultants"],
         "env": {
           "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
           "OPENAI_MODEL": "gpt-5-mini",
@@ -286,13 +286,13 @@ Configure what context is sent to the consultant:
 - 📖 Read the [API Documentation](../api/)
 - 🎯 Check out [Example Workflows](../../examples/)
 - 🔧 Explore [Configuration Options](../configuration.md)
-- 💬 Join [GitHub Discussions](https://github.com/amsv01/kortx-mcp/discussions)
+- 💬 Join [GitHub Discussions](https://github.com/amsv01/llm-consultants/discussions)
 
 ---
 
 ## Getting Help
 
 - 📖 [Troubleshooting Guide](../troubleshooting.md)
-- 💬 [GitHub Discussions](https://github.com/amsv01/kortx-mcp/discussions)
-- 🐛 [Report an Issue](https://github.com/amsv01/kortx-mcp/issues)
+- 💬 [GitHub Discussions](https://github.com/amsv01/llm-consultants/discussions)
+- 🐛 [Report an Issue](https://github.com/amsv01/llm-consultants/issues)
 - 📧 [Email Support](mailto:amin@effati.se)

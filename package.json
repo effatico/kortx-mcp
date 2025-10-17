@@ -1,10 +1,10 @@
 {
-  "name": "kortx-mcp",
-  "version": "1.1.0",
-  "description": "Kortx: MCP server for AI-driven code consultation with GPT-5 and intelligent context gathering",
+  "name": "llm-consultants",
+  "version": "1.0.0",
+  "description": "Open-source MCP server enabling AI assistants to consult with GPT-5 for specialized tasks with intelligent context gathering",
   "type": "module",
   "bin": {
-    "kortx-mcp": "./build/index.js"
+    "llm-consultants": "./build/index.js"
   },
   "main": "./build/server.js",
   "types": "./build/server.d.ts",
@@ -22,7 +22,6 @@
     "package.json"
   ],
   "keywords": [
-    "kortx",
     "mcp",
     "model-context-protocol",
     "llm",
@@ -40,12 +39,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/amsv01/kortx-mcp.git"
+    "url": "https://github.com/amsv01/llm-consultants.git"
   },
   "bugs": {
-    "url": "https://github.com/amsv01/kortx-mcp/issues"
+    "url": "https://github.com/amsv01/llm-consultants/issues"
   },
-  "homepage": "https://github.com/amsv01/kortx-mcp#readme",
+  "homepage": "https://github.com/amsv01/llm-consultants#readme",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"

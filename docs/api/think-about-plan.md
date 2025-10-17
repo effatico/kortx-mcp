@@ -407,7 +407,7 @@ Frame your plan clearly rather than asking open-ended questions.
 <summary><strong>Claude Code</strong></summary>
 
 ```
-Can you use kortx-mcp to think about my plan to implement
+Can you use llm-consultants to think about my plan to implement
 event sourcing for our order management system?
 ```
 
@@ -417,7 +417,7 @@ event sourcing for our order management system?
 <summary><strong>Copilot</strong></summary>
 
 ```
-@mcp:kortx-mcp think-about-plan
+@mcp:llm-consultants think-about-plan
 I'm planning to implement event sourcing...
 ```
 
@@ -427,7 +427,7 @@ I'm planning to implement event sourcing...
 <summary><strong>Cursor</strong></summary>
 
 ```
-@mcp:kortx-mcp I'm planning to migrate our REST API to GraphQL...
+@mcp:llm-consultants I'm planning to migrate our REST API to GraphQL...
 ```
 
 </details>
@@ -480,5 +480,5 @@ I'm planning to implement event sourcing...
 
 ## Getting Help
 
-- 💬 [GitHub Discussions](https://github.com/amsv01/kortx-mcp/discussions)
-- 🐛 [Report an Issue](https://github.com/amsv01/kortx-mcp/issues)
+- 💬 [GitHub Discussions](https://github.com/amsv01/llm-consultants/discussions)
+- 🐛 [Report an Issue](https://github.com/amsv01/llm-consultants/issues)

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Best practices for integrating the kortx-mcp server with AI assistants and external context sources.
+Best practices for integrating the llm-consultants server with AI assistants and external context sources.
 
 ## Claude Code Integration
 
@@ -10,10 +10,10 @@ Best practices for integrating the kortx-mcp server with AI assistants and exter
 
 ```bash
 # Using npx (recommended for published package)
-claude mcp add consultant -- npx kortx-mcp
+claude mcp add consultant -- npx llm-consultants
 
 # Using local development build
-claude mcp add consultant-dev -s local -- node /absolute/path/to/kortx-mcp/build/index.js
+claude mcp add consultant-dev -s local -- node /absolute/path/to/llm-consultants/build/index.js
 ```
 
 ### Configuration
@@ -25,7 +25,7 @@ Manual configuration in `~/.config/claude/mcp.json`:
   "mcpServers": {
     "consultant": {
       "command": "npx",
-      "args": ["kortx-mcp"],
+      "args": ["llm-consultants"],
       "env": {
         "OPENAI_API_KEY": "your-api-key-here",
         "OPENAI_MODEL": "gpt-5",
@@ -56,7 +56,7 @@ Configuration in Copliot settings:
     "servers": {
       "consultant": {
         "command": "npx",
-        "args": ["kortx-mcp"],
+        "args": ["llm-consultants"],
         "env": {
           "OPENAI_API_KEY": "your-api-key-here",
           "OPENAI_MODEL": "gpt-5",
@@ -220,10 +220,10 @@ CMD ["node", "build/index.js"]
 version: '3.8'
 
 services:
-  kortx-mcp:
+  llm-consultants:
     build: .
-    image: kortx-mcp:latest
-    container_name: kortx-mcp
+    image: llm-consultants:latest
+    container_name: llm-consultants
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_MODEL=${OPENAI_MODEL:-gpt-5}

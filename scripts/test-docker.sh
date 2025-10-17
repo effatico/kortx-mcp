@@ -1,5 +1,5 @@
 #!/bin/bash
-# Comprehensive Docker testing script for kortx-mcp MCP server
+# Comprehensive Docker testing script for llm-consultants MCP server
 # Tests: build, security, size, user config, container startup, and shutdown
 #
 # Usage: ./scripts/test-docker.sh
@@ -24,9 +24,9 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Test configuration
-IMAGE_NAME="kortx-mcp:test"
+IMAGE_NAME="llm-consultants:test"
 SIZE_LIMIT_MB=300  # Adjusted from 200MB to realistic target
-CONTAINER_NAME="kortx-mcp-test"
+CONTAINER_NAME="llm-consultants-test"
 
 # Helper functions
 print_header() {

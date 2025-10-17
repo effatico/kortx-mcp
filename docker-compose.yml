@@ -1,10 +1,10 @@
 services:
-  kortx-mcp:
+  llm-consultants:
     build:
       context: .
       dockerfile: Dockerfile
-    image: kortx-mcp:latest
-    container_name: kortx-mcp
+    image: llm-consultants:latest
+    container_name: llm-consultants
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_MODEL=${OPENAI_MODEL:-gpt-5-mini}

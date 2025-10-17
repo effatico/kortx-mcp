@@ -29,7 +29,7 @@ describe('Consultation Tools', () => {
         preferredSources: [],
       },
       server: {
-        name: 'kortx-mcp',
+        name: 'llm-consultants',
         version: '1.0.0',
         logLevel: 'info',
       },

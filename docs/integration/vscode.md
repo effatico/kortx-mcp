@@ -33,7 +33,7 @@ Create `.vscode/mcp-config.json` in your project root:
 {
   "consultant": {
     "command": "npx",
-    "args": ["-y", "kortx-mcp"],
+    "args": ["-y", "llm-consultants"],
     "env": {
       "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
     }
@@ -75,7 +75,7 @@ Developer: Reload Window
 {
   "consultant": {
     "command": "npx",
-    "args": ["-y", "kortx-mcp"],
+    "args": ["-y", "llm-consultants"],
     "env": {
       "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
     }
@@ -89,7 +89,7 @@ Developer: Reload Window
 {
   "consultant": {
     "command": "npx",
-    "args": ["-y", "kortx-mcp"],
+    "args": ["-y", "llm-consultants"],
     "env": {
       "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
       "OPENAI_MODEL": "gpt-5-mini",
@@ -286,7 +286,7 @@ Create different consultant configurations for different needs:
 {
   "consultant-fast": {
     "command": "npx",
-    "args": ["-y", "kortx-mcp"],
+    "args": ["-y", "llm-consultants"],
     "env": {
       "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
       "OPENAI_MODEL": "gpt-5-nano",
@@ -295,7 +295,7 @@ Create different consultant configurations for different needs:
   },
   "consultant-deep": {
     "command": "npx",
-    "args": ["-y", "kortx-mcp"],
+    "args": ["-y", "llm-consultants"],
     "env": {
       "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
       "OPENAI_MODEL": "gpt-5",
@@ -362,7 +362,7 @@ Create different consultant configurations for different needs:
 
 ### Permission Errors
 
-**Problem**: Cannot execute npx or kortx-mcp
+**Problem**: Cannot execute npx or llm-consultants
 
 **Solutions**:
 
@@ -370,8 +370,8 @@ Create different consultant configurations for different needs:
 # Ensure npx is available
 which npx
 
-# Test kortx-mcp directly
-npx -y kortx-mcp --help
+# Test llm-consultants directly
+npx -y llm-consultants --help
 
 # Check Node.js version
 node --version  # Should be >= 22.12.0
@@ -389,7 +389,7 @@ Commit `.vscode/mcp-config.json` to git (without secrets):
 {
   "consultant": {
     "command": "npx",
-    "args": ["-y", "kortx-mcp"],
+    "args": ["-y", "llm-consultants"],
     "env": {
       "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
     }
@@ -452,7 +452,7 @@ For testing changes:
 {
   "consultant": {
     "command": "node",
-    "args": ["/absolute/path/to/kortx-mcp/build/index.js"],
+    "args": ["/absolute/path/to/llm-consultants/build/index.js"],
     "env": {
       "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
       "LOG_LEVEL": "debug"
@@ -468,7 +468,7 @@ For testing changes:
   "consultant": {
     "env": {
       "LOG_LEVEL": "debug",
-      "LOG_FILE": "${workspaceFolder}/logs/kortx-mcp.log"
+      "LOG_FILE": "${workspaceFolder}/logs/llm-consultants.log"
     }
   }
 }
@@ -514,13 +514,13 @@ Add to `.vscode/keybindings.json`:
 - 📖 Read the [API Documentation](../api/)
 - 🎯 Check out [Example Workflows](../../examples/)
 - 🔧 Explore [Configuration Options](../configuration.md)
-- 💬 Join [GitHub Discussions](https://github.com/amsv01/kortx-mcp/discussions)
+- 💬 Join [GitHub Discussions](https://github.com/amsv01/llm-consultants/discussions)
 
 ---
 
 ## Getting Help
 
 - 📖 [Troubleshooting Guide](../troubleshooting.md)
-- 💬 [GitHub Discussions](https://github.com/amsv01/kortx-mcp/discussions)
-- 🐛 [Report an Issue](https://github.com/amsv01/kortx-mcp/issues)
+- 💬 [GitHub Discussions](https://github.com/amsv01/llm-consultants/discussions)
+- 🐛 [Report an Issue](https://github.com/amsv01/llm-consultants/issues)
 - 📧 [Email Support](mailto:amin@effati.se)

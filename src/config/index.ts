@@ -15,7 +15,7 @@ const OpenAIConfigSchema = z.object({
 
 // MCP Server configuration schema
 const ServerConfigSchema = z.object({
-  name: z.string().default('kortx-mcp'),
+  name: z.string().default('llm-consultants'),
   version: z.string().default('0.1.0'),
   port: z.number().int().positive().default(3000),
   transport: z.enum(['stdio', 'streaming']).default('stdio'),
