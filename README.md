@@ -19,11 +19,11 @@ This tool is designed for AI researchers, tool builders, and platform engineers 
 
 ## Features
 
-The server provides multiple GPT-5 variants (gpt-5, gpt-5-mini, gpt-5-nano, gpt-5-pro, gpt-5-codex) and dynamically selects the best variant per request based on task requirements. It integrates with Serena, graph-memory, and cclsp MCPs to fetch relevant code and metadata for context.
+The server provides multiple GPT-5 variants (gpt-5, gpt-5-mini, gpt-5-nano, gpt-5-pro, gpt-5-codex) for consultation tasks and Perplexity Sonar models (sonar, sonar-pro, sonar-deep-research, sonar-reasoning, sonar-reasoning-pro) for real-time web search. It integrates with Serena, graph-memory, and cclsp MCPs to fetch relevant code and metadata for context.
 
-Four specialized tools handle strategic planning, alternative solutions, copy improvement, and problem solving. Each tool accepts an optional `preferredModel` parameter, allowing assistants to request specific models while the system optimizes selection based on task complexity. The server ships production-ready with Docker support, non-root execution, sensitive-data redaction, and comprehensive structured logging via Pino.
+Five specialized tools handle strategic planning, alternative solutions, copy improvement, problem solving, and real-time web search with citations. Each consultation tool accepts an optional `preferredModel` parameter, allowing assistants to request specific models while the system optimizes selection based on task complexity. The server ships production-ready with Docker support, non-root execution, sensitive-data redaction, and comprehensive structured logging via Pino.
 
-You can install and run it with a single npx command. The defaults optimize for fast time-to-first-token using gpt-5-mini with minimal reasoning. The codebase maintains 80%+ test coverage with 46 passing unit tests.
+You can install and run it with a single npx command. The defaults optimize for fast time-to-first-token using gpt-5-mini with minimal reasoning. The codebase maintains 80%+ test coverage with 86 passing unit tests.
 
 ---
 
@@ -122,6 +122,7 @@ Create a `.env` file or set environment variables:
 ```bash
 # Required
 OPENAI_API_KEY=sk-your-api-key-here
+PERPLEXITY_API_KEY=pplx-your-api-key-here
 
 # Optional - Model Selection
 OPENAI_MODEL=gpt-5-mini              # gpt-5, gpt-5-mini, gpt-5-nano, gpt-5-codex
@@ -264,7 +265,9 @@ The Dockerfile implements security best practices:
 
 ## Available Tools
 
-All tools accept an optional `preferredModel` parameter. When set, the assistant treats it as a preference but may override it to select the most suitable GPT-5 variant (gpt-5, gpt-5-mini, gpt-5-nano, gpt-5-pro, or gpt-5-codex) based on task complexity and requirements.
+Consultation tools (think-about-plan, suggest-alternative, improve-copy, solve-problem) accept an optional `preferredModel` parameter. When set, the assistant treats it as a preference but may override it to select the most suitable GPT-5 variant (gpt-5, gpt-5-mini, gpt-5-nano, gpt-5-pro, or gpt-5-codex) based on task complexity and requirements.
+
+The search-content tool uses Perplexity Sonar models for real-time web search with citations.
 
 ### 1. think-about-plan
 
@@ -355,6 +358,31 @@ The response includes root cause analysis, diagnosis steps, proposed solutions, 
 
 [API documentation →](./docs/api/solve-problem.md)
 
+### 5. search-content
+
+Perform real-time web search using Perplexity's Sonar models. Returns comprehensive, well-sourced answers with citations from the web.
+
+**Parameters:**
+
+- `query` (required): Search query
+- `model` (optional): Perplexity model (sonar, sonar-pro, sonar-deep-research, sonar-reasoning, sonar-reasoning-pro)
+- `searchMode` (optional): Search mode - web for general search, academic for research papers, sec for SEC filings
+- `searchRecencyFilter` (optional): Filter by recency (week, month, year)
+- `searchDomainFilter` (optional): Array of domains to filter (e.g., ["github.com", "stackoverflow.com"])
+- `returnImages` (optional): Include image results
+- `returnRelatedQuestions` (optional): Include related follow-up questions
+- `reasoningEffort` (optional): Reasoning level for sonar-deep-research model (low, medium, high)
+
+**Example Usage:**
+
+```
+"What are the latest best practices for implementing WebAuthn in 2025?"
+```
+
+The response includes comprehensive search results with citations, sources, and optional related questions for deeper exploration.
+
+[API documentation →](./docs/api/search-content.md)
+
 ---
 
 ## Documentation
@@ -378,6 +406,7 @@ The response includes root cause analysis, diagnosis steps, proposed solutions, 
 - [suggest-alternative](./docs/api/suggest-alternative.md)
 - [improve-copy](./docs/api/improve-copy.md)
 - [solve-problem](./docs/api/solve-problem.md)
+- [search-content](./docs/api/search-content.md)
 
 ### Examples
 
@@ -460,8 +489,9 @@ kortx-mcp/
 │   ├── server.ts             # Main MCP server setup
 │   ├── config/               # Configuration management
 │   │   └── index.ts          # Zod validation, env parsing
-│   ├── llm/                  # OpenAI GPT-5 integration
-│   │   ├── openai-client.ts  # Responses API client
+│   ├── llm/                  # LLM integrations
+│   │   ├── openai-client.ts  # OpenAI GPT-5 Responses API
+│   │   ├── perplexity-client.ts # Perplexity Sonar API
 │   │   └── types.ts          # LLM types
 │   ├── context/              # Context gathering system
 │   │   ├── gatherer.ts       # Main orchestrator
@@ -474,7 +504,8 @@ kortx-mcp/
 │   │   ├── think-about-plan.ts
 │   │   ├── suggest-alternative.ts
 │   │   ├── improve-copy.ts
-│   │   └── solve-problem.ts
+│   │   ├── solve-problem.ts
+│   │   └── search-content.ts
 │   └── utils/                # Utilities
 │       └── logger.ts         # Pino structured logging
 ├── docs/                     # Documentation
@@ -504,7 +535,7 @@ Never commit your OpenAI API key to version control. Always use environment vari
 - **Runtime**: Node.js 22.20+
 - **Language**: TypeScript with strict mode
 - **MCP SDK**: @modelcontextprotocol/sdk v1.10.0+
-- **LLM**: OpenAI GPT-5 Responses API
+- **LLM**: OpenAI GPT-5 Responses API, Perplexity Sonar API
 - **Validation**: Zod for schema validation
 - **Logging**: Pino for structured logging
 - **Testing**: Vitest with 80%+ coverage
