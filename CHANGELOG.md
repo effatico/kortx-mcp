@@ -1,3 +1,11 @@
+## [1.1.4](https://github.com/effatico/kortx-mcp/compare/v1.1.3...v1.1.4) (2025-10-17)
+
+### Features
+
+- add comprehensive open source community files ([#11](https://github.com/effatico/kortx-mcp/issues/11)) ([361e19d](https://github.com/effatico/kortx-mcp/commit/361e19d2bee89e9f60347168b1594e4d9f350292))
+- implement Perplexity client infrastructure with official SDK ([#26](https://github.com/effatico/kortx-mcp/issues/26)) ([ca4ec2d](https://github.com/effatico/kortx-mcp/commit/ca4ec2d625eed82d85f6adae35215f136980840f)), closes [#25](https://github.com/effatico/kortx-mcp/issues/25)
+- implement search-content tool with Perplexity integration ([#28](https://github.com/effatico/kortx-mcp/issues/28)) ([78b7461](https://github.com/effatico/kortx-mcp/commit/78b7461fda05be84d11db025201db71c2faadb0c)), closes [#24](https://github.com/effatico/kortx-mcp/issues/24)
+
 ## [1.1.3](https://github.com/effatico/kortx-mcp/compare/v1.1.2...v1.1.3) (2025-10-17)
 
 ### Bug Fixes
