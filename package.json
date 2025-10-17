@@ -36,7 +36,7 @@
     "context-gathering",
     "typescript"
   ],
-  "author": "Effati Consulting AB (https://github.com/effatico)",
+  "author": "Effati Consulting AB <info@effati.se> (https://github.com/effatico)",
   "license": "MIT",
   "repository": {
     "type": "git",
