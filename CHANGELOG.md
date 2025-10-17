@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/effatico/kortx-mcp/compare/v1.1.0...v1.1.1) (2025-10-17)
+
+### Bug Fixes
+
+- correct binary name in package.json and fix OpenAI API response test mocks ([4df3b50](https://github.com/effatico/kortx-mcp/commit/4df3b506044399eb9c45946bd18a29f85fceded0))
+- resolve TypeScript lint warnings with proper type assertions ([bc61756](https://github.com/effatico/kortx-mcp/commit/bc61756fa84db99d5e84ca2d8dfcadbf268dfdc1))
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
