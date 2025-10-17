@@ -1,3 +1,9 @@
+## [1.1.3](https://github.com/effatico/kortx-mcp/compare/v1.1.2...v1.1.3) (2025-10-17)
+
+### Bug Fixes
+
+- remove postpublish script to prevent tag conflicts in CI/CD ([233c2f6](https://github.com/effatico/kortx-mcp/commit/233c2f65665aeb70e60b64fd38930aa4a52d0d5a))
+
 ## [1.1.2](https://github.com/effatico/kortx-mcp/compare/v1.1.1...v1.1.2) (2025-10-17)
 
 ### Bug Fixes
