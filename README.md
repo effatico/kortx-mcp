@@ -1,6 +1,6 @@
 # Kortx
 
-[![npm version](https://badge.fury.io/js/kortx-mcp.svg)](https://www.npmjs.com/package/kortx-mcp)
+[![npm version](https://badge.fury.io/js/%40effatico%2Fkortx-mcp.svg)](https://www.npmjs.com/package/@effatico/kortx-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://github.com/effatico/kortx-mcp/workflows/CI/badge.svg)](https://github.com/effatico/kortx-mcp/actions)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.12.0-brightgreen)](https://nodejs.org)
@@ -32,10 +32,10 @@ You can install and run it with a single npx command. The defaults optimize for 
 Get started in seconds with a single command:
 
 ```bash
-npx kortx-mcp
+npx @effatico/kortx-mcp
 ```
 
-You can also install globally via npm or run it in Docker. For a global installation, use `npm install -g kortx-mcp` and then run `kortx-mcp`. To run in Docker, use `docker run -e OPENAI_API_KEY=your-key ghcr.io/effatico/kortx-mcp:latest`.
+You can also install globally via npm or run it in Docker. For a global installation, use `npm install -g @effatico/kortx-mcp` and then run `kortx-mcp`. To run in Docker, use `docker run -e OPENAI_API_KEY=your-key ghcr.io/effatico/kortx-mcp:latest`.
 
 ---
 
@@ -46,10 +46,10 @@ You can also install globally via npm or run it in Docker. For a global installa
 The simplest setup uses npx:
 
 ```bash
-claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- npx -y kortx-mcp
+claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- npx -y @effatico/kortx-mcp
 ```
 
-If you've installed the package globally, replace `npx -y kortx-mcp` with just `kortx-mcp`. You can customize the server by adding environment variables like `OPENAI_MODEL=gpt-5-mini` or `LOG_LEVEL=info` to the command above.
+If you've installed the package globally, replace `npx -y @effatico/kortx-mcp` with just `kortx-mcp`. You can customize the server by adding environment variables like `OPENAI_MODEL=gpt-5-mini` or `LOG_LEVEL=info` to the command above.
 
 [Detailed Claude Code setup guide →](./docs/integration/claude-code.md)
 
@@ -63,7 +63,7 @@ Add to your Copliot configuration:
     "servers": {
       "consultant": {
         "command": "npx",
-        "args": ["-y", "kortx-mcp"],
+        "args": ["-y", "@effatico/kortx-mcp"],
         "env": {
           "OPENAI_API_KEY": "your-api-key-here"
         }
@@ -84,7 +84,7 @@ Add to your Copliot configuration:
 {
   "consultant": {
     "command": "npx",
-    "args": ["-y", "kortx-mcp"],
+    "args": ["-y", "@effatico/kortx-mcp"],
     "env": {
       "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
     }
@@ -102,7 +102,7 @@ Add to Cursor's MCP settings:
 {
   "mcp-servers": {
     "consultant": {
-      "command": "npx -y kortx-mcp",
+      "command": "npx -y @effatico/kortx-mcp",
       "env": {
         "OPENAI_API_KEY": "your-api-key-here"
       }

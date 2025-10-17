@@ -18,10 +18,10 @@ The fastest way to add MCP Consultant to Claude Code:
 
 ```bash
 # Using npx (recommended - no installation required)
-claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- npx -y kortx-mcp
+claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- npx -y @effatico/kortx-mcp
 
 # Using global install
-npm install -g kortx-mcp
+npm install -g @effatico/kortx-mcp
 claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- kortx-mcp
 ```
 
@@ -46,7 +46,7 @@ After running the `claude mcp add` command, your configuration will look like th
     "consultant": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "kortx-mcp"],
+      "args": ["-y", "@effatico/kortx-mcp"],
       "env": {
         "OPENAI_API_KEY": "your-key-here"
       }
@@ -74,7 +74,7 @@ claude mcp get consultant
 For most users, the basic setup command works best:
 
 ```bash
-claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- npx -y kortx-mcp
+claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- npx -y @effatico/kortx-mcp
 ```
 
 This uses:
@@ -99,7 +99,7 @@ claude mcp add --transport stdio consultant \
   --env ENABLE_MEMORY=true \
   --env ENABLE_CCLSP=true \
   --env MAX_CONTEXT_TOKENS=32000 \
-  -- npx -y kortx-mcp
+  -- npx -y @effatico/kortx-mcp
 ```
 
 ### Using Environment Variables
@@ -114,7 +114,7 @@ export OPENAI_API_KEY="sk-your-api-key-here"
 Then use the basic command without exposing the key:
 
 ```bash
-claude mcp add --transport stdio consultant --env OPENAI_API_KEY=$OPENAI_API_KEY -- npx -y kortx-mcp
+claude mcp add --transport stdio consultant --env OPENAI_API_KEY=$OPENAI_API_KEY -- npx -y @effatico/kortx-mcp
 ```
 
 ---
@@ -234,14 +234,14 @@ claude mcp add --transport stdio consultant-mini \
   --env OPENAI_API_KEY=$OPENAI_API_KEY \
   --env OPENAI_MODEL=gpt-5-mini \
   --env OPENAI_REASONING_EFFORT=minimal \
-  -- npx -y kortx-mcp
+  -- npx -y @effatico/kortx-mcp
 
 # Deep consultant for complex tasks
 claude mcp add --transport stdio consultant-pro \
   --env OPENAI_API_KEY=$OPENAI_API_KEY \
   --env OPENAI_MODEL=gpt-5 \
   --env OPENAI_REASONING_EFFORT=high \
-  -- npx -y kortx-mcp
+  -- npx -y @effatico/kortx-mcp
 ```
 
 Now you can choose which consultant to use based on the task complexity!
@@ -288,7 +288,7 @@ claude mcp add --transport stdio consultant \
   --env OPENAI_API_KEY=$OPENAI_API_KEY \
   --env OPENAI_MODEL=gpt-5-mini \
   --env OPENAI_REASONING_EFFORT=minimal \
-  -- npx -y kortx-mcp
+  -- npx -y @effatico/kortx-mcp
 ```
 
 ---
@@ -318,7 +318,7 @@ claude mcp add --transport stdio consultant \
   --env INCLUDE_FILE_CONTENT=true \
   --env INCLUDE_GIT_HISTORY=false \
   --env MAX_CONTEXT_TOKENS=32000 \
-  -- npx -y kortx-mcp
+  -- npx -y @effatico/kortx-mcp
 ```
 
 ### Privacy Considerations
@@ -338,7 +338,7 @@ claude mcp add --transport stdio consultant \
   --env ENABLE_MEMORY=false \
   --env ENABLE_CCLSP=false \
   --env INCLUDE_FILE_CONTENT=false \
-  -- npx -y kortx-mcp
+  -- npx -y @effatico/kortx-mcp
 ```
 
 ---
@@ -361,7 +361,7 @@ claude mcp add --transport stdio consultant \
 cat ~/.config/claude/mcp.json | jq .
 
 # Check if npx can find kortx-mcp
-npx -y kortx-mcp --help
+npx -y @effatico/kortx-mcp --help
 ```
 
 ### API Key Errors
@@ -400,7 +400,7 @@ claude mcp add --transport stdio consultant \
   --env OPENAI_MODEL=gpt-5-mini \
   --env OPENAI_REASONING_EFFORT=minimal \
   --env MAX_CONTEXT_TOKENS=8000 \
-  -- npx -y kortx-mcp
+  -- npx -y @effatico/kortx-mcp
 ```
 
 ### Context Gathering Errors
@@ -421,7 +421,7 @@ claude mcp add --transport stdio consultant \
   --env ENABLE_SERENA=false \
   --env ENABLE_MEMORY=false \
   --env ENABLE_CCLSP=false \
-  -- npx -y kortx-mcp
+  -- npx -y @effatico/kortx-mcp
 ```
 
 ### High API Costs
@@ -446,7 +446,7 @@ claude mcp add --transport stdio consultant \
   --env ENABLE_SERENA=false \
   --env ENABLE_MEMORY=false \
   --env ENABLE_CCLSP=false \
-  -- npx -y kortx-mcp
+  -- npx -y @effatico/kortx-mcp
 ```
 
 ---
@@ -481,14 +481,14 @@ claude mcp add --transport stdio consultant-fast \
   --env OPENAI_API_KEY=$OPENAI_API_KEY \
   --env OPENAI_MODEL=gpt-5-nano \
   --env OPENAI_REASONING_EFFORT=minimal \
-  -- npx -y kortx-mcp
+  -- npx -y @effatico/kortx-mcp
 
 # Deep consultant for complex analysis
 claude mcp add --transport stdio consultant-deep \
   --env OPENAI_API_KEY=$OPENAI_API_KEY \
   --env OPENAI_MODEL=gpt-5 \
   --env OPENAI_REASONING_EFFORT=high \
-  -- npx -y kortx-mcp
+  -- npx -y @effatico/kortx-mcp
 ```
 
 ### Custom Logging
@@ -500,7 +500,7 @@ claude mcp add --transport stdio consultant \
   --env OPENAI_API_KEY=$OPENAI_API_KEY \
   --env LOG_LEVEL=debug \
   --env LOG_FILE=/custom/path/kortx-mcp.log \
-  -- npx -y kortx-mcp
+  -- npx -y @effatico/kortx-mcp
 ```
 
 ---

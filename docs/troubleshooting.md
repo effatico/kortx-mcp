@@ -24,13 +24,13 @@ This guide helps you diagnose and resolve common issues with MCP Consultant.
 1. Install globally:
 
    ```bash
-   npm install -g kortx-mcp
+   npm install -g @effatico/kortx-mcp
    ```
 
 2. Use npx instead (no installation needed):
 
    ```bash
-   npx -y kortx-mcp
+   npx -y @effatico/kortx-mcp
    ```
 
 3. Check your PATH includes npm global bin:
@@ -89,7 +89,7 @@ This guide helps you diagnose and resolve common issues with MCP Consultant.
 
 2. Use npx instead (recommended):
    ```bash
-   npx -y kortx-mcp
+   npx -y @effatico/kortx-mcp
    ```
 
 ## Configuration Problems
@@ -176,7 +176,7 @@ This guide helps you diagnose and resolve common issues with MCP Consultant.
 2. Test server manually:
 
    ```bash
-   OPENAI_API_KEY=sk-your-key npx -y kortx-mcp
+   OPENAI_API_KEY=sk-your-key npx -y @effatico/kortx-mcp
    ```
 
 3. Verify JSON syntax in MCP config:
@@ -226,7 +226,7 @@ This guide helps you diagnose and resolve common issues with MCP Consultant.
 
 4. Verify npx is using latest version:
    ```bash
-   npx -y kortx-mcp --version
+   npx -y @effatico/kortx-mcp --version
    ```
 
 ## API and Authentication
@@ -580,7 +580,7 @@ Or in your MCP config:
 
 ```bash
 # Logs to stderr
-OPENAI_API_KEY=sk-key npx -y kortx-mcp 2> debug.log
+OPENAI_API_KEY=sk-key npx -y @effatico/kortx-mcp 2> debug.log
 ```
 
 ### Understanding log output
@@ -604,7 +604,7 @@ export OPENAI_API_KEY="sk-your-key"
 export LOG_LEVEL="debug"
 
 # Run server
-npx -y kortx-mcp
+npx -y @effatico/kortx-mcp
 ```
 
 The server will wait for stdio input (MCP protocol messages).
@@ -618,7 +618,7 @@ npm install -g @modelcontextprotocol/inspector
 
 # Run inspector
 npx @modelcontextprotocol/inspector \
-  npx -y kortx-mcp
+  npx -y @effatico/kortx-mcp
 ```
 
 This provides a web UI to test tools interactively.
@@ -680,7 +680,7 @@ When reporting issues, include:
 
 - Node.js version: `node --version`
 - npm version: `npm --version`
-- Package version: `npx -y kortx-mcp --version`
+- Package version: `npx -y @effatico/kortx-mcp --version`
 - Operating system
 - AI assistant (Claude Code, Copliot, etc.)
 - Full error messages

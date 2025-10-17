@@ -32,7 +32,7 @@ Edit the config file and add the consultant server:
     "servers": {
       "consultant": {
         "command": "npx",
-        "args": ["-y", "kortx-mcp"],
+        "args": ["-y", "@effatico/kortx-mcp"],
         "env": {
           "OPENAI_API_KEY": "sk-your-api-key-here"
         }
@@ -58,7 +58,7 @@ Restart Copliot to load the new configuration.
     "servers": {
       "consultant": {
         "command": "npx",
-        "args": ["-y", "kortx-mcp"],
+        "args": ["-y", "@effatico/kortx-mcp"],
         "env": {
           "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
         }
@@ -76,7 +76,7 @@ Restart Copliot to load the new configuration.
     "servers": {
       "consultant": {
         "command": "npx",
-        "args": ["-y", "kortx-mcp"],
+        "args": ["-y", "@effatico/kortx-mcp"],
         "env": {
           "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
           "OPENAI_MODEL": "gpt-5-mini",

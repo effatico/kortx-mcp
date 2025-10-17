@@ -10,7 +10,7 @@ Best practices for integrating the kortx-mcp server with AI assistants and exter
 
 ```bash
 # Using npx (recommended for published package)
-claude mcp add consultant -- npx kortx-mcp
+claude mcp add consultant -- npx @effatico/kortx-mcp
 
 # Using local development build
 claude mcp add consultant-dev -s local -- node /absolute/path/to/kortx-mcp/build/index.js
@@ -25,7 +25,7 @@ Manual configuration in `~/.config/claude/mcp.json`:
   "mcpServers": {
     "consultant": {
       "command": "npx",
-      "args": ["kortx-mcp"],
+      "args": ["@effatico/kortx-mcp"],
       "env": {
         "OPENAI_API_KEY": "your-api-key-here",
         "OPENAI_MODEL": "gpt-5",
@@ -56,7 +56,7 @@ Configuration in Copliot settings:
     "servers": {
       "consultant": {
         "command": "npx",
-        "args": ["kortx-mcp"],
+        "args": ["@effatico/kortx-mcp"],
         "env": {
           "OPENAI_API_KEY": "your-api-key-here",
           "OPENAI_MODEL": "gpt-5",

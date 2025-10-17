@@ -8,9 +8,9 @@ You'll need Node.js 22.12.0 or newer (download from [nodejs.org](https://nodejs.
 
 ## Installation Options
 
-The fastest way to get started uses npx with no installation required. Run `npx -y kortx-mcp` to download and run the latest version automatically, which works well for trying it out or occasional use.
+The fastest way to get started uses npx with no installation required. Run `npx -y @effatico/kortx-mcp` to download and run the latest version automatically, which works well for trying it out or occasional use.
 
-For regular use, install globally with `npm install -g kortx-mcp` and then run `kortx-mcp` anytime.
+For regular use, install globally with `npm install -g @effatico/kortx-mcp` and then run `kortx-mcp` anytime.
 
 For containerized deployments, pull the Docker image with `docker pull ghcr.io/effatico/kortx-mcp:latest` and run it with `docker run -e OPENAI_API_KEY=sk-your-key ghcr.io/effatico/kortx-mcp:latest`.
 
@@ -55,7 +55,7 @@ The simplest integration:
 
 ```bash
 # Add the server
-claude mcp add consultant -- npx -y kortx-mcp
+claude mcp add consultant -- npx -y @effatico/kortx-mcp
 ```
 
 Or manually edit `~/.config/claude/mcp.json`:
@@ -65,7 +65,7 @@ Or manually edit `~/.config/claude/mcp.json`:
   "mcpServers": {
     "consultant": {
       "command": "npx",
-      "args": ["-y", "kortx-mcp"],
+      "args": ["-y", "@effatico/kortx-mcp"],
       "env": {
         "OPENAI_API_KEY": "sk-your-key-here"
       }
@@ -86,7 +86,7 @@ Edit your Copliot configuration file:
     "servers": {
       "consultant": {
         "command": "npx",
-        "args": ["-y", "kortx-mcp"],
+        "args": ["-y", "@effatico/kortx-mcp"],
         "env": {
           "OPENAI_API_KEY": "your-key-here"
         }
@@ -106,7 +106,7 @@ Install the MCP extension, then add to `.vscode/mcp-config.json`:
 {
   "consultant": {
     "command": "npx",
-    "args": ["-y", "kortx-mcp"],
+    "args": ["-y", "@effatico/kortx-mcp"],
     "env": {
       "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
     }
@@ -124,7 +124,7 @@ Add to Cursor's MCP settings:
 {
   "mcp-servers": {
     "consultant": {
-      "command": "npx -y kortx-mcp",
+      "command": "npx -y @effatico/kortx-mcp",
       "env": {
         "OPENAI_API_KEY": "your-key-here"
       }
@@ -253,7 +253,7 @@ Now that you're up and running, try each of the four tools with different querie
 Install globally first:
 
 ```bash
-npm install -g kortx-mcp
+npm install -g @effatico/kortx-mcp
 ```
 
 ### "Invalid API key"
@@ -269,7 +269,7 @@ Check the logs:
 tail -f ~/.config/claude/logs/mcp-*.log
 
 # Or check stderr
-OPENAI_API_KEY=sk-your-key npx kortx-mcp 2>&1 | head -20
+OPENAI_API_KEY=sk-your-key npx @effatico/kortx-mcp 2>&1 | head -20
 ```
 
 ### "Tools not appearing"

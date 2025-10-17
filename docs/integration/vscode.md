@@ -33,7 +33,7 @@ Create `.vscode/mcp-config.json` in your project root:
 {
   "consultant": {
     "command": "npx",
-    "args": ["-y", "kortx-mcp"],
+    "args": ["-y", "@effatico/kortx-mcp"],
     "env": {
       "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
     }
@@ -75,7 +75,7 @@ Developer: Reload Window
 {
   "consultant": {
     "command": "npx",
-    "args": ["-y", "kortx-mcp"],
+    "args": ["-y", "@effatico/kortx-mcp"],
     "env": {
       "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
     }
@@ -89,7 +89,7 @@ Developer: Reload Window
 {
   "consultant": {
     "command": "npx",
-    "args": ["-y", "kortx-mcp"],
+    "args": ["-y", "@effatico/kortx-mcp"],
     "env": {
       "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
       "OPENAI_MODEL": "gpt-5-mini",
@@ -286,7 +286,7 @@ Create different consultant configurations for different needs:
 {
   "consultant-fast": {
     "command": "npx",
-    "args": ["-y", "kortx-mcp"],
+    "args": ["-y", "@effatico/kortx-mcp"],
     "env": {
       "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
       "OPENAI_MODEL": "gpt-5-nano",
@@ -295,7 +295,7 @@ Create different consultant configurations for different needs:
   },
   "consultant-deep": {
     "command": "npx",
-    "args": ["-y", "kortx-mcp"],
+    "args": ["-y", "@effatico/kortx-mcp"],
     "env": {
       "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
       "OPENAI_MODEL": "gpt-5",
@@ -371,7 +371,7 @@ Create different consultant configurations for different needs:
 which npx
 
 # Test kortx-mcp directly
-npx -y kortx-mcp --help
+npx -y @effatico/kortx-mcp --help
 
 # Check Node.js version
 node --version  # Should be >= 22.12.0
@@ -389,7 +389,7 @@ Commit `.vscode/mcp-config.json` to git (without secrets):
 {
   "consultant": {
     "command": "npx",
-    "args": ["-y", "kortx-mcp"],
+    "args": ["-y", "@effatico/kortx-mcp"],
     "env": {
       "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
     }

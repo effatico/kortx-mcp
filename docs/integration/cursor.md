@@ -32,7 +32,7 @@ Add to Cursor's MCP configuration:
 {
   "mcp-servers": {
     "consultant": {
-      "command": "npx -y kortx-mcp",
+      "command": "npx -y @effatico/kortx-mcp",
       "env": {
         "OPENAI_API_KEY": "your-api-key-here"
       }
@@ -55,7 +55,7 @@ Restart Cursor to load the new configuration.
 {
   "mcp-servers": {
     "consultant": {
-      "command": "npx -y kortx-mcp",
+      "command": "npx -y @effatico/kortx-mcp",
       "env": {
         "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
       }
@@ -70,7 +70,7 @@ Restart Cursor to load the new configuration.
 {
   "mcp-servers": {
     "consultant": {
-      "command": "npx -y kortx-mcp",
+      "command": "npx -y @effatico/kortx-mcp",
       "env": {
         "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
         "OPENAI_MODEL": "gpt-5-mini",
@@ -94,7 +94,7 @@ Restart Cursor to load the new configuration.
   "mcp-servers": {
     "consultant": {
       "command": "npx",
-      "args": ["-y", "kortx-mcp"],
+      "args": ["-y", "@effatico/kortx-mcp"],
       "env": {
         "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
       }
@@ -133,7 +133,7 @@ set OPENAI_API_KEY=sk-your-api-key-here
 {
   "mcp-servers": {
     "consultant": {
-      "command": "npx -y kortx-mcp",
+      "command": "npx -y @effatico/kortx-mcp",
       "env": {
         "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
       }
@@ -347,7 +347,7 @@ Configure different profiles for different needs:
 {
   "mcp-servers": {
     "consultant-fast": {
-      "command": "npx -y kortx-mcp",
+      "command": "npx -y @effatico/kortx-mcp",
       "env": {
         "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
         "OPENAI_MODEL": "gpt-5-nano",
@@ -355,7 +355,7 @@ Configure different profiles for different needs:
       }
     },
     "consultant-pro": {
-      "command": "npx -y kortx-mcp",
+      "command": "npx -y @effatico/kortx-mcp",
       "env": {
         "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
         "OPENAI_MODEL": "gpt-5",
@@ -390,7 +390,7 @@ Use them in chat:
 
 ```bash
 # Test npx can find kortx-mcp
-npx -y kortx-mcp --help
+npx -y @effatico/kortx-mcp --help
 
 # Verify Node.js version
 node --version  # Should be >= 22.12.0
@@ -594,13 +594,13 @@ For privacy or performance:
 {
   "mcp-servers": {
     "gpt5-consultant": {
-      "command": "npx -y kortx-mcp",
+      "command": "npx -y @effatico/kortx-mcp",
       "env": {
         "OPENAI_MODEL": "gpt-5"
       }
     },
     "gpt5-mini-consultant": {
-      "command": "npx -y kortx-mcp",
+      "command": "npx -y @effatico/kortx-mcp",
       "env": {
         "OPENAI_MODEL": "gpt-5-mini"
       }
