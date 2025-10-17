@@ -19,9 +19,9 @@ This tool is designed for AI researchers, tool builders, and platform engineers 
 
 ## Features
 
-The server supports multiple GPT-5 models (including mini, nano, and codex variants) with configurable reasoning effort. It automatically integrates with Serena, graph-memory, and cclsp MCPs to surface relevant code and metadata through smart context gathering.
+The server provides multiple GPT-5 variants (gpt-5, gpt-5-mini, gpt-5-nano, gpt-5-pro, gpt-5-codex) and dynamically selects the best variant per request based on task requirements. It integrates with Serena, graph-memory, and cclsp MCPs to fetch relevant code and metadata for context.
 
-Four specialized tools handle strategic planning, alternative solutions, copy improvement, and problem solving. The server ships production-ready with Docker support, non-root execution, sensitive-data redaction, and comprehensive structured logging via Pino.
+Four specialized tools handle strategic planning, alternative solutions, copy improvement, and problem solving. Each tool accepts an optional `preferredModel` parameter, allowing assistants to request specific models while the system optimizes selection based on task complexity. The server ships production-ready with Docker support, non-root execution, sensitive-data redaction, and comprehensive structured logging via Pino.
 
 You can install and run it with a single npx command. The defaults optimize for fast time-to-first-token using gpt-5-mini with minimal reasoning. The codebase maintains 80%+ test coverage with 46 passing unit tests.
 
@@ -142,7 +142,15 @@ MAX_CONTEXT_TOKENS=32000             # Context limit
 
 ### Model Selection Guide
 
-The default **gpt-5-mini** offers cost-optimized performance with balanced speed and capability. Choose **gpt-5** for complex reasoning, broad world knowledge, and multi-step tasks. For high-throughput simple tasks, use **gpt-5-nano**. When working on code generation, refactoring, debugging, or code explanations, **gpt-5-codex** provides optimized results.
+The server uses **gpt-5-mini** as the default model for a cost-optimized balance of speed and capability. Assistants can override this by passing a `preferredModel` parameter with each tool call. If no `preferredModel` is provided, the assistant automatically selects an appropriate model based on task complexity.
+
+**Available models:**
+
+- **gpt-5** — Complex reasoning, broad knowledge, and multi-step tasks
+- **gpt-5-mini** — Balanced performance and cost (default)
+- **gpt-5-nano** — High-throughput, simple tasks
+- **gpt-5-pro** — Advanced reasoning and specialized domains
+- **gpt-5-codex** — Code generation, refactoring, debugging, and code explanations
 
 ### Reasoning Effort Guide
 
@@ -152,11 +160,121 @@ The default **minimal** setting uses very few reasoning tokens for fastest time-
 
 ---
 
+## Docker Deployment
+
+The server ships production-ready with a multi-stage Docker build optimized for security and size. The image runs as a non-root user (nodejs:1001) with comprehensive security scanning during build.
+
+### Quick Docker Start
+
+Build and run the Docker image:
+
+```bash
+# Build the image
+docker build -t llm-consultants .
+
+# Run with environment variables
+# Note: -i flag is required for stdio transport
+docker run -i --rm \
+  -e OPENAI_API_KEY=your-api-key \
+  llm-consultants
+```
+
+### Using Docker Compose
+
+The project includes a tested docker-compose.yml with resource limits and volume mounting support:
+
+```bash
+# Copy environment configuration
+cp .env.example .env.docker
+# Edit .env.docker with your API key
+
+# Run with docker-compose
+docker-compose up
+```
+
+### Docker Configuration
+
+Environment variables can be passed to the container:
+
+```yaml
+services:
+  llm-consultants:
+    image: llm-consultants:latest
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-5-mini}
+      - NODE_ENV=production
+      - LOG_LEVEL=info
+    volumes:
+      - ./workspace:/workspace:ro # Optional: mount project files
+    stdin_open: true
+    tty: true
+```
+
+### Resource Limits
+
+Production deployment includes sensible resource limits:
+
+- **CPU**: 1 core limit, 0.5 core reservation
+- **Memory**: 512MB limit, 256MB reservation
+- **Image Size**: ~273MB (Node.js 22 Alpine base required for full MCP runtime)
+
+### Testing Docker Setup
+
+Run the comprehensive test suite:
+
+```bash
+# Run automated Docker tests
+chmod +x scripts/test-docker.sh
+./scripts/test-docker.sh
+```
+
+The test script verifies:
+
+- Multi-stage build process
+- Image size optimization
+- Non-root user configuration (nodejs:1001)
+- Security audit execution
+- Container startup and stdio transport
+- Environment variable handling
+- File permissions and ownership
+- Docker Compose configuration
+- Resource limits
+
+### Docker Security
+
+The Dockerfile implements security best practices:
+
+- Multi-stage build to minimize attack surface
+- Runs as non-root user (nodejs:1001)
+- Security audits during build (npm audit --audit-level=high)
+- Production-only dependencies in final image
+- Alpine Linux base for minimal footprint
+- No unnecessary packages or build tools in production image
+
+### Troubleshooting Docker
+
+**Container exits immediately:** This is expected behavior for stdio transport. The MCP server requires an active stdin connection. Use the `-i` flag for interactive mode or connect via MCP client.
+
+**Permission errors:** Ensure files are readable by the nodejs user (UID 1001). The Dockerfile sets proper ownership with `--chown=nodejs:nodejs`.
+
+**Image size concerns:** The final image size (~273MB) exceeds the original 200MB optimization target. This is a deliberate trade-off: the Node.js 22 Alpine base contributes ~226MB (required for full MCP runtime capabilities), and production dependencies add ~46MB. While larger than initially targeted, this remains practical and necessary for comprehensive Node.js MCP server functionality.
+
+---
+
 ## Available Tools
+
+All tools accept an optional `preferredModel` parameter. When set, the assistant treats it as a preference but may override it to select the most suitable GPT-5 variant (gpt-5, gpt-5-mini, gpt-5-nano, gpt-5-pro, or gpt-5-codex) based on task complexity and requirements.
 
 ### 1. think-about-plan
 
 Get strategic feedback on plans and approaches. The tool analyzes clarity, feasibility, risks, and dependencies while suggesting alternatives and providing actionable recommendations.
+
+**Parameters:**
+
+- `plan` (required): Description of the plan to analyze
+- `context` (optional): Additional context about the plan
+- `preferredModel` (optional): GPT-5 model variant to use
 
 **Example Usage:**
 
@@ -173,6 +291,13 @@ The response includes a clarity assessment, feasibility analysis, risk evaluatio
 
 Request alternative approaches or solutions. The tool considers different paradigms, simpler solutions, proven patterns, and trade-offs to provide multiple viable options.
 
+**Parameters:**
+
+- `currentApproach` (required): Description of the current approach
+- `constraints` (optional): List of constraints or limitations
+- `goals` (optional): List of goals or objectives
+- `preferredModel` (optional): GPT-5 model variant to use
+
 **Example Usage:**
 
 ```
@@ -188,6 +313,13 @@ The response presents multiple alternative approaches with pros and cons for eac
 
 Improve text, documentation, or user-facing messages with a focus on clarity, conciseness, appropriate tone, logical structure, and accessibility.
 
+**Parameters:**
+
+- `originalText` (required): The text to improve
+- `purpose` (required): Purpose of the text (e.g., "technical documentation", "error message")
+- `targetAudience` (optional): Target audience (e.g., "developers", "end users")
+- `preferredModel` (optional): GPT-5 model variant to use
+
 **Example Usage:**
 
 ```
@@ -202,6 +334,14 @@ The response provides an improved version with an explanation of changes and rea
 ### 4. solve-problem
 
 Get debugging and problem-solving assistance. The tool performs root cause analysis and provides diagnosis steps, proposed solutions, testing guidance, and prevention strategies.
+
+**Parameters:**
+
+- `problem` (required): Description of the problem
+- `attemptedSolutions` (optional): List of solutions that have been tried
+- `errorMessages` (optional): List of error messages or stack traces
+- `relevantCode` (optional): Relevant code snippets
+- `preferredModel` (optional): GPT-5 model variant to use
 
 **Example Usage:**
 
