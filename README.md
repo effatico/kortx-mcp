@@ -19,9 +19,9 @@ This tool is designed for AI researchers, tool builders, and platform engineers 
 
 ## Features
 
-The server supports multiple GPT-5 models (gpt-5, gpt-5-mini, gpt-5-nano, gpt-5-pro, gpt-5-codex) with dynamic model selection. AI assistants can automatically choose the most appropriate model variant for each consultation based on task complexity and requirements. It automatically integrates with Serena, graph-memory, and cclsp MCPs to surface relevant code and metadata through smart context gathering.
+The server provides multiple GPT-5 variants (gpt-5, gpt-5-mini, gpt-5-nano, gpt-5-pro, gpt-5-codex) and dynamically selects the best variant per request based on task requirements. It integrates with Serena, graph-memory, and cclsp MCPs to fetch relevant code and metadata for context.
 
-Four specialized tools handle strategic planning, alternative solutions, copy improvement, and problem solving. Each tool accepts an optional `preferredModel` parameter, allowing the AI assistant to optimize model selection per task. The server ships production-ready with Docker support, non-root execution, sensitive-data redaction, and comprehensive structured logging via Pino.
+Four specialized tools handle strategic planning, alternative solutions, copy improvement, and problem solving. Each tool accepts an optional `preferredModel` parameter, allowing assistants to request specific models while the system optimizes selection based on task complexity. The server ships production-ready with Docker support, non-root execution, sensitive-data redaction, and comprehensive structured logging via Pino.
 
 You can install and run it with a single npx command. The defaults optimize for fast time-to-first-token using gpt-5-mini with minimal reasoning. The codebase maintains 80%+ test coverage with 46 passing unit tests.
 
@@ -142,15 +142,15 @@ MAX_CONTEXT_TOKENS=32000             # Context limit
 
 ### Model Selection Guide
 
-The server defaults to **gpt-5-mini** for cost-optimized performance with balanced speed and capability. AI assistants can override this default by specifying a `preferredModel` parameter in each tool invocation:
+The server uses **gpt-5-mini** as the default model for a cost-optimized balance of speed and capability. Assistants can override this by passing a `preferredModel` parameter with each tool call. If no `preferredModel` is provided, the assistant automatically selects an appropriate model based on task complexity.
 
-- **gpt-5**: Complex reasoning, broad world knowledge, and multi-step tasks
-- **gpt-5-mini**: Balanced performance and cost (default)
-- **gpt-5-nano**: High-throughput simple tasks
-- **gpt-5-pro**: Advanced reasoning and specialized domains
-- **gpt-5-codex**: Code generation, refactoring, debugging, and code explanations
+**Available models:**
 
-The AI assistant automatically selects the most appropriate model based on task complexity when no preference is specified.
+- **gpt-5** — Complex reasoning, broad knowledge, and multi-step tasks
+- **gpt-5-mini** — Balanced performance and cost (default)
+- **gpt-5-nano** — High-throughput, simple tasks
+- **gpt-5-pro** — Advanced reasoning and specialized domains
+- **gpt-5-codex** — Code generation, refactoring, debugging, and code explanations
 
 ### Reasoning Effort Guide
 
@@ -264,7 +264,7 @@ The Dockerfile implements security best practices:
 
 ## Available Tools
 
-All tools support dynamic model selection through an optional `preferredModel` parameter. The AI assistant can automatically choose the most appropriate GPT-5 model variant (gpt-5, gpt-5-mini, gpt-5-nano, gpt-5-pro, or gpt-5-codex) based on task complexity and requirements.
+All tools accept an optional `preferredModel` parameter. When set, the assistant treats it as a preference but may override it to select the most suitable GPT-5 variant (gpt-5, gpt-5-mini, gpt-5-nano, gpt-5-pro, or gpt-5-codex) based on task complexity and requirements.
 
 ### 1. think-about-plan
 
