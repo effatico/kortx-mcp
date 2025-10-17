@@ -17,6 +17,7 @@ import {
   logToolExecutionComplete,
 } from './utils/logger.js';
 import { OpenAIClient } from './llm/openai-client.js';
+import { PerplexityClient } from './llm/perplexity-client.js';
 import { ContextGatherer } from './context/gatherer.js';
 import { FileContextSource } from './context/sources/file.js';
 import { SerenaContextSource } from './context/sources/serena.js';
@@ -29,6 +30,7 @@ import {
 } from './tools/suggest-alternative.js';
 import { ImproveCopyTool, ImproveCopyInputSchema } from './tools/improve-copy.js';
 import { SolveProblemTool, SolveProblemInputSchema } from './tools/solve-problem.js';
+import { SearchContentTool, SearchContentInputSchema } from './tools/search-content.js';
 import { RateLimiter } from './middleware/rate-limiter.js';
 
 /**
@@ -39,12 +41,14 @@ export class MCPConsultantServer {
   private config: ReturnType<typeof getConfig>;
   private logger: ReturnType<typeof createLogger>;
   private openaiClient: OpenAIClient;
+  private perplexityClient: PerplexityClient;
   private contextGatherer: ContextGatherer;
   private rateLimiter: RateLimiter | null;
   private thinkAboutPlanTool: ThinkAboutPlanTool;
   private suggestAlternativeTool: SuggestAlternativeTool;
   private improveCopyTool: ImproveCopyTool;
   private solveProblemTool: SolveProblemTool;
+  private searchContentTool: SearchContentTool;
 
   constructor() {
     // Load configuration
@@ -62,6 +66,7 @@ export class MCPConsultantServer {
 
     // Initialize core services
     this.openaiClient = new OpenAIClient(this.config, this.logger);
+    this.perplexityClient = new PerplexityClient(this.config, this.logger);
     this.contextGatherer = new ContextGatherer(this.config, this.logger);
 
     // Initialize rate limiter if enabled
@@ -107,6 +112,7 @@ export class MCPConsultantServer {
       this.openaiClient,
       this.contextGatherer
     );
+    this.searchContentTool = new SearchContentTool(this.config, this.logger, this.perplexityClient);
 
     // Create MCP server
     this.server = new Server(
@@ -290,6 +296,63 @@ export class MCPConsultantServer {
               required: ['problem'],
             },
           },
+          {
+            name: 'search-content',
+            description:
+              'Perform real-time web search using Perplexity Sonar models. Returns comprehensive, well-sourced answers with citations from the web.',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                query: {
+                  type: 'string',
+                  description: 'Search query',
+                  minLength: 1,
+                },
+                model: {
+                  type: 'string',
+                  enum: [
+                    'sonar',
+                    'sonar-pro',
+                    'sonar-deep-research',
+                    'sonar-reasoning',
+                    'sonar-reasoning-pro',
+                  ],
+                  description: 'Perplexity model to use for search',
+                },
+                searchMode: {
+                  type: 'string',
+                  enum: ['web', 'academic', 'sec'],
+                  description:
+                    'Search mode: web for general, academic for research papers, sec for SEC filings',
+                },
+                searchRecencyFilter: {
+                  type: 'string',
+                  enum: ['week', 'month', 'year'],
+                  description: 'Filter results by recency',
+                },
+                searchDomainFilter: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  description:
+                    'Filter to specific domains (e.g., ["github.com", "stackoverflow.com"])',
+                },
+                returnImages: {
+                  type: 'boolean',
+                  description: 'Whether to return image results',
+                },
+                returnRelatedQuestions: {
+                  type: 'boolean',
+                  description: 'Whether to return related questions',
+                },
+                reasoningEffort: {
+                  type: 'string',
+                  enum: ['low', 'medium', 'high'],
+                  description: 'Reasoning effort (only for sonar-deep-research model)',
+                },
+              },
+              required: ['query'],
+            },
+          },
         ],
       };
     });
@@ -352,6 +415,12 @@ export class MCPConsultantServer {
           case 'solve-problem': {
             const input = SolveProblemInputSchema.parse(args);
             result = await this.solveProblemTool.execute(input);
+            break;
+          }
+
+          case 'search-content': {
+            const input = SearchContentInputSchema.parse(args);
+            result = await this.searchContentTool.execute(input);
             break;
           }
 
