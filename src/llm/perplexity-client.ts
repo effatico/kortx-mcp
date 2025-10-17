@@ -19,47 +19,55 @@ export class PerplexityClient {
     });
   }
 
-  async chat(request: PerplexityRequest): Promise<PerplexityResponse> {
+  private buildRequestParams(request: PerplexityRequest, stream: boolean) {
     const model = request.model || this.config.perplexity.model;
     const temperature = request.temperature ?? this.config.perplexity.temperature;
     const maxTokens = request.maxTokens || this.config.perplexity.maxTokens;
     const searchMode = request.searchMode || this.config.perplexity.searchMode;
 
+    return {
+      model,
+      messages: request.messages,
+      temperature,
+      max_tokens: maxTokens,
+      search_mode: searchMode,
+      top_p: request.topP,
+      stream,
+      disable_search: request.disableSearch,
+      enable_search_classifier: request.enableSearchClassifier,
+      search_domain_filter: request.searchDomainFilter,
+      search_recency_filter: request.searchRecencyFilter,
+      search_after_date_filter: request.searchAfterDateFilter,
+      search_before_date_filter: request.searchBeforeDateFilter,
+      last_updated_after_filter: request.lastUpdatedAfterFilter,
+      last_updated_before_filter: request.lastUpdatedBeforeFilter,
+      return_images: request.returnImages ?? this.config.perplexity.returnImages,
+      return_related_questions:
+        request.returnRelatedQuestions ?? this.config.perplexity.returnRelatedQuestions,
+      language_preference: request.languagePreference,
+      web_search_options: request.webSearchOptions
+        ? {
+            search_context_size: request.webSearchOptions.context_size,
+            user_location: request.webSearchOptions.user_location
+              ? { country: request.webSearchOptions.user_location }
+              : undefined,
+          }
+        : undefined,
+      reasoning_effort: request.reasoningEffort,
+    };
+  }
+
+  async chat(request: PerplexityRequest): Promise<PerplexityResponse> {
+    const model = request.model || this.config.perplexity.model;
     const startTime = Date.now();
 
     logLLMRequest(this.logger, model, JSON.stringify(request.messages).length);
 
     try {
-      const response = await this.client.chat.completions.create({
-        model,
-        messages: request.messages,
-        temperature,
-        max_tokens: maxTokens,
-        search_mode: searchMode,
-        top_p: request.topP,
+      const response = (await this.client.chat.completions.create({
+        ...this.buildRequestParams(request, false),
         stream: false,
-        disable_search: request.disableSearch,
-        enable_search_classifier: request.enableSearchClassifier,
-        search_domain_filter: request.searchDomainFilter,
-        search_recency_filter: request.searchRecencyFilter,
-        search_after_date_filter: request.searchAfterDateFilter,
-        search_before_date_filter: request.searchBeforeDateFilter,
-        last_updated_after_filter: request.lastUpdatedAfterFilter,
-        last_updated_before_filter: request.lastUpdatedBeforeFilter,
-        return_images: request.returnImages ?? this.config.perplexity.returnImages,
-        return_related_questions:
-          request.returnRelatedQuestions ?? this.config.perplexity.returnRelatedQuestions,
-        language_preference: request.languagePreference,
-        web_search_options: request.webSearchOptions
-          ? {
-              search_context_size: request.webSearchOptions.context_size,
-              user_location: request.webSearchOptions.user_location
-                ? { country: request.webSearchOptions.user_location }
-                : undefined,
-            }
-          : undefined,
-        reasoning_effort: request.reasoningEffort,
-      });
+      })) as any;
 
       const duration = Date.now() - startTime;
 
@@ -68,12 +76,14 @@ export class PerplexityClient {
         typeof choice?.message.content === 'string'
           ? choice.message.content
           : Array.isArray(choice?.message.content)
-            ? choice.message.content.map(chunk => ('text' in chunk ? chunk.text : '')).join('')
+            ? choice.message.content
+                .map((chunk: any) => ('text' in chunk ? chunk.text : ''))
+                .join('')
             : '';
 
       const perplexityResponse: PerplexityResponse = {
         content,
-        model: response.model || 'sonar',
+        model: response.model || model,
         tokensUsed: {
           prompt: response.usage?.prompt_tokens || 0,
           completion: response.usage?.completion_tokens || 0,
@@ -97,45 +107,15 @@ export class PerplexityClient {
     onChunk: (chunk: string) => void
   ): Promise<PerplexityResponse> {
     const model = request.model || this.config.perplexity.model;
-    const temperature = request.temperature ?? this.config.perplexity.temperature;
-    const maxTokens = request.maxTokens || this.config.perplexity.maxTokens;
-    const searchMode = request.searchMode || this.config.perplexity.searchMode;
-
     const startTime = Date.now();
 
     logLLMRequest(this.logger, model, JSON.stringify(request.messages).length);
 
     try {
-      const stream = await this.client.chat.completions.create({
-        model,
-        messages: request.messages,
-        temperature,
-        max_tokens: maxTokens,
-        search_mode: searchMode,
-        top_p: request.topP,
+      const stream = (await this.client.chat.completions.create({
+        ...this.buildRequestParams(request, true),
         stream: true,
-        disable_search: request.disableSearch,
-        enable_search_classifier: request.enableSearchClassifier,
-        search_domain_filter: request.searchDomainFilter,
-        search_recency_filter: request.searchRecencyFilter,
-        search_after_date_filter: request.searchAfterDateFilter,
-        search_before_date_filter: request.searchBeforeDateFilter,
-        last_updated_after_filter: request.lastUpdatedAfterFilter,
-        last_updated_before_filter: request.lastUpdatedBeforeFilter,
-        return_images: request.returnImages ?? this.config.perplexity.returnImages,
-        return_related_questions:
-          request.returnRelatedQuestions ?? this.config.perplexity.returnRelatedQuestions,
-        language_preference: request.languagePreference,
-        web_search_options: request.webSearchOptions
-          ? {
-              search_context_size: request.webSearchOptions.context_size,
-              user_location: request.webSearchOptions.user_location
-                ? { country: request.webSearchOptions.user_location }
-                : undefined,
-            }
-          : undefined,
-        reasoning_effort: request.reasoningEffort,
-      });
+      })) as any;
 
       let fullContent = '';
       let inputTokens = 0;
@@ -151,7 +131,7 @@ export class PerplexityClient {
             typeof delta.content === 'string'
               ? delta.content
               : Array.isArray(delta.content)
-                ? delta.content.map(c => ('text' in c ? c.text : '')).join('')
+                ? delta.content.map((c: any) => ('text' in c ? c.text : '')).join('')
                 : '';
           if (content) {
             fullContent += content;
@@ -169,7 +149,7 @@ export class PerplexityClient {
         }
 
         if (chunk.citations) {
-          citations = chunk.citations.filter((c): c is string => c !== null);
+          citations = chunk.citations.filter((c: any) => c !== null);
         }
 
         if (chunk.model) {
