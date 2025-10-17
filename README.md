@@ -1,8 +1,8 @@
-# LLM Consultants
+# Kortx
 
-[![npm version](https://badge.fury.io/js/llm-consultants.svg)](https://www.npmjs.com/package/llm-consultants)
+[![npm version](https://badge.fury.io/js/kortx-mcp.svg)](https://www.npmjs.com/package/kortx-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://github.com/amsv01/llm-consultants/workflows/Test/badge.svg)](https://github.com/amsv01/llm-consultants/actions)
+[![Build Status](https://github.com/amsv01/kortx-mcp/workflows/Test/badge.svg)](https://github.com/amsv01/kortx-mcp/actions)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.12.0-brightgreen)](https://nodejs.org)
 
 A lightweight, open-source MCP server that enables AI assistants like Claude Code to consult GPT-5 models for specialized tasks while automatically gathering relevant context from your codebase.
@@ -32,10 +32,10 @@ You can install and run it with a single npx command. The defaults optimize for 
 Get started in seconds with a single command:
 
 ```bash
-npx llm-consultants
+npx kortx-mcp
 ```
 
-You can also install globally via npm or run it in Docker. For a global installation, use `npm install -g llm-consultants` and then run `llm-consultants`. To run in Docker, use `docker run -e OPENAI_API_KEY=your-key ghcr.io/amsv01/llm-consultants:latest`.
+You can also install globally via npm or run it in Docker. For a global installation, use `npm install -g kortx-mcp` and then run `kortx-mcp`. To run in Docker, use `docker run -e OPENAI_API_KEY=your-key ghcr.io/amsv01/kortx-mcp:latest`.
 
 ---
 
@@ -46,10 +46,10 @@ You can also install globally via npm or run it in Docker. For a global installa
 The simplest setup uses npx:
 
 ```bash
-claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- npx -y llm-consultants
+claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- npx -y kortx-mcp
 ```
 
-If you've installed the package globally, replace `npx -y llm-consultants` with just `llm-consultants`. You can customize the server by adding environment variables like `OPENAI_MODEL=gpt-5-mini` or `LOG_LEVEL=info` to the command above.
+If you've installed the package globally, replace `npx -y kortx-mcp` with just `kortx-mcp`. You can customize the server by adding environment variables like `OPENAI_MODEL=gpt-5-mini` or `LOG_LEVEL=info` to the command above.
 
 [Detailed Claude Code setup guide →](./docs/integration/claude-code.md)
 
@@ -63,7 +63,7 @@ Add to your Copliot configuration:
     "servers": {
       "consultant": {
         "command": "npx",
-        "args": ["-y", "llm-consultants"],
+        "args": ["-y", "kortx-mcp"],
         "env": {
           "OPENAI_API_KEY": "your-api-key-here"
         }
@@ -84,7 +84,7 @@ Add to your Copliot configuration:
 {
   "consultant": {
     "command": "npx",
-    "args": ["-y", "llm-consultants"],
+    "args": ["-y", "kortx-mcp"],
     "env": {
       "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
     }
@@ -102,7 +102,7 @@ Add to Cursor's MCP settings:
 {
   "mcp-servers": {
     "consultant": {
-      "command": "npx -y llm-consultants",
+      "command": "npx -y kortx-mcp",
       "env": {
         "OPENAI_API_KEY": "your-api-key-here"
       }
@@ -170,13 +170,13 @@ Build and run the Docker image:
 
 ```bash
 # Build the image
-docker build -t llm-consultants .
+docker build -t kortx-mcp .
 
 # Run with environment variables
 # Note: -i flag is required for stdio transport
 docker run -i --rm \
   -e OPENAI_API_KEY=your-api-key \
-  llm-consultants
+  kortx-mcp
 ```
 
 ### Using Docker Compose
@@ -198,8 +198,8 @@ Environment variables can be passed to the container:
 
 ```yaml
 services:
-  llm-consultants:
-    image: llm-consultants:latest
+  kortx-mcp:
+    image: kortx-mcp:latest
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_MODEL=${OPENAI_MODEL:-gpt-5-mini}
@@ -408,8 +408,8 @@ The response includes root cause analysis, diagnosis steps, proposed solutions, 
 
 ```bash
 # Clone the repository
-git clone https://github.com/amsv01/llm-consultants.git
-cd llm-consultants
+git clone https://github.com/amsv01/kortx-mcp.git
+cd kortx-mcp
 
 # Install dependencies
 npm install
@@ -454,7 +454,7 @@ npm run inspector        # Debug with MCP Inspector
 ## Project Structure
 
 ```
-llm-consultants/
+kortx-mcp/
 ├── src/
 │   ├── index.ts              # Entry point with shebang
 │   ├── server.ts             # Main MCP server setup
@@ -539,8 +539,8 @@ This project is actively maintained and production-ready. Core functionality is 
 ## Support
 
 - 📖 [Documentation](./docs)
-- 💬 [GitHub Discussions](https://github.com/amsv01/llm-consultants/discussions)
-- 🐛 [Issue Tracker](https://github.com/amsv01/llm-consultants/issues)
+- 💬 [GitHub Discussions](https://github.com/amsv01/kortx-mcp/discussions)
+- 🐛 [Issue Tracker](https://github.com/amsv01/kortx-mcp/issues)
 - 📧 [Email Support](mailto:amin@effati.se)
 
 ---
@@ -549,4 +549,4 @@ This project is actively maintained and production-ready. Core functionality is 
 
 If you find this project useful, please consider giving it a star on GitHub!
 
-[![Star History Chart](https://api.star-history.com/svg?repos=amsv01/llm-consultants&type=Date)](https://star-history.com/#amsv01/llm-consultants&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=amsv01/kortx-mcp&type=Date)](https://star-history.com/#amsv01/kortx-mcp&Date)

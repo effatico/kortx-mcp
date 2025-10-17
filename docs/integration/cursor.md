@@ -32,7 +32,7 @@ Add to Cursor's MCP configuration:
 {
   "mcp-servers": {
     "consultant": {
-      "command": "npx -y llm-consultants",
+      "command": "npx -y kortx-mcp",
       "env": {
         "OPENAI_API_KEY": "your-api-key-here"
       }
@@ -55,7 +55,7 @@ Restart Cursor to load the new configuration.
 {
   "mcp-servers": {
     "consultant": {
-      "command": "npx -y llm-consultants",
+      "command": "npx -y kortx-mcp",
       "env": {
         "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
       }
@@ -70,7 +70,7 @@ Restart Cursor to load the new configuration.
 {
   "mcp-servers": {
     "consultant": {
-      "command": "npx -y llm-consultants",
+      "command": "npx -y kortx-mcp",
       "env": {
         "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
         "OPENAI_MODEL": "gpt-5-mini",
@@ -94,7 +94,7 @@ Restart Cursor to load the new configuration.
   "mcp-servers": {
     "consultant": {
       "command": "npx",
-      "args": ["-y", "llm-consultants"],
+      "args": ["-y", "kortx-mcp"],
       "env": {
         "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
       }
@@ -133,7 +133,7 @@ set OPENAI_API_KEY=sk-your-api-key-here
 {
   "mcp-servers": {
     "consultant": {
-      "command": "npx -y llm-consultants",
+      "command": "npx -y kortx-mcp",
       "env": {
         "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
       }
@@ -347,7 +347,7 @@ Configure different profiles for different needs:
 {
   "mcp-servers": {
     "consultant-fast": {
-      "command": "npx -y llm-consultants",
+      "command": "npx -y kortx-mcp",
       "env": {
         "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
         "OPENAI_MODEL": "gpt-5-nano",
@@ -355,7 +355,7 @@ Configure different profiles for different needs:
       }
     },
     "consultant-pro": {
-      "command": "npx -y llm-consultants",
+      "command": "npx -y kortx-mcp",
       "env": {
         "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
         "OPENAI_MODEL": "gpt-5",
@@ -389,8 +389,8 @@ Use them in chat:
 4. Check Cursor's output panel for errors
 
 ```bash
-# Test npx can find llm-consultants
-npx -y llm-consultants --help
+# Test npx can find kortx-mcp
+npx -y kortx-mcp --help
 
 # Verify Node.js version
 node --version  # Should be >= 22.12.0
@@ -540,7 +540,7 @@ For testing or development:
   "mcp-servers": {
     "consultant": {
       "command": "node",
-      "args": ["/absolute/path/to/llm-consultants/build/index.js"],
+      "args": ["/absolute/path/to/kortx-mcp/build/index.js"],
       "env": {
         "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
         "LOG_LEVEL": "debug"
@@ -558,7 +558,7 @@ For testing or development:
     "consultant": {
       "env": {
         "LOG_LEVEL": "debug",
-        "LOG_FILE": "/custom/path/llm-consultants.log"
+        "LOG_FILE": "/custom/path/kortx-mcp.log"
       }
     }
   }
@@ -594,13 +594,13 @@ For privacy or performance:
 {
   "mcp-servers": {
     "gpt5-consultant": {
-      "command": "npx -y llm-consultants",
+      "command": "npx -y kortx-mcp",
       "env": {
         "OPENAI_MODEL": "gpt-5"
       }
     },
     "gpt5-mini-consultant": {
-      "command": "npx -y llm-consultants",
+      "command": "npx -y kortx-mcp",
       "env": {
         "OPENAI_MODEL": "gpt-5-mini"
       }
@@ -642,13 +642,13 @@ Based on your feedback about our timeline, what are simpler alternatives?
 - 📖 Read the [API Documentation](../api/)
 - 🎯 Check out [Example Workflows](../../examples/)
 - 🔧 Explore [Configuration Options](../configuration.md)
-- 💬 Join [GitHub Discussions](https://github.com/amsv01/llm-consultants/discussions)
+- 💬 Join [GitHub Discussions](https://github.com/amsv01/kortx-mcp/discussions)
 
 ---
 
 ## Getting Help
 
 - 📖 [Troubleshooting Guide](../troubleshooting.md)
-- 💬 [GitHub Discussions](https://github.com/amsv01/llm-consultants/discussions)
-- 🐛 [Report an Issue](https://github.com/amsv01/llm-consultants/issues)
+- 💬 [GitHub Discussions](https://github.com/amsv01/kortx-mcp/discussions)
+- 🐛 [Report an Issue](https://github.com/amsv01/kortx-mcp/issues)
 - 📧 [Email Support](mailto:amin@effati.se)
