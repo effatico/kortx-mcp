@@ -1,205 +1,107 @@
-# Contributing to MCP Consultant
+# Contributing to Kortx MCP
 
-Thank you for your interest in contributing to MCP Consultant. This document provides guidelines and instructions for contributing, including the code of conduct, getting started steps, development workflow, pull request process, coding standards, testing guidelines, documentation, bug reporting, and feature requests.
+Thank you for your interest in contributing! We welcome contributions from the community.
 
-## Code of Conduct
+## Ways to Contribute
 
-This project adheres to a code of conduct. By participating, you are expected to uphold this code. Please be respectful and constructive in all interactions.
+Reporting bugs, suggesting new features, improving documentation, submitting pull requests, starring the project, and participating in discussions are all valuable ways to help Kortx grow.
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js >= 22.12.0
-- npm >= 9.0.0
-- OpenAI API key (for testing)
-- Git
+Before you begin, ensure you have Node.js 22.12 or higher, npm or yarn, Git, and an OpenAI API key for testing. These tools are essential for working with the Kortx codebase.
 
-### Fork and Clone
+### Setup Development Environment
 
-Fork the repository on GitHub, then clone your fork locally with `git clone https://github.com/YOUR_USERNAME/llm-consultants.git` and `cd llm-consultants`. Add the upstream repository with `git remote add upstream https://github.com/effatico/kortx-mcp.git`.
-
-### Initial Setup
+Fork the repository and clone your fork to your local machine. Navigate to the project directory and install dependencies. Copy the `.env.example` file to `.env` and add your OpenAI API key. Build the project and verify everything works by running tests.
 
 ```bash
-# Install dependencies
+git clone https://github.com/YOUR_USERNAME/kortx-mcp.git
+cd kortx-mcp
 npm install
-
-# Copy environment template
 cp .env.example .env
-# Edit .env with your OpenAI API key
-
-# Build the project
+# Add your OpenAI API key to .env
 npm run build
-
-# Run tests
 npm test
 ```
 
 ## Development Workflow
 
-### Creating a Branch
+### Making Changes
 
-Always create a feature branch for your work:
+When you're ready to make changes, create a new branch from the main branch. Make your modifications, write or update tests to cover your changes, and run the test suite to ensure everything passes. Run the linter and code formatter to maintain consistency. Commit your changes using Conventional Commits format.
 
 ```bash
 git checkout -b feature/your-feature-name
-# or
-git checkout -b fix/bug-description
+# Make your changes
+npm test
+npm run lint
+npm run format
+git commit -m "feat: add your feature"
 ```
 
-Branch naming conventions:
+### Commit Message Format
 
-- `feature/` - New features
-- `fix/` - Bug fixes
-- `docs/` - Documentation changes
-- `test/` - Test additions or modifications
-- `refactor/` - Code refactoring
+We use Conventional Commits to maintain a clean and meaningful git history. Use `feat:` for new features, `fix:` for bug fixes, `docs:` for documentation changes, `style:` for code style changes, `refactor:` for code refactoring, `test:` for adding or updating tests, and `chore:` for maintenance tasks.
 
-### Making Changes
-
-Make your changes in your feature branch, write or update tests as needed, and update documentation if required. Ensure all tests pass with `npm test`, check code quality with `npm run lint` and `npm run format:check`, and verify the build succeeds with `npm run build`.
-
-### Commit Messages
-
-Follow Conventional Commits format:
-
-```
-type(scope): subject
-
-body (optional)
-
-footer (optional)
-```
-
-**Types:**
-
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, etc.)
-- `refactor`: Code refactoring
-- `test`: Test additions or changes
-- `chore`: Build process or auxiliary tool changes
-
-**Examples:**
-
-```
-feat(tools): add code analysis tool
-
-Implements a new tool for analyzing code quality and suggesting improvements.
-
-Closes #42
-```
-
-```
-fix(config): handle missing environment variables
-
-Improves error messages when required env vars are not set.
-```
+Examples of good commit messages include "feat: add new tool for code review", "fix: resolve memory leak in context gatherer", and "docs: update integration guide for Cursor".
 
 ## Pull Request Process
 
-### Before Submitting
+Before submitting a pull request, update documentation if your changes affect user-facing features. Add tests for any new functionality and ensure all tests pass. Update the CHANGELOG.md file with your changes. Push your branch to your fork and create a pull request with a clear title and description. Reference any related issues and include screenshots or examples if applicable.
 
-Ensure your PR passes all tests, linting, and formatting checks. Verify it builds successfully, includes tests for new functionality, updates relevant documentation, has a clear descriptive title, and references any related issues.
+### Code Review
 
-### Submitting a Pull Request
+During code review, be respectful and constructive in your feedback. Address reviewer comments promptly and keep discussions focused on the code. Update your pull request based on the feedback you receive.
 
-1. Push your branch to your fork:
+## Code Standards
 
-```bash
-git push origin feature/your-feature-name
+### TypeScript
+
+Write code using strict TypeScript. Define types for all functions and avoid using the `any` type. Use descriptive variable names that make the code self-documenting.
+
+### Testing
+
+Write tests for new features and maintain over 80% code coverage. Include unit, integration, and end-to-end tests where appropriate. Use descriptive test names that clearly state what is being tested.
+
+### Documentation
+
+Update the README when making user-facing changes. Document new tools in the `/docs/api/` directory. Add inline comments for complex logic to help future maintainers understand your code. Keep all documentation up-to-date.
+
+## Project Structure
+
+The project is organized with source code in `src/`, test files in `tests/`, documentation in `docs/`, usage examples in `examples/`, and GitHub templates in `.github/`.
+
+```
+kortx-mcp/
+├── src/              # Source code
+├── tests/            # Test files
+├── docs/             # Documentation
+├── examples/         # Usage examples
+└── .github/          # GitHub templates
 ```
 
-2. Open a Pull Request on GitHub
-3. Fill out the PR template completely
-4. Link any related issues
-5. Request review from maintainers
+## Testing
 
-### PR Review Process
+### Running Tests
 
-- Maintainers will review your PR
-- Address any requested changes
-- Keep your PR up to date with the main branch
-- Once approved, a maintainer will merge your PR
-
-### Keeping Your Fork Updated
-
-```bash
-git checkout master
-git fetch upstream
-git merge upstream/master
-git push origin master
-```
-
-## Coding Standards
-
-### TypeScript Guidelines
-
-- Use TypeScript strict mode
-- Provide type annotations for function parameters and return types
-- Avoid `any` types when possible
-- Use interfaces for object shapes
-- Use enums for fixed sets of values
-
-### Code Style
-
-We use ESLint and Prettier for code formatting:
-
-```bash
-# Check linting
-npm run lint
-
-# Fix linting issues
-npm run lint:fix
-
-# Check formatting
-npm run format:check
-
-# Fix formatting
-npm run format
-```
-
-### File Organization
-
-- Keep files focused and single-purpose
-- Use clear, descriptive file names
-- Group related functionality in directories
-- Export only what's necessary
-
-### Error Handling
-
-- Use proper error types
-- Provide meaningful error messages
-- Log errors appropriately
-- Handle edge cases
-
-## Testing Guidelines
-
-### Test Structure
-
-- Unit tests: Test individual functions/classes in isolation
-- Integration tests: Test component interactions
-- Use Vitest testing framework
-- Follow AAA pattern (Arrange, Act, Assert)
+Run all tests with `npm test`, use watch mode during development with `npm test -- --watch`, check coverage with `npm test -- --coverage`, or run specific test files with `npm test -- tests/unit/config.test.ts`.
 
 ### Writing Tests
 
+Structure your tests following the Arrange-Act-Assert pattern. Use Vitest's testing framework and write clear, descriptive test cases.
+
 ```typescript
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
 describe('Feature Name', () => {
-  beforeEach(() => {
-    // Setup
-  });
-
-  it('should do something specific', () => {
+  it('should do something', () => {
     // Arrange
     const input = 'test';
 
     // Act
-    const result = someFunction(input);
+    const result = doSomething(input);
 
     // Assert
     expect(result).toBe('expected');
@@ -207,102 +109,20 @@ describe('Feature Name', () => {
 });
 ```
 
-### Test Coverage
+## Adding New Tools
 
-- Aim for >80% line coverage
-- Cover edge cases and error conditions
-- Test both happy paths and error paths
-- Run `npm run test:coverage` to check coverage
+When adding a new MCP tool, create a new file in `src/tools/` and define the tool schema with Zod. Implement the tool logic, register it in `src/server.ts`, and add comprehensive tests in `tests/`. Document the tool in `docs/api/` and provide usage examples in `examples/`.
 
-## Documentation
+## Security
 
-### What to Document
-
-- New features and APIs
-- Configuration options
-- Breaking changes
-- Migration guides
-- Examples and use cases
-
-### Documentation Style
-
-- Use clear, concise language
-- Provide code examples
-- Include expected inputs/outputs
-- Add links to related documentation
-
-### README Updates
-
-If your changes affect:
-
-- Installation process
-- Configuration
-- Available features
-- Usage examples
-
-Update the README.md accordingly.
-
-## Reporting Bugs
-
-### Before Reporting
-
-- Check existing issues
-- Verify it's not a configuration issue
-- Test with the latest version
-
-### Bug Report Template
-
-```markdown
-**Description**
-Clear description of the bug
-
-**To Reproduce**
-Steps to reproduce:
-
-1. ...
-2. ...
-
-**Expected Behavior**
-What you expected to happen
-
-**Actual Behavior**
-What actually happened
-
-**Environment**
-
-- OS: [e.g., macOS 13.0]
-- Node.js: [e.g., 22.12.0]
-- Package version: [e.g., 1.0.0]
-
-**Additional Context**
-Any other relevant information
-```
-
-## Requesting Features
-
-### Feature Request Template
-
-```markdown
-**Feature Description**
-Clear description of the feature
-
-**Use Case**
-Why this feature would be useful
-
-**Proposed Solution**
-How you think it could be implemented
-
-**Alternatives**
-Other solutions you've considered
-
-**Additional Context**
-Any other relevant information
-```
+Never commit API keys or secrets to the repository. Report security issues privately by following the process outlined in SECURITY.md. Follow security best practices in all code contributions and help keep dependencies updated.
 
 ## Questions?
 
-- 📖 Check the [documentation](./docs)
-- 💬 Ask in [GitHub Discussions](https://github.com/effatico/kortx-mcp/discussions)
-- 📧 Email: amin@effati.se
+If you have questions or need help, join discussions on GitHub at https://github.com/effatico/kortx-mcp/discussions, email the maintainers at info@effati.se, or open an issue at https://github.com/effatico/kortx-mcp/issues.
 
-Thank you for contributing to MCP Consultant! 🎉
+## License
+
+By contributing, you agree that your contributions will be licensed under the MIT License.
+
+Thank you for contributing to Kortx!
