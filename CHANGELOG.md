@@ -28,6 +28,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Search Content Tool**: Real-time web search using Perplexity Sonar models with comprehensive citation support
+  - Five Perplexity models: sonar, sonar-pro, sonar-deep-research, sonar-reasoning, sonar-reasoning-pro
+  - Advanced search modes: web (general), academic (research papers), sec (SEC filings)
+  - Search filters: recency (week/month/year), domain filtering, images, related questions
+  - Reasoning effort control for deep-research model (low/medium/high)
+  - Cost calculation for all Perplexity pricing tiers
+  - Comprehensive test coverage (19 tests) for all search parameters
 - **GPT-5-codex Model Support**: Added `gpt-5-codex` to supported models for code generation, refactoring, debugging, and code explanations
   - Updated configuration schema validation
   - Updated documentation across README, configuration guide, and integration guides
