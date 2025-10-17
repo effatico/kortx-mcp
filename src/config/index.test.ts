@@ -18,6 +18,7 @@ describe('Configuration Management', () => {
   describe('loadConfig', () => {
     it('should load valid configuration with all required fields', () => {
       process.env.OPENAI_API_KEY = 'test-api-key-123';
+      process.env.PERPLEXITY_API_KEY = 'test-perplexity-key-123';
       process.env.OPENAI_MODEL = 'gpt-5';
       process.env.OPENAI_REASONING_EFFORT = 'medium';
       process.env.OPENAI_MAX_TOKENS = '2048';
@@ -32,6 +33,7 @@ describe('Configuration Management', () => {
 
     it('should apply default values when optional fields are missing', () => {
       process.env.OPENAI_API_KEY = 'test-api-key-123';
+      process.env.PERPLEXITY_API_KEY = 'test-perplexity-key-123';
 
       const config = loadConfig();
 
@@ -65,6 +67,7 @@ describe('Configuration Management', () => {
 
       validModels.forEach(model => {
         process.env.OPENAI_API_KEY = 'test-key';
+        process.env.PERPLEXITY_API_KEY = 'test-perplexity-key';
         process.env.OPENAI_MODEL = model;
 
         const config = loadConfig();
@@ -84,6 +87,7 @@ describe('Configuration Management', () => {
 
       validEfforts.forEach(effort => {
         process.env.OPENAI_API_KEY = 'test-key';
+        process.env.PERPLEXITY_API_KEY = 'test-perplexity-key';
         process.env.OPENAI_REASONING_EFFORT = effort;
 
         const config = loadConfig();
@@ -129,6 +133,7 @@ describe('Configuration Management', () => {
 
       validTransports.forEach(transport => {
         process.env.OPENAI_API_KEY = 'test-key';
+        process.env.PERPLEXITY_API_KEY = 'test-perplexity-key';
         process.env.TRANSPORT = transport;
 
         const config = loadConfig();
@@ -141,6 +146,7 @@ describe('Configuration Management', () => {
 
       validLevels.forEach(level => {
         process.env.OPENAI_API_KEY = 'test-key';
+        process.env.PERPLEXITY_API_KEY = 'test-perplexity-key';
         process.env.LOG_LEVEL = level;
 
         const config = loadConfig();
@@ -150,6 +156,7 @@ describe('Configuration Management', () => {
 
     it('should handle context feature flags correctly', () => {
       process.env.OPENAI_API_KEY = 'test-key';
+      process.env.PERPLEXITY_API_KEY = 'test-perplexity-key';
 
       // Test disabling features
       process.env.ENABLE_SERENA = 'false';

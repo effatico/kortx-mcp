@@ -13,6 +13,19 @@ const OpenAIConfigSchema = z.object({
   maxTokens: z.number().int().positive().default(1024),
 });
 
+// Perplexity configuration schema
+const PerplexityConfigSchema = z.object({
+  apiKey: z.string().min(1, 'PERPLEXITY_API_KEY is required'),
+  model: z
+    .enum(['sonar', 'sonar-pro', 'sonar-deep-research', 'sonar-reasoning', 'sonar-reasoning-pro'])
+    .default('sonar'),
+  temperature: z.number().min(0).max(2).default(0.2),
+  maxTokens: z.number().int().positive().default(4096),
+  searchMode: z.enum(['academic', 'sec', 'web']).default('web'),
+  returnImages: z.boolean().default(false),
+  returnRelatedQuestions: z.boolean().default(false),
+});
+
 // MCP Server configuration schema
 const ServerConfigSchema = z.object({
   name: z.string().default('kortx-mcp'),
@@ -45,6 +58,7 @@ const SecurityConfigSchema = z.object({
 // Complete configuration schema
 const ConfigSchema = z.object({
   openai: OpenAIConfigSchema,
+  perplexity: PerplexityConfigSchema,
   server: ServerConfigSchema,
   context: ContextConfigSchema,
   security: SecurityConfigSchema,
@@ -64,6 +78,20 @@ export function loadConfig(): Config {
         maxTokens: process.env.OPENAI_MAX_TOKENS
           ? parseInt(process.env.OPENAI_MAX_TOKENS, 10)
           : undefined,
+      },
+      perplexity: {
+        apiKey: process.env.PERPLEXITY_API_KEY,
+        model: process.env.PERPLEXITY_MODEL,
+        temperature: process.env.PERPLEXITY_TEMPERATURE
+          ? parseFloat(process.env.PERPLEXITY_TEMPERATURE)
+          : undefined,
+        maxTokens: process.env.PERPLEXITY_MAX_TOKENS
+          ? parseInt(process.env.PERPLEXITY_MAX_TOKENS, 10)
+          : undefined,
+        searchMode: process.env.PERPLEXITY_SEARCH_MODE as 'academic' | 'sec' | 'web' | undefined,
+        returnImages: process.env.PERPLEXITY_RETURN_IMAGES === 'true' ? true : undefined,
+        returnRelatedQuestions:
+          process.env.PERPLEXITY_RETURN_RELATED_QUESTIONS === 'true' ? true : undefined,
       },
       server: {
         name: process.env.SERVER_NAME,
