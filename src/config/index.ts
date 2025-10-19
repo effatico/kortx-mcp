@@ -96,6 +96,9 @@ const GPTImageConfigSchema = z.object({
 
   /** Cost alert threshold in dollars (default: 10.0) */
   costAlertThreshold: z.coerce.number().positive().default(10.0),
+
+  /** Enable detailed debug logging for image generation (default: false) */
+  debugImageGeneration: booleanSchema(false),
 });
 
 // MCP Server configuration schema
@@ -175,6 +178,7 @@ export function loadConfig(): Config {
         timeout: process.env.GPT_IMAGE_TIMEOUT,
         enableCostTracking: process.env.GPT_IMAGE_ENABLE_COST_TRACKING,
         costAlertThreshold: process.env.GPT_IMAGE_COST_ALERT_THRESHOLD,
+        debugImageGeneration: process.env.DEBUG_IMAGE_GENERATION,
       },
       server: {
         name: process.env.SERVER_NAME,

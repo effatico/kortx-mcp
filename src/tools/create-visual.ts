@@ -273,6 +273,10 @@ Provide search guidance and help interpret results for visual projects.`;
   async execute(input: CreateVisualInput) {
     this.logger.info({ mode: input.mode }, 'Executing create-visual tool');
 
+    if (this.config.gptImage.debugImageGeneration) {
+      this.logger.debug({ input }, '[DEBUG] create-visual input parameters');
+    }
+
     try {
       // Route to appropriate handler based on mode
       let result: VisualResult;
@@ -287,6 +291,19 @@ Provide search guidance and help interpret results for visual projects.`;
         case 'search':
           result = await this.executeSearch(input);
           break;
+      }
+
+      if (this.config.gptImage.debugImageGeneration) {
+        this.logger.debug(
+          {
+            mode: result.mode,
+            imageCount: result.images?.length || 0,
+            hasSearchResults: !!result.searchResults,
+            tokensUsed: result.tokensUsed,
+            cost: result.cost,
+          },
+          '[DEBUG] Execution result before formatting'
+        );
       }
 
       return await this.formatVisualResponse(result);
@@ -583,6 +600,10 @@ Provide search guidance and help interpret results for visual projects.`;
    * Format visual result as MCP tool response
    */
   private async formatVisualResponse(result: VisualResult) {
+    if (this.config.gptImage.debugImageGeneration) {
+      this.logger.debug({ resultMode: result.mode }, '[DEBUG] Entering formatVisualResponse');
+    }
+
     const parts: string[] = [];
 
     // Mode-specific content
@@ -662,6 +683,13 @@ Provide search guidance and help interpret results for visual projects.`;
 
     // Add images to response (for generate/edit modes)
     if (result.images && result.images.length > 0) {
+      if (this.config.gptImage.debugImageGeneration) {
+        this.logger.debug(
+          { imageCount: result.images.length },
+          '[DEBUG] Processing images for response'
+        );
+      }
+
       // Save images to filesystem and collect paths
       const savedPaths: string[] = [];
 
@@ -671,10 +699,26 @@ Provide search guidance and help interpret results for visual projects.`;
         // Detect MIME type from base64 data signature
         const mimeType = this.detectImageMimeType(img.b64_json);
 
+        if (this.config.gptImage.debugImageGeneration) {
+          this.logger.debug(
+            {
+              index,
+              mimeType,
+              dataLength: img.b64_json.length,
+              hasRevisedPrompt: !!img.revised_prompt,
+            },
+            '[DEBUG] Processing image'
+          );
+        }
+
         // Save to filesystem
         try {
           const filepath = await this.saveImageToFilesystem(img.b64_json, mimeType, index);
           savedPaths.push(filepath);
+
+          if (this.config.gptImage.debugImageGeneration) {
+            this.logger.debug({ index, filepath }, '[DEBUG] Image saved successfully');
+          }
         } catch (error) {
           this.logger.error({ error, index }, 'Failed to save image to filesystem');
           // Continue with other images even if one fails
@@ -696,6 +740,17 @@ Provide search guidance and help interpret results for visual projects.`;
           text: responseText,
         };
       }
+    }
+
+    if (this.config.gptImage.debugImageGeneration) {
+      this.logger.debug(
+        {
+          contentItemsCount: content.length,
+          textLength: content[0]?.text?.length || 0,
+          imageCount: content.filter(c => c.type === 'image').length,
+        },
+        '[DEBUG] Returning formatted response'
+      );
     }
 
     return { content };
@@ -748,6 +803,13 @@ Provide search guidance and help interpret results for visual projects.`;
     mimeType: string,
     index: number
   ): Promise<string> {
+    if (this.config.gptImage.debugImageGeneration) {
+      this.logger.debug(
+        { mimeType, index, dataLength: base64Data.length },
+        '[DEBUG] saveImageToFilesystem called'
+      );
+    }
+
     // Determine file extension from MIME type
     const extensionMap: Record<string, string> = {
       'image/png': 'png',
@@ -762,11 +824,31 @@ Provide search guidance and help interpret results for visual projects.`;
       // Use project directory: ./generated-images
       const projectDir = process.cwd();
       imagesDir = path.join(projectDir, 'generated-images');
+
+      if (this.config.gptImage.debugImageGeneration) {
+        this.logger.debug(
+          { imagesDir, projectDir },
+          '[DEBUG] Attempting to create project images directory'
+        );
+      }
+
       await fs.mkdir(imagesDir, { recursive: true });
+
+      if (this.config.gptImage.debugImageGeneration) {
+        this.logger.debug('[DEBUG] Project images directory created successfully');
+      }
     } catch (error) {
       // Fallback to temp directory
       const tmpDir = os.tmpdir();
       imagesDir = path.join(tmpDir, 'kortx-mcp-images');
+
+      if (this.config.gptImage.debugImageGeneration) {
+        this.logger.debug(
+          { imagesDir, tmpDir, error: String(error) },
+          '[DEBUG] Falling back to temp directory'
+        );
+      }
+
       await fs.mkdir(imagesDir, { recursive: true });
     }
 
@@ -775,9 +857,25 @@ Provide search guidance and help interpret results for visual projects.`;
     const filename = `image-${timestamp}-${index}.${extension}`;
     const filepath = path.join(imagesDir, filename);
 
+    if (this.config.gptImage.debugImageGeneration) {
+      this.logger.debug({ filepath, filename }, '[DEBUG] Generated filepath for image');
+    }
+
     // Convert base64 to buffer and write to file
     const buffer = Buffer.from(base64Data, 'base64');
+
+    if (this.config.gptImage.debugImageGeneration) {
+      this.logger.debug(
+        { bufferSize: buffer.length, filepath },
+        '[DEBUG] Writing image buffer to file'
+      );
+    }
+
     await fs.writeFile(filepath, buffer);
+
+    if (this.config.gptImage.debugImageGeneration) {
+      this.logger.debug({ filepath }, '[DEBUG] File write completed successfully');
+    }
 
     this.logger.info({ filepath, size: buffer.length, mimeType }, 'Saved generated image');
 

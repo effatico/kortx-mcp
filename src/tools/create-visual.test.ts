@@ -47,21 +47,14 @@ describe('CreateVisualInputSchema', () => {
       expect(result.n).toBe(4);
     });
 
-    it('should reject generate mode with inputImages', () => {
+    it.each([
+      { field: 'inputImages', value: ['base64string'], desc: 'inputImages' },
+      { field: 'inputImageMask', value: 'base64mask', desc: 'inputImageMask' },
+    ])('should reject generate mode with $desc', ({ field, value }) => {
       const input = {
-        mode: 'generate',
+        mode: 'generate' as const,
         prompt: 'A sunset',
-        inputImages: ['base64string'],
-      };
-
-      expect(() => CreateVisualInputSchema.parse(input)).toThrow();
-    });
-
-    it('should reject generate mode with inputImageMask', () => {
-      const input = {
-        mode: 'generate',
-        prompt: 'A sunset',
-        inputImageMask: 'base64mask',
+        [field]: value,
       };
 
       expect(() => CreateVisualInputSchema.parse(input)).toThrow();
@@ -200,81 +193,68 @@ describe('CreateVisualInputSchema', () => {
   });
 
   describe('Parameter validation', () => {
-    it('should validate partialImages with literal union', () => {
-      const validValues = [0, 1, 2, 3];
-
-      validValues.forEach(value => {
-        const input = {
-          mode: 'generate' as const,
-          prompt: 'Test',
-          partialImages: value,
-        };
-        expect(() => CreateVisualInputSchema.parse(input)).not.toThrow();
-      });
-    });
-
-    it('should reject invalid partialImages value', () => {
-      const input = {
-        mode: 'generate',
-        prompt: 'Test',
-        partialImages: 5,
-      };
-
-      expect(() => CreateVisualInputSchema.parse(input)).toThrow();
-    });
-
-    it('should validate n within range', () => {
+    it.each([
+      { value: 0, shouldPass: true },
+      { value: 1, shouldPass: true },
+      { value: 2, shouldPass: true },
+      { value: 3, shouldPass: true },
+      { value: 5, shouldPass: false },
+    ])('should validate partialImages=$value (shouldPass=$shouldPass)', ({ value, shouldPass }) => {
       const input = {
         mode: 'generate' as const,
         prompt: 'Test',
-        n: 5,
+        partialImages: value,
       };
 
-      expect(() => CreateVisualInputSchema.parse(input)).not.toThrow();
+      if (shouldPass) {
+        expect(() => CreateVisualInputSchema.parse(input)).not.toThrow();
+      } else {
+        expect(() => CreateVisualInputSchema.parse(input)).toThrow();
+      }
     });
 
-    it('should reject n below minimum', () => {
+    it.each([
+      { value: 1, shouldPass: true, desc: 'minimum' },
+      { value: 5, shouldPass: true, desc: 'mid-range' },
+      { value: 10, shouldPass: true, desc: 'maximum' },
+      { value: 0, shouldPass: false, desc: 'below minimum' },
+      { value: 11, shouldPass: false, desc: 'above maximum' },
+    ])('should validate n=$value ($desc)', ({ value, shouldPass }) => {
       const input = {
-        mode: 'generate',
+        mode: 'generate' as const,
         prompt: 'Test',
-        n: 0,
+        n: value,
       };
 
-      expect(() => CreateVisualInputSchema.parse(input)).toThrow();
+      if (shouldPass) {
+        expect(() => CreateVisualInputSchema.parse(input)).not.toThrow();
+      } else {
+        expect(() => CreateVisualInputSchema.parse(input)).toThrow();
+      }
     });
 
-    it('should reject n above maximum', () => {
-      const input = {
-        mode: 'generate',
-        prompt: 'Test',
-        n: 11,
-      };
-
-      expect(() => CreateVisualInputSchema.parse(input)).toThrow();
-    });
-
-    it('should validate outputCompression range', () => {
-      const validValues = [0, 50, 85, 100];
-
-      validValues.forEach(value => {
+    it.each([
+      { value: 0, shouldPass: true },
+      { value: 50, shouldPass: true },
+      { value: 85, shouldPass: true },
+      { value: 100, shouldPass: true },
+      { value: 101, shouldPass: false },
+    ])(
+      'should validate outputCompression=$value (shouldPass=$shouldPass)',
+      ({ value, shouldPass }) => {
         const input = {
           mode: 'generate' as const,
           prompt: 'Test',
           outputCompression: value,
         };
-        expect(() => CreateVisualInputSchema.parse(input)).not.toThrow();
-      });
-    });
 
-    it('should reject outputCompression out of range', () => {
-      const input = {
-        mode: 'generate',
-        prompt: 'Test',
-        outputCompression: 101,
-      };
-
-      expect(() => CreateVisualInputSchema.parse(input)).toThrow();
-    });
+        if (shouldPass) {
+          expect(() => CreateVisualInputSchema.parse(input)).not.toThrow();
+        } else {
+          expect(() => CreateVisualInputSchema.parse(input)).toThrow();
+        }
+      }
+    );
   });
 });
 
