@@ -278,11 +278,16 @@ Find current design trends and inspiration:
 
 ### Common Parameters (All Modes)
 
+| Parameter | Type                               | Required | Default | Description                      |
+| --------- | ---------------------------------- | -------- | ------- | -------------------------------- |
+| `mode`    | `"generate" \| "edit" \| "search"` | Yes      | -       | Operation mode                   |
+| `prompt`  | `string`                           | Yes      | -       | Text description or search query |
+
+### Generate/Edit Mode Parameters
+
 | Parameter           | Type                                              | Required | Default         | Description                            |
 | ------------------- | ------------------------------------------------- | -------- | --------------- | -------------------------------------- |
-| `mode`              | `"generate" \| "edit" \| "search"`                | Yes      | -               | Operation mode                         |
-| `prompt`            | `string`                                          | Yes      | -               | Text description or search query       |
-| `model`             | `"gpt-image-1"`                                   | No       | `"gpt-image-1"` | Image model (generate/edit only)       |
+| `model`             | `"gpt-image-1"`                                   | No       | `"gpt-image-1"` | Image model to use                     |
 | `size`              | `"auto" \| "square" \| "landscape" \| "portrait"` | No       | Config default  | Image dimensions                       |
 | `quality`           | `"auto" \| "low" \| "medium" \| "high"`           | No       | Config default  | Rendering quality                      |
 | `background`        | `"auto" \| "opaque" \| "transparent"`             | No       | Config default  | Background transparency                |
@@ -291,13 +296,13 @@ Find current design trends and inspiration:
 | `partialImages`     | `0 \| 1 \| 2 \| 3`                                | No       | -               | Number of partial images for streaming |
 | `n`                 | `number` (1-4)                                    | No       | 1               | Number of images to generate           |
 
-### Edit Mode Specific Parameters
+### Edit Mode Additional Parameters
 
-| Parameter        | Type              | Required | Default | Description                                      |
-| ---------------- | ----------------- | -------- | ------- | ------------------------------------------------ |
-| `inputImages`    | `string[]`        | Yes      | -       | Input images as base64 strings or file IDs       |
-| `inputImageMask` | `string`          | No       | -       | Optional mask for inpainting (base64 or file ID) |
-| `inputFidelity`  | `"low" \| "high"` | No       | `"low"` | Input image detail preservation level            |
+| Parameter        | Type              | Required | Default | Description                                                                      |
+| ---------------- | ----------------- | -------- | ------- | -------------------------------------------------------------------------------- |
+| `inputImages`    | `string[]`        | Yes      | -       | Input images as base64 strings or file IDs                                       |
+| `inputImageMask` | `string`          | No       | -       | Optional single mask for inpainting (base64 or file ID). Only one mask supported |
+| `inputFidelity`  | `"low" \| "high"` | No       | `"low"` | Input image detail preservation level                                            |
 
 ### Search Mode Specific Parameters
 
@@ -312,7 +317,7 @@ Find current design trends and inspiration:
 
 ```typescript
 {
-  "mode": "generate" | "edit",
+  "mode": "generate", // or "edit"
   "images": [
     {
       "b64_json": string,        // Base64 encoded image
@@ -337,7 +342,7 @@ Find current design trends and inspiration:
   "searchResults": {
     "content": string,           // AI-generated summary
     "citations": string[],       // Source URLs
-    "imageUrls": [
+    "imageUrls": [               // Image search results (optional)
       {
         "imageUrl": string,
         "originUrl": string,
@@ -345,7 +350,7 @@ Find current design trends and inspiration:
         "height": number
       }
     ],
-    "searchResults": [
+    "searchResults": [           // Web page search results (optional)
       {
         "title": string,
         "url": string,
@@ -362,6 +367,8 @@ Find current design trends and inspiration:
   "cost": number
 }
 ```
+
+**Note**: The nested `searchResults.searchResults` structure is maintained for consistency with Perplexity API response format.
 
 ## Cost Estimation
 
@@ -402,9 +409,12 @@ Partial images add overhead for faster preview:
 **Scenario**: Edit a portrait photo (high fidelity input) and generate high-quality output
 
 ```
-Input cost:  1 image × 1,000 tokens × $X per token = $0.02
-Output cost: 1 image × 5,200 tokens × $X per token = $0.08
+Input cost:  1 image × 1,000 tokens × $0.00002 per token = $0.02
+Output cost: 1 image × 5,200 tokens × $0.000015 per token = $0.08
 Total:       $0.10 per edit
+
+Note: Token rates shown are illustrative placeholders.
+Actual GPT Image pricing may vary - check OpenAI pricing page for current rates.
 ```
 
 ### Perplexity Search Costs

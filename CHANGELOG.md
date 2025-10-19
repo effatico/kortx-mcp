@@ -46,10 +46,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Generate up to 4 images per request
   - **Edit Mode**: Modify existing images through multi-turn conversational refinement
     - Input fidelity control (low/high) for preserving faces, logos, and fine details
-    - Inpainting with mask images for precise regional edits
+    - Inpainting with a single optional mask image for precise regional edits
     - Multi-turn workflows where each edit builds on previous results
     - High fidelity preservation across multiple edit rounds
-    - Support for multiple input images and masks
+    - Support for multiple input images with one optional mask
   - **Search Mode**: Find visual inspiration using Perplexity web and academic search
     - Image URL results with dimensions and source citations
     - Search recency filters (week, month, year)
