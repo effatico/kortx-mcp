@@ -34,6 +34,8 @@ const OpenAIConfigSchema = z.object({
   reasoningEffort: z.enum(['minimal', 'low', 'medium', 'high']).default('minimal'),
   verbosity: z.enum(['low', 'medium', 'high']).default('low'),
   maxTokens: z.coerce.number().int().positive().default(1024),
+  maxRetries: z.coerce.number().int().min(0).max(5).default(3),
+  retryDelay: z.coerce.number().int().positive().default(1000),
 });
 
 // Perplexity configuration schema
@@ -148,6 +150,8 @@ export function loadConfig(): Config {
         reasoningEffort: process.env.OPENAI_REASONING_EFFORT,
         verbosity: process.env.OPENAI_VERBOSITY,
         maxTokens: process.env.OPENAI_MAX_TOKENS,
+        maxRetries: process.env.OPENAI_MAX_RETRIES,
+        retryDelay: process.env.OPENAI_RETRY_DELAY,
       },
       perplexity: {
         apiKey: process.env.PERPLEXITY_API_KEY,

@@ -52,6 +52,9 @@ tmp/
 temp/
 *.tmp
 
+# Generated images
+generated-images/
+
 # Posts and drafts
 hackernews-post.txt
 

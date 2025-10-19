@@ -120,18 +120,27 @@ export function logContextGathering(
   );
 }
 
-export function logError(logger: Logger, error: Error, context?: unknown): void {
+export function logError(logger: Logger, error: Error | unknown, context?: unknown): void {
+  const errorObj =
+    error instanceof Error
+      ? {
+          message: error.message,
+          stack: error.stack,
+          name: error.name,
+        }
+      : {
+          message: String(error),
+          stack: undefined,
+          name: 'Unknown',
+        };
+
   logger.error(
     {
       event: 'error',
-      error: {
-        message: error.message,
-        stack: error.stack,
-        name: error.name,
-      },
+      error: errorObj,
       context: context ? sanitizeParams(context) : undefined,
     },
-    `Error: ${error.message}`
+    `Error: ${errorObj.message}`
   );
 }
 
