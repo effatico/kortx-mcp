@@ -237,7 +237,7 @@ export class OpenAIClient {
    * @returns GPT Image generation response with image data and token usage
    */
   async generateImage(request: GPTImageRequest): Promise<GPTImageResponse> {
-    const model = 'gpt-4.1'; // Use GPT-4.1 as mainline model for Responses API
+    const model = 'gpt-5'; // Use GPT-5 for Responses API with image_generation tool
     const startTime = Date.now();
     const timeout = this.config.gptImage.timeout;
 
@@ -341,7 +341,7 @@ export class OpenAIClient {
    * @returns GPT Image response with edited image
    */
   async editImage(request: GPTImageRequest): Promise<GPTImageResponse> {
-    const model = 'gpt-4.1'; // Use GPT-4.1 as mainline model for Responses API
+    const model = 'gpt-5'; // Use GPT-5 for Responses API with image_generation tool
     const startTime = Date.now();
     const timeout = this.config.gptImage.timeout;
 
