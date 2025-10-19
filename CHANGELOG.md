@@ -1,3 +1,9 @@
+## [1.2.3](https://github.com/effatico/kortx-mcp/compare/v1.2.2...v1.2.3) (2025-10-19)
+
+### Features
+
+- Add debug logging for image generation troubleshooting ([0230a04](https://github.com/effatico/kortx-mcp/commit/0230a0409ed7c7b90c78847c1f6948143fe52c2b))
+
 ## [1.2.2](https://github.com/effatico/kortx-mcp/compare/v1.2.1...v1.2.2) (2025-10-19)
 
 ## [1.2.1](https://github.com/effatico/kortx-mcp/compare/v1.2.0...v1.2.1) (2025-10-19)

@@ -1,6 +1,6 @@
 {
   "name": "@effatico/kortx-mcp",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Kortx: MCP server for AI-driven code consultation with GPT-5 and intelligent context gathering",
   "type": "module",
   "bin": {
