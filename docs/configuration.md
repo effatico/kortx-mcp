@@ -318,6 +318,27 @@ LOG_LEVEL=info
 LOG_LEVEL=warn
 ```
 
+### `AUDIT_LOGGING`
+
+Enable audit logging to `.audit/kortx-mcp.log` file.
+
+- **Required**: No
+- **Default**: `false`
+- **Valid values**: `true`, `false`
+- **Example**: `AUDIT_LOGGING=true`
+
+When enabled with `stdio` transport, logs are written to `.audit/kortx-mcp.log` instead of being discarded. The `.audit` directory is automatically created if it doesn't exist and is excluded from version control.
+
+When disabled (default), logs are not persisted to disk unless you're using a non-stdio transport in development mode.
+
+```bash
+# Enable audit logging for compliance or debugging
+AUDIT_LOGGING=true
+
+# Disable audit logging (default)
+AUDIT_LOGGING=false
+```
+
 **⚠️ Security Note**: Never use `debug` level in production with sensitive data.
 
 ---

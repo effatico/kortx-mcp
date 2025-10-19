@@ -24,6 +24,9 @@ yarn-error.log*
 pino-debug.log*
 lerna-debug.log*
 
+# Audit logs
+.audit/
+
 # IDE
 .vscode/*
 !.vscode/settings.json
