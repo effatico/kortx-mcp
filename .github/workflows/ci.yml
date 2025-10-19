@@ -26,10 +26,17 @@ jobs:
           BASE_SHA="${{ github.event.pull_request.base.sha }}"
           HEAD_SHA="${{ github.sha }}"
 
-          # Check commit messages for Claude attribution (case-insensitive)
-          if git log ${BASE_SHA}..${HEAD_SHA} --pretty=format:"%B" | grep -iE "(co-author|co-authored-by).*claude"; then
+          # Verify git log command succeeds
+          if ! git log ${BASE_SHA}..${HEAD_SHA} --pretty=format:"%B" > /dev/null 2>&1; then
+            echo "❌ Error: Failed to retrieve commit history"
+            exit 1
+          fi
+
+          # Check commit messages for Claude attribution in Git trailer format (case-insensitive)
+          # Matches standard Git trailers like "Co-Authored-By: Claude" or "Author: Claude"
+          if git log ${BASE_SHA}..${HEAD_SHA} --pretty=format:"%B" | grep -iE "^\s*(co-authored-by|authored-by|author):\s*.*claude"; then
             echo "❌ Error: Found Claude attribution in commit messages"
-            echo "Please remove Co-Authored-By: Claude from your commits"
+            echo "Please remove Co-Authored-By: Claude or similar attributions from your commits"
             exit 1
           fi
 
