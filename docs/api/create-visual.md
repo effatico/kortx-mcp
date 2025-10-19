@@ -30,18 +30,57 @@ OPENAI_API_KEY=your-openai-key
 PERPLEXITY_API_KEY=your-perplexity-key
 ```
 
+### API Implementation Notes
+
+**Important:** This tool uses OpenAI's **Responses API** (`responses.create()`) with the `image_generation` tool, not the direct Images API (`images.generate()`).
+
+**Model Selection:**
+
+- Responses API with `image_generation` tool → `model: "gpt-5"` (used internally)
+- Direct Images API (not used) → `model: "gpt-image-1"`
+
+**Input Image Format:**
+
+- ✅ Base64-encoded images (inline: `data:image/png;base64,...`)
+- ✅ Raw base64 strings (automatically prefixed with data URL)
+- ❌ File IDs from `openai.files.create()` (not currently supported)
+
+For file ID support, you would need to convert files to base64 first.
+
 ### Optional GPT Image Configuration
 
 ```bash
 # Image generation defaults
-GPT_IMAGE_SIZE=auto                    # Options: auto, square, landscape, portrait
-GPT_IMAGE_QUALITY=auto                 # Options: auto, low, medium, high
-GPT_IMAGE_BACKGROUND=auto              # Options: auto, opaque, transparent
+GPT_IMAGE_SIZE=auto                    # Options: 1024x1024, 1536x1024, 1024x1536, auto (default)
+GPT_IMAGE_QUALITY=auto                 # Options: low, medium, high, auto (default)
+GPT_IMAGE_BACKGROUND=auto              # Options: transparent, opaque, auto (default)
 GPT_IMAGE_OUTPUT_FORMAT=png            # Options: png, jpeg, webp
-GPT_IMAGE_OUTPUT_COMPRESSION=95        # Range: 0-100 (for JPEG/WebP)
+GPT_IMAGE_OUTPUT_COMPRESSION=85        # Range: 0-100 (for JPEG/WebP only)
 GPT_IMAGE_INPUT_FIDELITY=low          # Options: low, high
 GPT_IMAGE_MAX_IMAGES=4                 # Maximum images per request (1-4)
 ```
+
+**Size Options:**
+
+- `1024x1024` (square) - Balanced composition, fastest to generate
+- `1536x1024` (landscape) - Wider scenes and panoramas
+- `1024x1536` (portrait) - Vertical subjects and compositions
+- `auto` (default) - Model chooses optimal size based on prompt
+
+**Quality Options:**
+
+- `low` - Fastest generation, 272-408 tokens, suitable for drafts
+- `medium` - Balanced quality, 1056-1584 tokens, good for most uses
+- `high` - Best quality, 4160-6240 tokens, detailed final outputs
+- `auto` (default) - Model chooses quality based on prompt complexity
+
+**Background Options:**
+
+- `transparent` - Transparent background (PNG/WebP only)
+- `opaque` - Opaque background
+- `auto` (default) - Model chooses based on prompt context
+
+**Note:** Square images with standard quality are fastest to generate. The `auto` option is recommended for best results.
 
 ## Usage Examples
 
@@ -606,6 +645,55 @@ Each edit can reference previous edits naturally:
 3. Use high input fidelity to preserve quality across turns
 4. Keep prompts focused on the specific change needed
 5. Save intermediate results for branching experiments
+
+## Troubleshooting
+
+### Timeout Errors
+
+If you encounter timeout errors (`Request timed out`), this typically happens when:
+
+- Generating high-quality images
+- Creating multiple images in one request
+- Editing images with high input fidelity
+- Network connectivity is slow
+
+**Solutions:**
+
+1. **Increase Timeout**: Set `GPT_IMAGE_TIMEOUT` to a higher value:
+
+   ```bash
+   # For high quality images
+   GPT_IMAGE_TIMEOUT=180000  # 3 minutes
+
+   # For multiple images or editing
+   GPT_IMAGE_TIMEOUT=240000  # 4 minutes
+   ```
+
+2. **Reduce Quality Settings**: Lower the quality or size to speed up generation:
+
+   ```bash
+   GPT_IMAGE_QUALITY=medium  # Instead of high
+   GPT_IMAGE_SIZE=1024x1024  # Instead of auto
+   ```
+
+3. **Generate Fewer Images**: Reduce the `n` parameter in your request
+
+**Recommended Timeout Settings:**
+
+| Scenario                   | Timeout     | Setting                              |
+| -------------------------- | ----------- | ------------------------------------ |
+| Low quality, single image  | 60 seconds  | `GPT_IMAGE_TIMEOUT=60000`            |
+| Medium quality, 1-2 images | 120 seconds | `GPT_IMAGE_TIMEOUT=120000` (default) |
+| High quality, single image | 180 seconds | `GPT_IMAGE_TIMEOUT=180000`           |
+| Multiple images or editing | 240 seconds | `GPT_IMAGE_TIMEOUT=240000`           |
+
+### PNG Compression Errors
+
+If you see "Compression less than 100 is not supported for PNG output format":
+
+- PNG only supports lossless compression (100)
+- Switch to JPEG or WebP for lossy compression
+- Or set `outputCompression: 100` for PNG
 
 ## Related Documentation
 

@@ -103,6 +103,7 @@ const ServerConfigSchema = z.object({
   port: z.coerce.number().int().positive().default(3000),
   transport: z.enum(['stdio', 'streaming']).default('stdio'),
   logLevel: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
+  auditLogging: z.coerce.boolean().default(false),
 });
 
 // Context gathering configuration
@@ -177,6 +178,7 @@ export function loadConfig(): Config {
         port: process.env.PORT,
         transport: process.env.TRANSPORT,
         logLevel: process.env.LOG_LEVEL,
+        auditLogging: process.env.AUDIT_LOGGING,
       },
       context: {
         enableSerena: process.env.ENABLE_SERENA,

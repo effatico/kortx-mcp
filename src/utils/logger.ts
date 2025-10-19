@@ -1,5 +1,5 @@
 import { pino, type Logger as PinoLogger } from 'pino';
-import { createWriteStream } from 'fs';
+import { createWriteStream, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import type { Config } from '../config/index.js';
 
@@ -9,11 +9,20 @@ export function createLogger(config: Config): Logger {
   // When using stdio transport for MCP, we must log to a file
   // to avoid interfering with the MCP protocol's JSON-RPC over stdio
   const isStdioTransport = config.server.transport === 'stdio';
+  const auditLoggingEnabled = config.server.auditLogging;
 
-  // In production with stdio, log to file. Otherwise use stdout with pino-pretty in dev
-  const destination = isStdioTransport
-    ? createWriteStream(join(process.cwd(), 'kortx-mcp.log'), { flags: 'a' })
-    : undefined;
+  // Determine log destination
+  let destination;
+  if (isStdioTransport && auditLoggingEnabled) {
+    // Create .audit directory if it doesn't exist
+    const auditDir = join(process.cwd(), '.audit');
+    if (!existsSync(auditDir)) {
+      mkdirSync(auditDir, { recursive: true });
+    }
+    destination = createWriteStream(join(auditDir, 'kortx-mcp.log'), { flags: 'a' });
+  } else {
+    destination = undefined;
+  }
 
   return pino(
     {
