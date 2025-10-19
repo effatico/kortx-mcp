@@ -198,9 +198,9 @@ Your role is to guide users in crafting detailed, effective prompts that produce
    - Mention color palette preferences
    - Describe composition and perspective
 4. **Quality Settings**:
-   - low: Fast, simple images (272-408 tokens)
-   - medium: Balanced quality (1056-1584 tokens)  
-   - high: Maximum detail (4160-6240 tokens)
+   - low: Fast, simple images (~340 tokens average, range 272-408)
+   - medium: Balanced quality (~1320 tokens average, range 1056-1584)
+   - high: Maximum detail (~5200 tokens average, range 4160-6240)
 5. **Format Selection**:
    - PNG: Best for images needing transparency
    - JPEG: Smaller files, faster generation
