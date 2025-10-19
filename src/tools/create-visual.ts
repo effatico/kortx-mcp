@@ -1,4 +1,17 @@
 import { z } from 'zod';
+import {
+  SIZE_OPTIONS,
+  QUALITY_OPTIONS,
+  BACKGROUND_OPTIONS,
+  OUTPUT_FORMAT_OPTIONS,
+  INPUT_FIDELITY_OPTIONS,
+  COMPRESSION_MIN,
+  COMPRESSION_MAX,
+  IMAGE_COUNT_MIN,
+  IMAGE_COUNT_MAX,
+  VISUAL_SEARCH_MODES,
+  SEARCH_RECENCY_OPTIONS,
+} from './gpt-image-constants.js';
 
 /**
  * Visual generation modes
@@ -20,28 +33,28 @@ const BaseVisualSchema = z.object({
 
   // GPT Image generation parameters (optional, defaults from config)
   model: z.literal('gpt-image-1').optional().describe('Image model to use'),
-  size: z
-    .enum(['1024x1024', '1536x1024', '1024x1536', 'auto'])
-    .optional()
-    .describe('Image dimensions'),
-  quality: z.enum(['low', 'medium', 'high', 'auto']).optional().describe('Rendering quality'),
-  background: z
-    .enum(['transparent', 'opaque', 'auto'])
-    .optional()
-    .describe('Background transparency'),
-  outputFormat: z.enum(['png', 'jpeg', 'webp']).optional().describe('Output image format'),
+  size: z.enum(SIZE_OPTIONS).optional().describe('Image dimensions'),
+  quality: z.enum(QUALITY_OPTIONS).optional().describe('Rendering quality'),
+  background: z.enum(BACKGROUND_OPTIONS).optional().describe('Background transparency'),
+  outputFormat: z.enum(OUTPUT_FORMAT_OPTIONS).optional().describe('Output image format'),
   outputCompression: z.coerce
     .number()
     .int()
-    .min(0)
-    .max(100)
+    .min(COMPRESSION_MIN)
+    .max(COMPRESSION_MAX)
     .optional()
     .describe('Compression level for JPEG/WebP (0-100)'),
   partialImages: z
     .union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)])
     .optional()
     .describe('Number of partial images for streaming (0-3)'),
-  n: z.coerce.number().int().min(1).max(10).optional().describe('Number of images to generate'),
+  n: z.coerce
+    .number()
+    .int()
+    .min(IMAGE_COUNT_MIN)
+    .max(IMAGE_COUNT_MAX)
+    .optional()
+    .describe('Number of images to generate'),
 });
 
 /**
@@ -65,24 +78,27 @@ const EditVisualSchema = BaseVisualSchema.extend({
     .optional()
     .describe('Optional mask image for inpainting (base64 or file ID)'),
   inputFidelity: z
-    .enum(['low', 'high'])
+    .enum(INPUT_FIDELITY_OPTIONS)
     .optional()
     .describe('Input image detail preservation level'),
 }).strict();
 
 /**
  * Search mode schema
+ *
+ * Note: 'sec' mode from Perplexity config is intentionally excluded as
+ * SEC filings are not relevant for visual search/inspiration
  */
 const SearchVisualSchema = z
   .object({
     mode: z.literal('search'),
     prompt: z.string().min(1, 'Prompt is required').describe('Search query for visual inspiration'),
     searchMode: z
-      .enum(['web', 'academic'])
+      .enum(VISUAL_SEARCH_MODES)
       .optional()
       .describe('Search domain: web or academic papers'),
     searchRecencyFilter: z
-      .enum(['week', 'month', 'year'])
+      .enum(SEARCH_RECENCY_OPTIONS)
       .optional()
       .describe('Filter results by recency'),
   })

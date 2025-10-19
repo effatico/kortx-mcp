@@ -1,5 +1,16 @@
 import { z } from 'zod';
 import { config as dotenvConfig } from 'dotenv';
+import {
+  SIZE_OPTIONS,
+  QUALITY_OPTIONS,
+  BACKGROUND_OPTIONS,
+  OUTPUT_FORMAT_OPTIONS,
+  INPUT_FIDELITY_OPTIONS,
+  COMPRESSION_MIN,
+  COMPRESSION_MAX,
+  IMAGE_COUNT_MIN,
+  IMAGE_COUNT_MAX,
+} from '../tools/gpt-image-constants.js';
 
 // Load environment variables
 dotenvConfig();
@@ -52,25 +63,25 @@ const GPTImageConfigSchema = z.object({
   model: z.literal('gpt-image-1').default('gpt-image-1'),
 
   /** Default image dimensions (default: 'auto' - model chooses based on prompt) */
-  size: z.enum(['1024x1024', '1536x1024', '1024x1536', 'auto']).default('auto'),
+  size: z.enum(SIZE_OPTIONS).default('auto'),
 
   /** Default rendering quality (default: 'auto' - model chooses based on prompt) */
-  quality: z.enum(['low', 'medium', 'high', 'auto']).default('auto'),
+  quality: z.enum(QUALITY_OPTIONS).default('auto'),
 
   /** Default background transparency (default: 'auto' - model chooses based on prompt) */
-  background: z.enum(['transparent', 'opaque', 'auto']).default('auto'),
+  background: z.enum(BACKGROUND_OPTIONS).default('auto'),
 
   /** Default output image format (default: 'png') */
-  outputFormat: z.enum(['png', 'jpeg', 'webp']).default('png'),
+  outputFormat: z.enum(OUTPUT_FORMAT_OPTIONS).default('png'),
 
   /** Default compression level for JPEG/WebP (0-100, default: 85) */
-  outputCompression: z.coerce.number().int().min(0).max(100).default(85),
+  outputCompression: z.coerce.number().int().min(COMPRESSION_MIN).max(COMPRESSION_MAX).default(85),
 
   /** Default input fidelity for preserving input image details (default: 'low') */
-  inputFidelity: z.enum(['low', 'high']).default('low'),
+  inputFidelity: z.enum(INPUT_FIDELITY_OPTIONS).default('low'),
 
   /** Maximum number of images per request (default: 4) */
-  maxImages: z.coerce.number().int().min(1).max(10).default(4),
+  maxImages: z.coerce.number().int().min(IMAGE_COUNT_MIN).max(IMAGE_COUNT_MAX).default(4),
 
   /** Default partial images for streaming (0-3, default: 0 - only final image) */
   partialImages: z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]).default(0),
