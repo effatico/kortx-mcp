@@ -1,3 +1,18 @@
+# [1.2.0](https://github.com/effatico/kortx-mcp/compare/v1.1.3...v1.2.0) (2025-10-19)
+
+### Features
+
+- add comprehensive open source community files ([#11](https://github.com/effatico/kortx-mcp/issues/11)) ([361e19d](https://github.com/effatico/kortx-mcp/commit/361e19d2bee89e9f60347168b1594e4d9f350292))
+- add GPT Image configuration support ([#47](https://github.com/effatico/kortx-mcp/issues/47)) ([4c6d2be](https://github.com/effatico/kortx-mcp/commit/4c6d2be939a01bf818b7be9f89bcbd6a7596bf91)), closes [#35](https://github.com/effatico/kortx-mcp/issues/35)
+- add GPT Image types for Responses API integration ([#44](https://github.com/effatico/kortx-mcp/issues/44)) ([6fbc96d](https://github.com/effatico/kortx-mcp/commit/6fbc96dec0111704e81e0562df73de95b7cee408)), closes [#33](https://github.com/effatico/kortx-mcp/issues/33)
+- implement CreateVisualTool for image generation and editing ([#49](https://github.com/effatico/kortx-mcp/issues/49)) ([2580e44](https://github.com/effatico/kortx-mcp/commit/2580e44eee7ad35af3dff857700e4e48cd0f811e)), closes [#37](https://github.com/effatico/kortx-mcp/issues/37)
+- implement GPT Image client methods ([#45](https://github.com/effatico/kortx-mcp/issues/45)) ([e52560c](https://github.com/effatico/kortx-mcp/commit/e52560cb57acde489f818fbb800c52ab5d29ddb3)), closes [#34](https://github.com/effatico/kortx-mcp/issues/34)
+- implement Perplexity client infrastructure with official SDK ([#26](https://github.com/effatico/kortx-mcp/issues/26)) ([ca4ec2d](https://github.com/effatico/kortx-mcp/commit/ca4ec2d625eed82d85f6adae35215f136980840f)), closes [#25](https://github.com/effatico/kortx-mcp/issues/25)
+- implement search-content tool with Perplexity integration ([#28](https://github.com/effatico/kortx-mcp/issues/28)) ([78b7461](https://github.com/effatico/kortx-mcp/commit/78b7461fda05be84d11db025201db71c2faadb0c)), closes [#24](https://github.com/effatico/kortx-mcp/issues/24)
+- integrate Perplexity image search into create-visual tool ([#50](https://github.com/effatico/kortx-mcp/issues/50)) ([c962415](https://github.com/effatico/kortx-mcp/commit/c9624153b52d9f9d4e5da95f5cdc9cc50739da12)), closes [#38](https://github.com/effatico/kortx-mcp/issues/38) [#38](https://github.com/effatico/kortx-mcp/issues/38)
+- register create-visual tool in MCP server ([#51](https://github.com/effatico/kortx-mcp/issues/51)) ([7c382d6](https://github.com/effatico/kortx-mcp/commit/7c382d676aacf6969a73c53f951cc6caa33779b6)), closes [#39](https://github.com/effatico/kortx-mcp/issues/39)
+- **tools:** Add create-visual input schema with mode validation ([#48](https://github.com/effatico/kortx-mcp/issues/48)) ([1637899](https://github.com/effatico/kortx-mcp/commit/16378992a3b2be3215bf71432782c61cbeb99e5e)), closes [#35](https://github.com/effatico/kortx-mcp/issues/35) [#36](https://github.com/effatico/kortx-mcp/issues/36)
+
 ## [1.1.4](https://github.com/effatico/kortx-mcp/compare/v1.1.3...v1.1.4) (2025-10-17)
 
 ### Features
