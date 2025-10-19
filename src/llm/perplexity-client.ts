@@ -70,14 +70,49 @@ export class PerplexityClient {
       const duration = Date.now() - startTime;
 
       const choice = response.choices?.[0];
-      const content =
-        typeof choice?.message.content === 'string'
-          ? choice.message.content
-          : Array.isArray(choice?.message.content)
-            ? choice.message.content
-                .map((chunk: any) => ('text' in chunk ? chunk.text : ''))
-                .join('')
-            : '';
+      const messageContent = choice?.message.content;
+
+      // Extract text content
+      let content = '';
+      const images: Array<{
+        imageUrl: string;
+        originUrl?: string;
+        height?: number;
+        width?: number;
+      }> = [];
+
+      if (typeof messageContent === 'string') {
+        content = messageContent;
+      } else if (Array.isArray(messageContent)) {
+        messageContent.forEach((chunk: any) => {
+          if ('text' in chunk && chunk.text) {
+            content += (content ? ' ' : '') + chunk.text;
+          } else if (chunk.type === 'image_url') {
+            // Extract image URL and metadata
+            const imageUrl =
+              typeof chunk.image_url === 'string' ? chunk.image_url : chunk.image_url?.url;
+
+            if (imageUrl) {
+              images.push({
+                imageUrl,
+                originUrl: chunk.origin_url,
+                height: chunk.height,
+                width: chunk.width,
+              });
+            }
+          }
+        });
+      }
+
+      // Extract search results if present
+      const searchResults = response.search_results?.map((result: any) => ({
+        title: result.title,
+        url: result.url,
+        date: result.date,
+        last_updated: result.last_updated,
+        snippet: result.snippet,
+        source: result.source,
+      }));
 
       const perplexityResponse: PerplexityResponse = {
         content,
@@ -89,6 +124,8 @@ export class PerplexityClient {
         },
         finishReason: choice?.finish_reason || 'stop',
         citations: response.citations || [],
+        images: images.length > 0 ? images : undefined,
+        searchResults: searchResults && searchResults.length > 0 ? searchResults : undefined,
       };
 
       logLLMResponse(this.logger, model, perplexityResponse.tokensUsed, duration);

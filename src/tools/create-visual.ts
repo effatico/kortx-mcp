@@ -142,7 +142,13 @@ import { OpenAIClient } from '../llm/openai-client.js';
 import { PerplexityClient } from '../llm/perplexity-client.js';
 import { ContextGatherer } from '../context/gatherer.js';
 import { BaseTool } from './base-tool.js';
-import type { GPTImageRequest, GPTImageResponse, PerplexityRequest } from '../llm/types.js';
+import type {
+  GPTImageRequest,
+  GPTImageResponse,
+  PerplexityRequest,
+  PerplexityImageResult,
+  PerplexitySearchResult,
+} from '../llm/types.js';
 
 /**
  * Result from visual generation
@@ -153,6 +159,8 @@ interface VisualResult {
   searchResults?: {
     content: string;
     citations: string[];
+    imageUrls?: Array<PerplexityImageResult>;
+    searchResults?: Array<PerplexitySearchResult>;
   };
   model: string;
   tokensUsed: {
@@ -446,6 +454,8 @@ Provide search guidance and help interpret results for visual projects.`;
       searchResults: {
         content: response.content,
         citations: response.citations || [],
+        imageUrls: response.images,
+        searchResults: response.searchResults,
       },
       model: response.model,
       tokensUsed: {
@@ -564,6 +574,33 @@ Provide search guidance and help interpret results for visual projects.`;
       parts.push('# Visual Search Results\n');
       parts.push(result.searchResults.content);
 
+      // Add image results if available
+      if (result.searchResults.imageUrls && result.searchResults.imageUrls.length > 0) {
+        parts.push('\n\n**Images Found:**');
+        result.searchResults.imageUrls.forEach((img, idx) => {
+          parts.push(`\n${idx + 1}. ${img.imageUrl}`);
+          if (img.originUrl) {
+            parts.push(`   Source: ${img.originUrl}`);
+          }
+          if (img.width && img.height) {
+            parts.push(`   Dimensions: ${img.width}x${img.height}`);
+          }
+        });
+      }
+
+      // Add search results if available
+      if (result.searchResults.searchResults && result.searchResults.searchResults.length > 0) {
+        parts.push('\n\n**Search Results:**');
+        result.searchResults.searchResults.forEach((searchResult, idx) => {
+          parts.push(`\n${idx + 1}. ${searchResult.title}`);
+          parts.push(`   URL: ${searchResult.url}`);
+          if (searchResult.snippet) {
+            parts.push(`   ${searchResult.snippet}`);
+          }
+        });
+      }
+
+      // Add citations if available
       if (result.searchResults.citations.length > 0) {
         parts.push('\n\n**Citations:**');
         result.searchResults.citations.forEach((citation, idx) => {

@@ -679,6 +679,175 @@ describe('CreateVisualTool', () => {
 
       expect(result.content[0].text).not.toContain('Citations');
     });
+
+    it('should include image URLs when present in search results', async () => {
+      const mockResponse = {
+        content: 'Found images of modern architecture',
+        model: 'sonar',
+        tokensUsed: {
+          prompt: 100,
+          completion: 200,
+          total: 300,
+        },
+        finishReason: 'stop',
+        citations: ['https://example.com/source'],
+        images: [
+          {
+            imageUrl: 'https://example.com/image1.jpg',
+            originUrl: 'https://example.com/page1',
+            width: 1920,
+            height: 1080,
+          },
+          {
+            imageUrl: 'https://example.com/image2.jpg',
+            originUrl: 'https://example.com/page2',
+            width: 1280,
+            height: 720,
+          },
+        ],
+      };
+
+      const mockContext: ConsultationContext = {
+        query: 'search images',
+        totalTokens: 50,
+        sourcesUsed: [],
+      };
+
+      vi.mocked(mockPerplexityClient.chat).mockResolvedValue(mockResponse);
+      vi.mocked(mockContextGatherer.gatherContext).mockResolvedValue(mockContext);
+
+      const tool = new CreateVisualTool(
+        mockConfig,
+        mockLogger,
+        mockOpenAIClient,
+        mockContextGatherer,
+        mockPerplexityClient
+      );
+
+      const result = await tool.execute({
+        mode: 'search',
+        prompt: 'modern architecture',
+        searchMode: 'web',
+      });
+
+      expect(result.content[0].type).toBe('text');
+      expect(result.content[0].text).toContain('Images Found:');
+      expect(result.content[0].text).toContain('https://example.com/image1.jpg');
+      expect(result.content[0].text).toContain('https://example.com/image2.jpg');
+      expect(result.content[0].text).toContain('Source: https://example.com/page1');
+      expect(result.content[0].text).toContain('Dimensions: 1920x1080');
+      expect(result.content[0].text).toContain('Dimensions: 1280x720');
+    });
+
+    it('should include search results when present', async () => {
+      const mockResponse = {
+        content: 'Architecture search results',
+        model: 'sonar',
+        tokensUsed: {
+          prompt: 100,
+          completion: 200,
+          total: 300,
+        },
+        finishReason: 'stop',
+        searchResults: [
+          {
+            title: 'Modern Architecture Gallery',
+            url: 'https://example.com/gallery',
+            snippet: 'Collection of contemporary building designs',
+          },
+          {
+            title: 'Architectural Digest',
+            url: 'https://example.com/digest',
+            snippet: 'Latest trends in architecture',
+          },
+        ],
+      };
+
+      const mockContext: ConsultationContext = {
+        query: 'search',
+        totalTokens: 50,
+        sourcesUsed: [],
+      };
+
+      vi.mocked(mockPerplexityClient.chat).mockResolvedValue(mockResponse);
+      vi.mocked(mockContextGatherer.gatherContext).mockResolvedValue(mockContext);
+
+      const tool = new CreateVisualTool(
+        mockConfig,
+        mockLogger,
+        mockOpenAIClient,
+        mockContextGatherer,
+        mockPerplexityClient
+      );
+
+      const result = await tool.execute({
+        mode: 'search',
+        prompt: 'architecture',
+      });
+
+      expect(result.content[0].text).toContain('Search Results:');
+      expect(result.content[0].text).toContain('Modern Architecture Gallery');
+      expect(result.content[0].text).toContain('https://example.com/gallery');
+      expect(result.content[0].text).toContain('Collection of contemporary building designs');
+      expect(result.content[0].text).toContain('Architectural Digest');
+    });
+
+    it('should include both images and search results when both present', async () => {
+      const mockResponse = {
+        content: 'Comprehensive search results with images',
+        model: 'sonar',
+        tokensUsed: {
+          prompt: 150,
+          completion: 250,
+          total: 400,
+        },
+        finishReason: 'stop',
+        citations: ['https://example.com/source1'],
+        images: [
+          {
+            imageUrl: 'https://example.com/img.jpg',
+            originUrl: 'https://example.com/page',
+          },
+        ],
+        searchResults: [
+          {
+            title: 'Architecture Resource',
+            url: 'https://example.com/resource',
+            snippet: 'Comprehensive architecture guide',
+          },
+        ],
+      };
+
+      const mockContext: ConsultationContext = {
+        query: 'search',
+        totalTokens: 50,
+        sourcesUsed: [],
+      };
+
+      vi.mocked(mockPerplexityClient.chat).mockResolvedValue(mockResponse);
+      vi.mocked(mockContextGatherer.gatherContext).mockResolvedValue(mockContext);
+
+      const tool = new CreateVisualTool(
+        mockConfig,
+        mockLogger,
+        mockOpenAIClient,
+        mockContextGatherer,
+        mockPerplexityClient
+      );
+
+      const result = await tool.execute({
+        mode: 'search',
+        prompt: 'architecture',
+      });
+
+      const text = result.content[0].text as string;
+      expect(text).toContain('Images Found:');
+      expect(text).toContain('https://example.com/img.jpg');
+      expect(text).toContain('Search Results:');
+      expect(text).toContain('Architecture Resource');
+      expect(text).toContain('Citations:');
+      expect(text).toContain('https://example.com/source1');
+    });
   });
 
   describe('Error handling', () => {

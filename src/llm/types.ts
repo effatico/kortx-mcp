@@ -90,6 +90,40 @@ export interface PerplexityResponse {
   };
   finishReason: string;
   citations?: Array<string>;
+  images?: Array<PerplexityImageResult>;
+  searchResults?: Array<PerplexitySearchResult>;
+}
+
+/**
+ * Image result from Perplexity search
+ */
+export interface PerplexityImageResult {
+  /** URL of the image */
+  imageUrl: string;
+  /** URL of the page where the image was found */
+  originUrl?: string;
+  /** Image height in pixels */
+  height?: number;
+  /** Image width in pixels */
+  width?: number;
+}
+
+/**
+ * Search result from Perplexity
+ */
+export interface PerplexitySearchResult {
+  /** Title of the search result */
+  title: string;
+  /** URL of the search result */
+  url: string;
+  /** Publication or last updated date */
+  date?: string;
+  /** Last updated timestamp */
+  last_updated?: string;
+  /** Snippet/preview of the content */
+  snippet?: string;
+  /** Source type */
+  source?: 'web' | 'attachment';
 }
 
 // GPT Image generation types
