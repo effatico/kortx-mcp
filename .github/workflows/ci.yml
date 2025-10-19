@@ -14,6 +14,26 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for Claude attribution
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "Checking commits for Claude attribution..."
+
+          # Get the base branch commit
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.sha }}"
+
+          # Check commit messages for Claude attribution (case-insensitive)
+          if git log ${BASE_SHA}..${HEAD_SHA} --pretty=format:"%B" | grep -iE "(co-author|co-authored-by).*claude"; then
+            echo "❌ Error: Found Claude attribution in commit messages"
+            echo "Please remove Co-Authored-By: Claude from your commits"
+            exit 1
+          fi
+
+          echo "✅ No Claude attribution found in commits"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
