@@ -1,4 +1,7 @@
 import { z } from 'zod';
+import { promises as fs } from 'fs';
+import path from 'path';
+import os from 'os';
 import {
   SIZE_OPTIONS,
   QUALITY_OPTIONS,
@@ -281,7 +284,7 @@ Provide search guidance and help interpret results for visual projects.`;
           break;
       }
 
-      return this.formatVisualResponse(result);
+      return await this.formatVisualResponse(result);
     } catch (error) {
       this.logger.error({ error, mode: input.mode }, 'Error executing create-visual tool');
       throw error;
@@ -574,7 +577,7 @@ Provide search guidance and help interpret results for visual projects.`;
   /**
    * Format visual result as MCP tool response
    */
-  private formatVisualResponse(result: VisualResult) {
+  private async formatVisualResponse(result: VisualResult) {
     const parts: string[] = [];
 
     // Mode-specific content
@@ -642,7 +645,7 @@ Provide search guidance and help interpret results for visual projects.`;
     );
     parts.push(`**Estimated Cost:** $${result.cost.toFixed(6)}`);
 
-    const responseText = parts.join('\n');
+    let responseText = parts.join('\n');
 
     // Build response with images if present
     const content: Array<{ type: string; text?: string; data?: string; mimeType?: string }> = [
@@ -654,15 +657,125 @@ Provide search guidance and help interpret results for visual projects.`;
 
     // Add images to response (for generate/edit modes)
     if (result.images && result.images.length > 0) {
-      result.images.forEach(img => {
+      // Save images to filesystem and collect paths
+      const savedPaths: string[] = [];
+
+      for (let index = 0; index < result.images.length; index++) {
+        const img = result.images[index];
+
+        // Detect MIME type from base64 data signature
+        const mimeType = this.detectImageMimeType(img.b64_json);
+
+        // Save to filesystem
+        try {
+          const filepath = await this.saveImageToFilesystem(img.b64_json, mimeType, index);
+          savedPaths.push(filepath);
+        } catch (error) {
+          this.logger.error({ error, index }, 'Failed to save image to filesystem');
+          // Continue with other images even if one fails
+        }
+
         content.push({
           type: 'image',
           data: img.b64_json,
-          mimeType: 'image/png',
+          mimeType,
         });
-      });
+      }
+
+      // Add saved paths information to response text
+      if (savedPaths.length > 0) {
+        responseText += '\n\n**Saved images:**\n' + savedPaths.map(p => `- ${p}`).join('\n');
+        // Update the text content with saved paths
+        content[0] = {
+          type: 'text',
+          text: responseText,
+        };
+      }
     }
 
     return { content };
+  }
+
+  /**
+   * Detect the MIME type of an image from its base64 data or format parameter
+   * @param base64Data - Base64 encoded image data
+   * @param format - Optional format from request (png, jpeg, webp)
+   * @returns The MIME type string
+   */
+  private detectImageMimeType(base64Data: string, format?: string): string {
+    // If format is explicitly specified, use it
+    if (format) {
+      const mimeTypes: Record<string, string> = {
+        png: 'image/png',
+        jpeg: 'image/jpeg',
+        jpg: 'image/jpeg',
+        webp: 'image/webp',
+      };
+      return mimeTypes[format.toLowerCase()] || 'image/png';
+    }
+
+    // Detect from base64 data signature
+    // PNG: starts with iVBORw0KGgo (base64 of 89504E47...)
+    // JPEG: starts with /9j/ (base64 of FFD8)
+    // WebP: starts with UklGR (base64 of 52494646)
+    if (base64Data.startsWith('iVBORw0KGgo')) {
+      return 'image/png';
+    } else if (base64Data.startsWith('/9j/')) {
+      return 'image/jpeg';
+    } else if (base64Data.startsWith('UklGR')) {
+      return 'image/webp';
+    }
+
+    // Default to PNG if unable to detect
+    return 'image/png';
+  }
+
+  /**
+   * Save generated image to filesystem
+   * Saves to project ./generated-images directory or fallback to temp directory
+   * @param base64Data - Base64 encoded image data
+   * @param mimeType - MIME type of the image
+   * @param index - Image index for multiple images
+   * @returns The full path to the saved image file
+   */
+  private async saveImageToFilesystem(
+    base64Data: string,
+    mimeType: string,
+    index: number
+  ): Promise<string> {
+    // Determine file extension from MIME type
+    const extensionMap: Record<string, string> = {
+      'image/png': 'png',
+      'image/jpeg': 'jpg',
+      'image/webp': 'webp',
+    };
+    const extension = extensionMap[mimeType] || 'png';
+
+    // Try project directory first, fallback to temp
+    let imagesDir: string;
+    try {
+      // Use project directory: ./generated-images
+      const projectDir = process.cwd();
+      imagesDir = path.join(projectDir, 'generated-images');
+      await fs.mkdir(imagesDir, { recursive: true });
+    } catch (error) {
+      // Fallback to temp directory
+      const tmpDir = os.tmpdir();
+      imagesDir = path.join(tmpDir, 'kortx-mcp-images');
+      await fs.mkdir(imagesDir, { recursive: true });
+    }
+
+    // Generate filename with timestamp and index
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const filename = `image-${timestamp}-${index}.${extension}`;
+    const filepath = path.join(imagesDir, filename);
+
+    // Convert base64 to buffer and write to file
+    const buffer = Buffer.from(base64Data, 'base64');
+    await fs.writeFile(filepath, buffer);
+
+    this.logger.info({ filepath, size: buffer.length, mimeType }, 'Saved generated image');
+
+    return filepath;
   }
 }

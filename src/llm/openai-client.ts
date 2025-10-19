@@ -173,10 +173,13 @@ export class OpenAIClient {
     const retries = maxRetries ?? this.config.openai.maxRetries;
     const delay = baseDelay ?? this.config.openai.retryDelay;
 
-    for (let attempt = 0; attempt < retries; attempt++) {
+    let lastError: unknown;
+
+    for (let attempt = 0; attempt <= retries; attempt++) {
       try {
         return await fn();
       } catch (error) {
+        lastError = error;
         const errorMessage = error instanceof Error ? error.message : String(error);
         const errorCode = (error as { code?: string }).code;
 
@@ -188,7 +191,7 @@ export class OpenAIClient {
           errorCode === 'ECONNRESET' ||
           errorCode === 'ETIMEDOUT';
 
-        if (isNetworkError && attempt < retries - 1) {
+        if (isNetworkError && attempt < retries) {
           const retryDelay = delay * Math.pow(2, attempt);
           this.logger.warn(
             { attempt: attempt + 1, retryDelay, error: errorMessage },
@@ -198,11 +201,13 @@ export class OpenAIClient {
           continue;
         }
 
+        // If not a network error or out of retries, throw immediately
         throw error;
       }
     }
 
-    throw new Error('Maximum retries exceeded');
+    // This should never be reached, but TypeScript needs it
+    throw lastError || new Error('Maximum retries exceeded');
   }
 
   private parseResponse(completion: OpenAI.Chat.Completions.ChatCompletion): LLMResponse {
