@@ -11,6 +11,7 @@ import {
   IMAGE_COUNT_MAX,
   VISUAL_SEARCH_MODES,
   SEARCH_RECENCY_OPTIONS,
+  type ImageFormat,
 } from './gpt-image-constants.js';
 
 /**
@@ -290,6 +291,18 @@ Provide search guidance and help interpret results for visual projects.`;
   /**
    * Execute generate mode
    */
+  /**
+   * Get output compression value, handling PNG format constraints
+   * PNG only supports lossless compression (100), so we omit the parameter
+   * for PNG when compression is not 100 to use default behavior
+   */
+  private getOutputCompression(
+    outputFormat: ImageFormat,
+    compressionValue: number
+  ): number | undefined {
+    return outputFormat === 'png' && compressionValue !== 100 ? undefined : compressionValue;
+  }
+
   private async executeGenerate(
     input: Extract<CreateVisualInput, { mode: 'generate' }>
   ): Promise<VisualResult> {
@@ -301,14 +314,10 @@ Provide search guidance and help interpret results for visual projects.`;
     // Validate image count
     const imageCount = validateImageCount(input.n, this.config.gptImage.maxImages);
 
-    // Determine output format
+    // Determine output format and compression
     const outputFormat = input.outputFormat || this.config.gptImage.outputFormat;
-
-    // For PNG format, only use compression if it's 100 (lossless)
-    // Otherwise, omit it to use default behavior
     const compressionValue = input.outputCompression ?? this.config.gptImage.outputCompression;
-    const outputCompression =
-      outputFormat === 'png' && compressionValue !== 100 ? undefined : compressionValue;
+    const outputCompression = this.getOutputCompression(outputFormat, compressionValue);
 
     // Build request
     const request: GPTImageRequest = {
@@ -368,14 +377,10 @@ Provide search guidance and help interpret results for visual projects.`;
     // Validate image count
     const imageCount = validateImageCount(input.n, this.config.gptImage.maxImages);
 
-    // Determine output format
+    // Determine output format and compression
     const outputFormat = input.outputFormat || this.config.gptImage.outputFormat;
-
-    // For PNG format, only use compression if it's 100 (lossless)
-    // Otherwise, omit it to use default behavior
     const compressionValue = input.outputCompression ?? this.config.gptImage.outputCompression;
-    const outputCompression =
-      outputFormat === 'png' && compressionValue !== 100 ? undefined : compressionValue;
+    const outputCompression = this.getOutputCompression(outputFormat, compressionValue);
 
     // Build request
     const request: GPTImageRequest = {

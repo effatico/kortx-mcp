@@ -491,7 +491,8 @@ export class OpenAIClient {
     request: GPTImageRequest,
     onPartialImage?: (imageData: string, index: number) => void
   ): Promise<GPTImageResponse> {
-    const model = 'gpt-4.1'; // Use GPT-4.1 as mainline model for Responses API
+    const model = 'gpt-5'; // GPT-5 for Responses API with image_generation tool
+    const timeout = this.config.gptImage.timeout;
     const startTime = Date.now();
     const partialImages = request.partialImages !== undefined ? request.partialImages : 0;
 
@@ -502,6 +503,7 @@ export class OpenAIClient {
         size: request.size,
         quality: request.quality,
         partialImages,
+        timeout,
       },
       'Streaming image generation via Responses API'
     );
@@ -523,13 +525,16 @@ export class OpenAIClient {
       if (request.inputFidelity) imageGenerationTool.input_fidelity = request.inputFidelity;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const stream = (await this.client.responses.create({
-        model,
-        input: request.prompt,
-        stream: true,
-        tools: [imageGenerationTool],
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any)) as unknown as AsyncIterable<any>;
+      const stream = (await this.client.responses.create(
+        {
+          model,
+          input: request.prompt,
+          stream: true,
+          tools: [imageGenerationTool],
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
+        { timeout }
+      )) as unknown as AsyncIterable<any>;
 
       const finalImages: Array<{ b64_json: string; revised_prompt?: string }> = [];
       let inputTokens = 0;
