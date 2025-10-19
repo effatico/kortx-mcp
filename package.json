@@ -1,7 +1,7 @@
 {
   "name": "@effatico/kortx-mcp",
   "version": "1.2.3",
-  "description": "Kortex: MCP server for AI-powered consultation. GPT-5 strategic planning, Perplexity real-time search, GPT Image visual creation, with intelligent context gathering",
+  "description": "Kortx: MCP server for AI-powered consultation. GPT-5 strategic planning, Perplexity real-time search, GPT Image visual creation, with intelligent context gathering",
   "type": "module",
   "bin": {
     "kortx-mcp": "./build/index.js"
