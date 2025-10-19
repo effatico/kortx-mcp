@@ -13,7 +13,9 @@ A lightweight, open-source MCP server that enables AI assistants like Claude Cod
 
 ## Who Should Use This
 
-This tool is designed for AI researchers, tool builders, and platform engineers who want to add specialized consultation capabilities to AI assistants and enable intelligent, automated context gathering from codebases.
+This tool is designed for software development teams and individual developers who use AI assistants like Claude Code, Cursor, or Copliot. If you make technical decisions about architecture, debugging, technology selection, or visual content creation and want your AI assistant to provide context-aware recommendations backed by current research, kortx-mcp enhances your workflow.
+
+Kortx-mcp is also valuable for AI researchers, tool builders, and platform engineers who want to add specialized consultation capabilities and intelligent context gathering to AI assistant integrations.
 
 ---
 
