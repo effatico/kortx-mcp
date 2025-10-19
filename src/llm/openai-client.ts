@@ -182,32 +182,39 @@ export class OpenAIClient {
         lastError = error;
         const errorMessage = error instanceof Error ? error.message : String(error);
         const errorCode = (error as { code?: string }).code;
+        const errorStatus = (error as { status?: number }).status;
 
-        // Only retry on network errors, not on validation or auth errors
-        const isNetworkError =
+        // Check if this is a retryable error
+        // Network errors: Premature close, connection reset, timeout
+        // HTTP errors: 429 (rate limit), 500 (server error), 503 (service unavailable)
+        const isRetryableError =
           errorMessage.includes('Premature close') ||
           errorMessage.includes('ECONNRESET') ||
           errorMessage.includes('ETIMEDOUT') ||
           errorCode === 'ECONNRESET' ||
-          errorCode === 'ETIMEDOUT';
+          errorCode === 'ETIMEDOUT' ||
+          errorStatus === 429 ||
+          errorStatus === 500 ||
+          errorStatus === 503;
 
-        if (isNetworkError && attempt < retries) {
+        // If this is a retryable error and we haven't exhausted retries, wait and retry
+        if (isRetryableError && attempt < retries) {
           const retryDelay = delay * Math.pow(2, attempt);
           this.logger.warn(
-            { attempt: attempt + 1, retryDelay, error: errorMessage },
-            'Retrying request after network error'
+            { attempt: attempt + 1, retryDelay, error: errorMessage, status: errorStatus },
+            'Retrying request after retryable error'
           );
           await new Promise(resolve => setTimeout(resolve, retryDelay));
           continue;
         }
 
-        // If not a network error or out of retries, throw immediately
+        // If not a retryable error or we've exhausted retries, throw the original error
         throw error;
       }
     }
 
-    // This should never be reached, but TypeScript needs it
-    throw lastError || new Error('Maximum retries exceeded');
+    // This should never be reached, but TypeScript needs it for type safety
+    throw lastError;
   }
 
   private parseResponse(completion: OpenAI.Chat.Completions.ChatCompletion): LLMResponse {
@@ -257,8 +264,11 @@ export class OpenAIClient {
   }
 
   private handleError(error: unknown): LLMError {
-    const errorObj = error as { message?: string; status?: number; code?: string };
-    let errorMessage = errorObj.message || 'OpenAI API error';
+    const errorObj = error as
+      | { message?: string; status?: number; code?: string }
+      | null
+      | undefined;
+    let errorMessage = errorObj?.message || String(error) || 'OpenAI API error';
 
     // Handle premature close errors
     if (errorMessage.includes('Premature close')) {
@@ -268,32 +278,32 @@ export class OpenAIClient {
         '2. Request timeout - try reducing context size or output tokens',
         '3. API server load - wait a moment and retry',
         '',
-        'Original error: ' + errorObj.message,
+        'Original error: ' + (errorObj?.message || String(error)),
       ].join('\n');
     }
     // Enhance timeout error messages
-    else if (errorObj.code === 'ETIMEDOUT' || errorMessage.includes('timeout')) {
+    else if (errorObj?.code === 'ETIMEDOUT' || errorMessage.includes('timeout')) {
       errorMessage = `Request timed out after ${this.config.gptImage.timeout}ms. Image generation can take longer for high quality settings. Try increasing GPT_IMAGE_TIMEOUT or reducing image quality/size.`;
     }
 
     const llmError = new Error(errorMessage) as LLMError;
     llmError.name = 'LLMError';
 
-    if (errorObj.status) {
+    if (errorObj?.status) {
       llmError.status = errorObj.status;
     }
 
-    if (errorObj.code) {
+    if (errorObj?.code) {
       llmError.code = errorObj.code;
     }
 
     // Determine if error is retryable
     llmError.retryable =
-      errorObj.status === 429 || // Rate limit
-      errorObj.status === 503 || // Service unavailable
-      errorObj.status === 500 || // Internal server error
-      errorObj.code === 'ECONNRESET' ||
-      errorObj.code === 'ETIMEDOUT' ||
+      errorObj?.status === 429 || // Rate limit
+      errorObj?.status === 503 || // Service unavailable
+      errorObj?.status === 500 || // Internal server error
+      errorObj?.code === 'ECONNRESET' ||
+      errorObj?.code === 'ETIMEDOUT' ||
       errorMessage.includes('Premature close'); // Network errors
 
     return llmError;

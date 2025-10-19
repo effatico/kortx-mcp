@@ -32,6 +32,8 @@ describe('OpenAIClient', () => {
         reasoningEffort: 'minimal',
         verbosity: 'low',
         maxTokens: 1024,
+        maxRetries: 3,
+        retryDelay: 1000,
       },
       server: {
         name: 'kortx-mcp',
@@ -268,32 +270,46 @@ describe('OpenAIClient', () => {
     });
 
     it('should handle API errors gracefully', async () => {
+      // Create a new client with maxRetries: 0 to test error handling without retries
+      const noRetryConfig = {
+        ...mockConfig,
+        openai: { ...mockConfig.openai, maxRetries: 0 },
+      };
+      const noRetryClient = new OpenAIClient(noRetryConfig, mockLogger);
+
       const mockError = new Error('API Error') as Error & { status: number };
       mockError.status = 500;
 
       const mockCreate = vi.fn().mockRejectedValue(mockError);
-      (client as OpenAIClientWithPrivate).client.responses.create = mockCreate;
+      (noRetryClient as OpenAIClientWithPrivate).client.responses.create = mockCreate;
 
       const request: LLMRequest = {
         messages: [{ role: 'user', content: 'Test message' }],
       };
 
-      await expect(client.chat(request)).rejects.toThrow('API Error');
+      await expect(noRetryClient.chat(request)).rejects.toThrow('API Error');
     });
 
     it('should mark rate limit errors as retryable', async () => {
+      // Create a new client with maxRetries: 0 to test retryable flag without actual retries
+      const noRetryConfig = {
+        ...mockConfig,
+        openai: { ...mockConfig.openai, maxRetries: 0 },
+      };
+      const noRetryClient = new OpenAIClient(noRetryConfig, mockLogger);
+
       const mockError = new Error('Rate limit exceeded') as Error & { status: number };
       mockError.status = 429;
 
       const mockCreate = vi.fn().mockRejectedValue(mockError);
-      (client as OpenAIClientWithPrivate).client.responses.create = mockCreate;
+      (noRetryClient as OpenAIClientWithPrivate).client.responses.create = mockCreate;
 
       const request: LLMRequest = {
         messages: [{ role: 'user', content: 'Test message' }],
       };
 
       try {
-        await client.chat(request);
+        await noRetryClient.chat(request);
       } catch (error: unknown) {
         const llmError = error as { retryable?: boolean; status?: number };
         expect(llmError.retryable).toBe(true);
