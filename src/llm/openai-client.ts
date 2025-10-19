@@ -40,26 +40,28 @@ export class OpenAIClient {
     logLLMRequest(this.logger, model, JSON.stringify(request.messages).length);
 
     try {
-      // GPT-5 uses the Responses API, not Chat Completions
-      const response = (await this.client.responses.create({
-        model,
-        input: request.messages,
-        max_output_tokens: maxTokens,
-        reasoning: {
-          effort: reasoningEffort,
-        },
-        text: {
-          verbosity,
-        },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any)) as any;
+      return await this.retryWithBackoff(async () => {
+        // GPT-5 uses the Responses API, not Chat Completions
+        const response = (await this.client.responses.create({
+          model,
+          input: request.messages,
+          max_output_tokens: maxTokens,
+          reasoning: {
+            effort: reasoningEffort,
+          },
+          text: {
+            verbosity,
+          },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any)) as any;
 
-      const duration = Date.now() - startTime;
-      const llmResponse = this.parseResponsesAPIResponse(response);
+        const duration = Date.now() - startTime;
+        const llmResponse = this.parseResponsesAPIResponse(response);
 
-      logLLMResponse(this.logger, model, llmResponse.tokensUsed, duration);
+        logLLMResponse(this.logger, model, llmResponse.tokensUsed, duration);
 
-      return llmResponse;
+        return llmResponse;
+      });
     } catch (error) {
       logError(this.logger, error as Error, { model, request });
       throw this.handleError(error);
@@ -80,63 +82,65 @@ export class OpenAIClient {
     logLLMRequest(this.logger, model, JSON.stringify(request.messages).length);
 
     try {
-      // GPT-5 uses the Responses API with streaming
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const stream = (await this.client.responses.create({
-        model,
-        input: request.messages,
-        max_output_tokens: maxTokens,
-        stream: true,
-        reasoning: {
-          effort: reasoningEffort,
-        },
-        text: {
-          verbosity,
-        },
+      return await this.retryWithBackoff(async () => {
+        // GPT-5 uses the Responses API with streaming
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any)) as unknown as AsyncIterable<any>;
+        const stream = (await this.client.responses.create({
+          model,
+          input: request.messages,
+          max_output_tokens: maxTokens,
+          stream: true,
+          reasoning: {
+            effort: reasoningEffort,
+          },
+          text: {
+            verbosity,
+          },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any)) as unknown as AsyncIterable<any>;
 
-      let fullContent = '';
-      let inputTokens = 0;
-      let outputTokens = 0;
-      let reasoningTokens = 0;
+        let fullContent = '';
+        let inputTokens = 0;
+        let outputTokens = 0;
+        let reasoningTokens = 0;
 
-      for await (const event of stream) {
-        // Handle Responses API streaming events
-        if (event.type === 'response.output_text.delta') {
-          const delta = event.delta || '';
-          if (delta) {
-            fullContent += delta;
-            onChunk(delta);
+        for await (const event of stream) {
+          // Handle Responses API streaming events
+          if (event.type === 'response.output_text.delta') {
+            const delta = event.delta || '';
+            if (delta) {
+              fullContent += delta;
+              onChunk(delta);
+            }
+          }
+
+          // Token counts typically available at the end
+          if (event.type === 'response.done' && event.response?.usage) {
+            inputTokens = event.response.usage.input_tokens || 0;
+            outputTokens = event.response.usage.output_tokens || 0;
+            reasoningTokens = event.response.usage.reasoning_tokens || 0;
           }
         }
 
-        // Token counts typically available at the end
-        if (event.type === 'response.done' && event.response?.usage) {
-          inputTokens = event.response.usage.input_tokens || 0;
-          outputTokens = event.response.usage.output_tokens || 0;
-          reasoningTokens = event.response.usage.reasoning_tokens || 0;
-        }
-      }
+        const duration = Date.now() - startTime;
+        const totalTokens = inputTokens + outputTokens + reasoningTokens;
 
-      const duration = Date.now() - startTime;
-      const totalTokens = inputTokens + outputTokens + reasoningTokens;
+        const response: LLMResponse = {
+          content: fullContent,
+          model,
+          tokensUsed: {
+            prompt: inputTokens,
+            completion: outputTokens,
+            total: totalTokens,
+            ...(reasoningTokens > 0 && { reasoning: reasoningTokens }),
+          },
+          finishReason: 'stop',
+        };
 
-      const response: LLMResponse = {
-        content: fullContent,
-        model,
-        tokensUsed: {
-          prompt: inputTokens,
-          completion: outputTokens,
-          total: totalTokens,
-          ...(reasoningTokens > 0 && { reasoning: reasoningTokens }),
-        },
-        finishReason: 'stop',
-      };
+        logLLMResponse(this.logger, model, response.tokensUsed, duration);
 
-      logLLMResponse(this.logger, model, response.tokensUsed, duration);
-
-      return response;
+        return response;
+      });
     } catch (error) {
       logError(this.logger, error as Error, { model, request });
       throw this.handleError(error);
@@ -152,6 +156,53 @@ export class OpenAIClient {
       return 'low';
     }
     return reasoningEffort;
+  }
+
+  /**
+   * Retry a function with exponential backoff for network errors
+   * @param fn - The function to retry
+   * @param maxRetries - Maximum number of retries (from config)
+   * @param baseDelay - Base delay in milliseconds (from config)
+   * @returns The result of the function
+   */
+  private async retryWithBackoff<T>(
+    fn: () => Promise<T>,
+    maxRetries?: number,
+    baseDelay?: number
+  ): Promise<T> {
+    const retries = maxRetries ?? this.config.openai.maxRetries;
+    const delay = baseDelay ?? this.config.openai.retryDelay;
+
+    for (let attempt = 0; attempt < retries; attempt++) {
+      try {
+        return await fn();
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorCode = (error as { code?: string }).code;
+
+        // Only retry on network errors, not on validation or auth errors
+        const isNetworkError =
+          errorMessage.includes('Premature close') ||
+          errorMessage.includes('ECONNRESET') ||
+          errorMessage.includes('ETIMEDOUT') ||
+          errorCode === 'ECONNRESET' ||
+          errorCode === 'ETIMEDOUT';
+
+        if (isNetworkError && attempt < retries - 1) {
+          const retryDelay = delay * Math.pow(2, attempt);
+          this.logger.warn(
+            { attempt: attempt + 1, retryDelay, error: errorMessage },
+            'Retrying request after network error'
+          );
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+          continue;
+        }
+
+        throw error;
+      }
+    }
+
+    throw new Error('Maximum retries exceeded');
   }
 
   private parseResponse(completion: OpenAI.Chat.Completions.ChatCompletion): LLMResponse {
@@ -202,10 +253,21 @@ export class OpenAIClient {
 
   private handleError(error: unknown): LLMError {
     const errorObj = error as { message?: string; status?: number; code?: string };
-
-    // Enhance timeout error messages
     let errorMessage = errorObj.message || 'OpenAI API error';
-    if (errorObj.code === 'ETIMEDOUT' || errorMessage.includes('timeout')) {
+
+    // Handle premature close errors
+    if (errorMessage.includes('Premature close')) {
+      errorMessage = [
+        'API connection closed prematurely. This usually indicates:',
+        '1. Network instability - retry the request',
+        '2. Request timeout - try reducing context size or output tokens',
+        '3. API server load - wait a moment and retry',
+        '',
+        'Original error: ' + errorObj.message,
+      ].join('\n');
+    }
+    // Enhance timeout error messages
+    else if (errorObj.code === 'ETIMEDOUT' || errorMessage.includes('timeout')) {
       errorMessage = `Request timed out after ${this.config.gptImage.timeout}ms. Image generation can take longer for high quality settings. Try increasing GPT_IMAGE_TIMEOUT or reducing image quality/size.`;
     }
 
@@ -226,7 +288,8 @@ export class OpenAIClient {
       errorObj.status === 503 || // Service unavailable
       errorObj.status === 500 || // Internal server error
       errorObj.code === 'ECONNRESET' ||
-      errorObj.code === 'ETIMEDOUT';
+      errorObj.code === 'ETIMEDOUT' ||
+      errorMessage.includes('Premature close'); // Network errors
 
     return llmError;
   }
@@ -262,81 +325,83 @@ export class OpenAIClient {
     );
 
     try {
-      // Build image_generation tool configuration
-      const imageGenerationTool: Record<string, unknown> = {
-        type: 'image_generation',
-      };
+      return await this.retryWithBackoff(async () => {
+        // Build image_generation tool configuration
+        const imageGenerationTool: Record<string, unknown> = {
+          type: 'image_generation',
+        };
 
-      if (request.size) imageGenerationTool.size = request.size;
-      if (request.quality) imageGenerationTool.quality = request.quality;
-      if (request.background) imageGenerationTool.background = request.background;
-      if (request.outputFormat) imageGenerationTool.output_format = request.outputFormat;
-      if (request.outputCompression !== undefined) {
-        imageGenerationTool.output_compression = request.outputCompression;
-      }
-      if (request.inputFidelity) imageGenerationTool.input_fidelity = request.inputFidelity;
-      if (request.partialImages !== undefined)
-        imageGenerationTool.partial_images = request.partialImages;
+        if (request.size) imageGenerationTool.size = request.size;
+        if (request.quality) imageGenerationTool.quality = request.quality;
+        if (request.background) imageGenerationTool.background = request.background;
+        if (request.outputFormat) imageGenerationTool.output_format = request.outputFormat;
+        if (request.outputCompression !== undefined) {
+          imageGenerationTool.output_compression = request.outputCompression;
+        }
+        if (request.inputFidelity) imageGenerationTool.input_fidelity = request.inputFidelity;
+        if (request.partialImages !== undefined)
+          imageGenerationTool.partial_images = request.partialImages;
 
-      // Use image-specific timeout for generation
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const response = (await this.client.responses.create(
-        {
-          model,
-          input: request.prompt,
-          tools: [imageGenerationTool],
+        // Use image-specific timeout for generation
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const response = (await this.client.responses.create(
+          {
+            model,
+            input: request.prompt,
+            tools: [imageGenerationTool],
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } as any,
+          { timeout }
+        )) as any;
+
+        const duration = Date.now() - startTime;
+
+        // Extract image generation calls from response
+        const imageGenerationCalls = (response.output || []).filter(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any,
-        { timeout }
-      )) as any;
+          (output: any) => output.type === 'image_generation_call'
+        );
 
-      const duration = Date.now() - startTime;
+        if (imageGenerationCalls.length === 0) {
+          throw new Error('No images generated in response');
+        }
 
-      // Extract image generation calls from response
-      const imageGenerationCalls = (response.output || []).filter(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (output: any) => output.type === 'image_generation_call'
-      );
+        const images = imageGenerationCalls.map(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (call: any) => ({
+            b64_json: call.result || '',
+            revised_prompt: call.revised_prompt,
+          })
+        );
 
-      if (imageGenerationCalls.length === 0) {
-        throw new Error('No images generated in response');
-      }
+        // Track token usage including image tokens
+        const usage = response.usage || {};
+        const inputTokens = usage.input_tokens || 0;
+        const outputTokens = usage.output_tokens || 0;
 
-      const images = imageGenerationCalls.map(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (call: any) => ({
-          b64_json: call.result || '',
-          revised_prompt: call.revised_prompt,
-        })
-      );
+        // Log rate limiting headers if present
+        this.logRateLimitInfo(response);
 
-      // Track token usage including image tokens
-      const usage = response.usage || {};
-      const inputTokens = usage.input_tokens || 0;
-      const outputTokens = usage.output_tokens || 0;
-
-      // Log rate limiting headers if present
-      this.logRateLimitInfo(response);
-
-      this.logger.info(
-        {
-          model,
-          imagesGenerated: images.length,
-          duration,
-          tokensUsed: {
-            input: inputTokens,
-            output: outputTokens,
-            total: inputTokens + outputTokens,
+        this.logger.info(
+          {
+            model,
+            imagesGenerated: images.length,
+            duration,
+            tokensUsed: {
+              input: inputTokens,
+              output: outputTokens,
+              total: inputTokens + outputTokens,
+            },
           },
-        },
-        'Image generation complete via Responses API'
-      );
+          'Image generation complete via Responses API'
+        );
 
-      return {
-        images,
-        model: 'gpt-image-1',
-        created: Date.now(),
-      };
+        return {
+          images,
+          model: 'gpt-image-1',
+          created: Date.now(),
+        };
+      });
     } catch (error) {
       logError(this.logger, error as Error, { model, request });
       throw this.handleError(error);
@@ -366,115 +431,117 @@ export class OpenAIClient {
     );
 
     try {
-      if (!request.inputImages || request.inputImages.length === 0) {
-        throw new Error('Input image is required for editing');
-      }
+      return await this.retryWithBackoff(async () => {
+        if (!request.inputImages || request.inputImages.length === 0) {
+          throw new Error('Input image is required for editing');
+        }
 
-      if (!request.prompt) {
-        throw new Error('Prompt is required for editing');
-      }
+        if (!request.prompt) {
+          throw new Error('Prompt is required for editing');
+        }
 
-      // Build input with text and images
-      const inputContent: unknown[] = [{ type: 'input_text', text: request.prompt }];
+        // Build input with text and images
+        const inputContent: unknown[] = [{ type: 'input_text', text: request.prompt }];
 
-      // Add input images
-      request.inputImages.forEach(imageData => {
-        inputContent.push({
-          type: 'input_image',
-          image_url: imageData.startsWith('data:')
-            ? imageData
-            : `data:image/png;base64,${imageData}`,
+        // Add input images
+        request.inputImages.forEach(imageData => {
+          inputContent.push({
+            type: 'input_image',
+            image_url: imageData.startsWith('data:')
+              ? imageData
+              : `data:image/png;base64,${imageData}`,
+          });
         });
-      });
 
-      // Build image_generation tool configuration
-      const imageGenerationTool: Record<string, unknown> = {
-        type: 'image_generation',
-      };
+        // Build image_generation tool configuration
+        const imageGenerationTool: Record<string, unknown> = {
+          type: 'image_generation',
+        };
 
-      if (request.size) imageGenerationTool.size = request.size;
-      if (request.quality) imageGenerationTool.quality = request.quality;
-      if (request.background) imageGenerationTool.background = request.background;
-      if (request.outputFormat) imageGenerationTool.output_format = request.outputFormat;
-      if (request.outputCompression !== undefined) {
-        imageGenerationTool.output_compression = request.outputCompression;
-      }
-      if (request.inputFidelity) imageGenerationTool.input_fidelity = request.inputFidelity;
-      if (request.partialImages !== undefined)
-        imageGenerationTool.partial_images = request.partialImages;
+        if (request.size) imageGenerationTool.size = request.size;
+        if (request.quality) imageGenerationTool.quality = request.quality;
+        if (request.background) imageGenerationTool.background = request.background;
+        if (request.outputFormat) imageGenerationTool.output_format = request.outputFormat;
+        if (request.outputCompression !== undefined) {
+          imageGenerationTool.output_compression = request.outputCompression;
+        }
+        if (request.inputFidelity) imageGenerationTool.input_fidelity = request.inputFidelity;
+        if (request.partialImages !== undefined)
+          imageGenerationTool.partial_images = request.partialImages;
 
-      // Add mask if provided
-      if (request.inputImageMask) {
-        const maskData = request.inputImageMask.startsWith('data:')
-          ? request.inputImageMask
-          : `data:image/png;base64,${request.inputImageMask}`;
-        imageGenerationTool.input_image_mask = { image_url: maskData };
-      }
+        // Add mask if provided
+        if (request.inputImageMask) {
+          const maskData = request.inputImageMask.startsWith('data:')
+            ? request.inputImageMask
+            : `data:image/png;base64,${request.inputImageMask}`;
+          imageGenerationTool.input_image_mask = { image_url: maskData };
+        }
 
-      // Use image-specific timeout for editing
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const response = (await this.client.responses.create(
-        {
-          model,
-          input: [
-            {
-              role: 'user',
-              content: inputContent,
-            },
-          ],
-          tools: [imageGenerationTool],
+        // Use image-specific timeout for editing
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const response = (await this.client.responses.create(
+          {
+            model,
+            input: [
+              {
+                role: 'user',
+                content: inputContent,
+              },
+            ],
+            tools: [imageGenerationTool],
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } as any,
+          { timeout }
+        )) as any;
+
+        const duration = Date.now() - startTime;
+
+        // Extract image generation calls from response
+        const imageGenerationCalls = (response.output || []).filter(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any,
-        { timeout }
-      )) as any;
+          (output: any) => output.type === 'image_generation_call'
+        );
 
-      const duration = Date.now() - startTime;
+        if (imageGenerationCalls.length === 0) {
+          throw new Error('No images generated in response');
+        }
 
-      // Extract image generation calls from response
-      const imageGenerationCalls = (response.output || []).filter(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (output: any) => output.type === 'image_generation_call'
-      );
+        const images = imageGenerationCalls.map(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (call: any) => ({
+            b64_json: call.result || '',
+            revised_prompt: call.revised_prompt,
+          })
+        );
 
-      if (imageGenerationCalls.length === 0) {
-        throw new Error('No images generated in response');
-      }
+        // Track token usage including image tokens
+        const usage = response.usage || {};
+        const inputTokens = usage.input_tokens || 0;
+        const outputTokens = usage.output_tokens || 0;
 
-      const images = imageGenerationCalls.map(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (call: any) => ({
-          b64_json: call.result || '',
-          revised_prompt: call.revised_prompt,
-        })
-      );
+        // Log rate limiting headers if present
+        this.logRateLimitInfo(response);
 
-      // Track token usage including image tokens
-      const usage = response.usage || {};
-      const inputTokens = usage.input_tokens || 0;
-      const outputTokens = usage.output_tokens || 0;
-
-      // Log rate limiting headers if present
-      this.logRateLimitInfo(response);
-
-      this.logger.info(
-        {
-          model,
-          imagesEdited: images.length,
-          duration,
-          tokensUsed: {
-            input: inputTokens,
-            output: outputTokens,
-            total: inputTokens + outputTokens,
+        this.logger.info(
+          {
+            model,
+            imagesEdited: images.length,
+            duration,
+            tokensUsed: {
+              input: inputTokens,
+              output: outputTokens,
+              total: inputTokens + outputTokens,
+            },
           },
-        },
-        'Image editing complete via Responses API'
-      );
+          'Image editing complete via Responses API'
+        );
 
-      return {
-        images,
-        model: 'gpt-image-1',
-        created: Date.now(),
-      };
+        return {
+          images,
+          model: 'gpt-image-1',
+          created: Date.now(),
+        };
+      });
     } catch (error) {
       logError(this.logger, error as Error, { model, request });
       throw this.handleError(error);
@@ -509,82 +576,84 @@ export class OpenAIClient {
     );
 
     try {
-      // Build image_generation tool configuration
-      const imageGenerationTool: Record<string, unknown> = {
-        type: 'image_generation',
-        partial_images: partialImages,
-      };
+      return await this.retryWithBackoff(async () => {
+        // Build image_generation tool configuration
+        const imageGenerationTool: Record<string, unknown> = {
+          type: 'image_generation',
+          partial_images: partialImages,
+        };
 
-      if (request.size) imageGenerationTool.size = request.size;
-      if (request.quality) imageGenerationTool.quality = request.quality;
-      if (request.background) imageGenerationTool.background = request.background;
-      if (request.outputFormat) imageGenerationTool.output_format = request.outputFormat;
-      if (request.outputCompression !== undefined) {
-        imageGenerationTool.output_compression = request.outputCompression;
-      }
-      if (request.inputFidelity) imageGenerationTool.input_fidelity = request.inputFidelity;
+        if (request.size) imageGenerationTool.size = request.size;
+        if (request.quality) imageGenerationTool.quality = request.quality;
+        if (request.background) imageGenerationTool.background = request.background;
+        if (request.outputFormat) imageGenerationTool.output_format = request.outputFormat;
+        if (request.outputCompression !== undefined) {
+          imageGenerationTool.output_compression = request.outputCompression;
+        }
+        if (request.inputFidelity) imageGenerationTool.input_fidelity = request.inputFidelity;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const stream = (await this.client.responses.create(
-        {
-          model,
-          input: request.prompt,
-          stream: true,
-          tools: [imageGenerationTool],
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any,
-        { timeout }
-      )) as unknown as AsyncIterable<any>;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const stream = (await this.client.responses.create(
+          {
+            model,
+            input: request.prompt,
+            stream: true,
+            tools: [imageGenerationTool],
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } as any,
+          { timeout }
+        )) as unknown as AsyncIterable<any>;
 
-      const finalImages: Array<{ b64_json: string; revised_prompt?: string }> = [];
-      let inputTokens = 0;
-      let outputTokens = 0;
+        const finalImages: Array<{ b64_json: string; revised_prompt?: string }> = [];
+        let inputTokens = 0;
+        let outputTokens = 0;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      for await (const event of stream) {
-        // Handle partial image events
-        if (event.type === 'response.image_generation_call.partial_image' && onPartialImage) {
-          const partialImageData = event.partial_image_b64 || '';
-          const partialIndex = event.partial_image_index || 0;
-          onPartialImage(partialImageData, partialIndex);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        for await (const event of stream) {
+          // Handle partial image events
+          if (event.type === 'response.image_generation_call.partial_image' && onPartialImage) {
+            const partialImageData = event.partial_image_b64 || '';
+            const partialIndex = event.partial_image_index || 0;
+            onPartialImage(partialImageData, partialIndex);
+          }
+
+          // Handle final image generation call
+          if (event.type === 'response.image_generation_call.done') {
+            finalImages.push({
+              b64_json: event.result || '',
+              revised_prompt: event.revised_prompt,
+            });
+          }
+
+          // Capture token usage
+          if (event.type === 'response.done' && event.response?.usage) {
+            inputTokens = event.response.usage.input_tokens || 0;
+            outputTokens = event.response.usage.output_tokens || 0;
+          }
         }
 
-        // Handle final image generation call
-        if (event.type === 'response.image_generation_call.done') {
-          finalImages.push({
-            b64_json: event.result || '',
-            revised_prompt: event.revised_prompt,
-          });
-        }
+        const duration = Date.now() - startTime;
 
-        // Capture token usage
-        if (event.type === 'response.done' && event.response?.usage) {
-          inputTokens = event.response.usage.input_tokens || 0;
-          outputTokens = event.response.usage.output_tokens || 0;
-        }
-      }
-
-      const duration = Date.now() - startTime;
-
-      this.logger.info(
-        {
-          model,
-          imagesGenerated: finalImages.length,
-          duration,
-          tokensUsed: {
-            input: inputTokens,
-            output: outputTokens,
-            total: inputTokens + outputTokens,
+        this.logger.info(
+          {
+            model,
+            imagesGenerated: finalImages.length,
+            duration,
+            tokensUsed: {
+              input: inputTokens,
+              output: outputTokens,
+              total: inputTokens + outputTokens,
+            },
           },
-        },
-        'Image streaming complete via Responses API'
-      );
+          'Image streaming complete via Responses API'
+        );
 
-      return {
-        images: finalImages,
-        model: 'gpt-image-1',
-        created: Date.now(),
-      };
+        return {
+          images: finalImages,
+          model: 'gpt-image-1',
+          created: Date.now(),
+        };
+      });
     } catch (error) {
       logError(this.logger, error as Error, { model, request });
       throw this.handleError(error);
