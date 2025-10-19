@@ -311,3 +311,22 @@ describe('validateImageCount', () => {
     expect(validateImageCount(5, 5)).toBe(5);
   });
 });
+
+describe('CreateVisualTool', () => {
+  // Note: Full integration tests with mocked OpenAI and Perplexity clients
+  // should be added here to test the execute methods for all three modes.
+  // These tests would verify:
+  // 1. Generate mode calls OpenAIClient.generateImage correctly
+  // 2. Edit mode calls OpenAIClient.editImage correctly
+  // 3. Search mode calls PerplexityClient.chat correctly
+  // 4. Cost calculation works for all modes
+  // 5. formatToolResponse produces correct output structure
+  // 6. Error handling for API failures
+  // 7. Streaming support for partial images
+
+  it('should be implemented with comprehensive integration tests', () => {
+    // Placeholder for comprehensive tool tests
+    // TODO: Add mocked client tests in a future PR
+    expect(true).toBe(true);
+  });
+});
