@@ -139,7 +139,15 @@ OPENAI_MAX_TOKENS=1024               # Output token limit
 
 # Optional - Server
 LOG_LEVEL=info                       # debug, info, warn, error
+AUDIT_LOGGING=false                  # Enable logging to .audit/kortx-mcp.log
 TRANSPORT=stdio                      # stdio, streaming
+
+# Optional - GPT Image Configuration
+GPT_IMAGE_TIMEOUT=120000             # API timeout in ms (2 minutes default)
+GPT_IMAGE_SIZE=auto                  # 1024x1024, 1536x1024, 1024x1536, auto
+GPT_IMAGE_QUALITY=auto               # low, medium, high, auto
+GPT_IMAGE_FORMAT=png                 # png, jpeg, webp
+GPT_IMAGE_COMPRESSION=85             # 0-100 (JPEG/WebP only, PNG always lossless)
 
 # Optional - Context Gathering
 ENABLE_SERENA=true                   # Semantic code search
