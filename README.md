@@ -41,84 +41,196 @@ You can also install globally via npm or run it in Docker. For a global installa
 
 ---
 
-## Integration with AI Assistants
+## Getting Started
 
-### Claude Code
+Add the following config to your MCP client:
 
-The simplest setup uses npx:
+```json
+{
+  "mcpServers": {
+    "kortx-mcp": {
+      "command": "npx",
+      "args": ["-y", "@effatico/kortx-mcp@latest"],
+      "env": {
+        "OPENAI_API_KEY": "your-openai-api-key",
+        "PERPLEXITY_API_KEY": "your-perplexity-api-key"
+      }
+    }
+  }
+}
+```
+
+> [!NOTE]
+> Using `@effatico/kortx-mcp@latest` ensures your MCP client always uses the latest version. The `PERPLEXITY_API_KEY` is optional but required for the `search-content` tool.
+
+### MCP Client Configuration
+
+<details>
+  <summary>Amp</summary>
+  Follow https://ampcode.com/manual#mcp and use the config provided above. You can also install kortx-mcp using the CLI:
 
 ```bash
-claude mcp add --transport stdio kortx-consultant \
-  --env OPENAI_API_KEY=YOUR_KEY \
-  --env PERPLEXITY_API_KEY=YOUR_PERPLEXITY_KEY \
-  -- npx -y @effatico/kortx-mcp@latest
+amp mcp add kortx-mcp -- npx @effatico/kortx-mcp@latest \
+  --env OPENAI_API_KEY=your-key \
+  --env PERPLEXITY_API_KEY=your-key
 ```
 
-If you've installed the package globally, replace `npx -y @effatico/kortx-mcp@latest` with just `kortx-mcp`. You can customize the server by adding environment variables like `OPENAI_MODEL=gpt-5-mini` or `LOG_LEVEL=info` to the command above.
+</details>
 
-Note: The `PERPLEXITY_API_KEY` is optional but required for the `search-content` tool. You can obtain one from [Perplexity AI](https://www.perplexity.ai/settings/api).
+<details>
+  <summary>Claude Code</summary>
+  Use the Claude Code CLI to add kortx-mcp (<a href="https://docs.anthropic.com/en/docs/claude-code/mcp">guide</a>):
 
-[Detailed Claude Code setup guide →](./docs/integration/claude-code.md)
-
-### Copliot
-
-Add to your Copliot configuration:
-
-```json
-{
-  "mcp": {
-    "servers": {
-      "consultant": {
-        "command": "npx",
-        "args": ["-y", "@effatico/kortx-mcp"],
-        "env": {
-          "OPENAI_API_KEY": "your-api-key-here"
-        }
-      }
-    }
-  }
-}
+```bash
+claude mcp add --transport stdio kortx-mcp \
+  --env OPENAI_API_KEY=your-key \
+  --env PERPLEXITY_API_KEY=your-key \
+  -- npx @effatico/kortx-mcp@latest
 ```
 
-[Detailed Copliot setup guide →](./docs/integration/copliot.md)
+[Detailed setup guide →](./docs/integration/claude-code.md)
 
-### VS Code with MCP Extension
+</details>
 
-1. Install the MCP extension for VS Code
-2. Add to `.vscode/mcp-config.json`:
+<details>
+  <summary>Cline</summary>
+  Follow https://docs.cline.bot/mcp/configuring-mcp-servers and use the config provided above.
+</details>
 
-```json
-{
-  "consultant": {
-    "command": "npx",
-    "args": ["-y", "@effatico/kortx-mcp"],
-    "env": {
-      "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
-    }
-  }
-}
+<details>
+  <summary>Codex</summary>
+  Follow the <a href="https://github.com/openai/codex/blob/main/docs/advanced.md#model-context-protocol-mcp">configure MCP guide</a> using the standard config from above. You can also install kortx-mcp using the Codex CLI:
+
+```bash
+codex mcp add kortx-mcp -- npx @effatico/kortx-mcp@latest \
+  --env OPENAI_API_KEY=your-key \
+  --env PERPLEXITY_API_KEY=your-key
 ```
 
-[Detailed VS Code setup guide →](./docs/integration/vscode.md)
+</details>
 
-### Cursor
+<details>
+  <summary>Copilot CLI</summary>
 
-Add to Cursor's MCP settings:
+Start Copilot CLI:
 
-```json
-{
-  "mcp-servers": {
-    "consultant": {
-      "command": "npx -y @effatico/kortx-mcp",
-      "env": {
-        "OPENAI_API_KEY": "your-api-key-here"
-      }
-    }
-  }
-}
+```bash
+copilot
 ```
 
-[Detailed Cursor setup guide →](./docs/integration/cursor.md)
+Start the dialog to add a new MCP server:
+
+```bash
+/mcp add
+```
+
+Configure the following fields and press `CTRL+S`:
+
+- **Server name:** `kortx-mcp`
+- **Server Type:** `[1] Local`
+- **Command:** `npx -y @effatico/kortx-mcp@latest`
+- **Environment:** Add `OPENAI_API_KEY` and `PERPLEXITY_API_KEY`
+
+</details>
+
+<details>
+  <summary>Copilot / VS Code</summary>
+  Follow the MCP install <a href="https://code.visualstudio.com/docs/copilot/chat/mcp-servers#_add-an-mcp-server">guide</a> with the standard config from above. You can also install using the VS Code CLI:
+
+```bash
+code --add-mcp '{"name":"kortx-mcp","command":"npx","args":["@effatico/kortx-mcp@latest"],"env":{"OPENAI_API_KEY":"your-key","PERPLEXITY_API_KEY":"your-key"}}'
+```
+
+[Detailed setup guide →](./docs/integration/vscode.md)
+
+</details>
+
+<details>
+  <summary>Cursor</summary>
+
+**Click the button to install:**
+
+[<img src="https://cursor.com/deeplink/mcp-install-dark.svg" alt="Install in Cursor">](https://cursor.com/en/install-mcp?name=kortx-mcp&config=eyJjb21tYW5kIjoibnB4IC15IEBlZmZhdGljby9rb3J0eC1tY3BAbGF0ZXN0IiwiZW52Ijp7Ik9QRU5BSV9BUElfS0VZIjoieW91ci1rZXkiLCJQRVJQTEVYSVRZX0FQSV9LRVkiOiJ5b3VyLWtleSJ9fQ%3D%3D)
+
+**Or install manually:**
+
+Go to `Cursor Settings` → `MCP` → `New MCP Server`. Use the config provided above.
+
+[Detailed setup guide →](./docs/integration/cursor.md)
+
+</details>
+
+<details>
+  <summary>Gemini CLI</summary>
+  Install kortx-mcp using the Gemini CLI.
+
+**Project-wide:**
+
+```bash
+gemini mcp add kortx-mcp npx @effatico/kortx-mcp@latest \
+  --env OPENAI_API_KEY=your-key \
+  --env PERPLEXITY_API_KEY=your-key
+```
+
+**Globally:**
+
+```bash
+gemini mcp add -s user kortx-mcp npx @effatico/kortx-mcp@latest \
+  --env OPENAI_API_KEY=your-key \
+  --env PERPLEXITY_API_KEY=your-key
+```
+
+Alternatively, follow the <a href="https://github.com/google-gemini/gemini-cli/blob/main/docs/tools/mcp-server.md#how-to-set-up-your-mcp-server">MCP guide</a> and use the standard config from above.
+
+</details>
+
+<details>
+  <summary>Gemini Code Assist</summary>
+  Follow the <a href="https://cloud.google.com/gemini/docs/codeassist/use-agentic-chat-pair-programmer#configure-mcp-servers">configure MCP guide</a> using the standard config from above.
+</details>
+
+<details>
+  <summary>JetBrains AI Assistant & Junie</summary>
+
+Go to `Settings | Tools | AI Assistant | Model Context Protocol (MCP)` → `Add`. Use the config provided above.
+
+The same way kortx-mcp can be configured for JetBrains Junie in `Settings | Tools | Junie | MCP Settings` → `Add`. Use the config provided above.
+
+</details>
+
+<details>
+  <summary>Kiro</summary>
+
+In **Kiro Settings**, go to `Configure MCP` > `Open Workspace or User MCP Config` > Use the configuration snippet provided above.
+
+Or, from the IDE **Activity Bar** > `Kiro` > `MCP Servers` > `Click Open MCP Config`. Use the configuration snippet provided above.
+
+</details>
+
+<details>
+  <summary>Qoder</summary>
+
+In **Qoder Settings**, go to `MCP Server` > `+ Add` > Use the configuration snippet provided above.
+
+Alternatively, follow the <a href="https://docs.qoder.com/user-guide/chat/model-context-protocol">MCP guide</a> and use the standard config from above.
+
+</details>
+
+<details>
+  <summary>Visual Studio</summary>
+
+**Click the button to install:**
+
+[<img src="https://img.shields.io/badge/Visual_Studio-Install-C16FDE?logo=visualstudio&logoColor=white" alt="Install in Visual Studio">](https://vs-open.link/mcp-install?%7B%22name%22%3A%22kortx-mcp%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22%40effatico%2Fkortx-mcp%40latest%22%5D%2C%22env%22%3A%7B%22OPENAI_API_KEY%22%3A%22your-key%22%2C%22PERPLEXITY_API_KEY%22%3A%22your-key%22%7D%7D)
+
+</details>
+
+<details>
+  <summary>Warp</summary>
+
+Go to `Settings | AI | Manage MCP Servers` → `+ Add` to [add an MCP Server](https://docs.warp.dev/knowledge-and-collaboration/mcp#adding-an-mcp-server). Use the config provided above.
+
+</details>
 
 ---
 
