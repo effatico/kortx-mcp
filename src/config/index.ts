@@ -43,6 +43,9 @@ const PerplexityConfigSchema = z.object({
  *
  * Supports GPT Image (gpt-image-1) model with comprehensive configuration options
  * for image generation, editing, and streaming.
+ *
+ * Note: Uses the shared OPENAI_API_KEY from the openai config section for authentication.
+ * No separate GPT_IMAGE_API_KEY is required.
  */
 const GPTImageConfigSchema = z.object({
   /** Image model to use (default: 'gpt-image-1') */
