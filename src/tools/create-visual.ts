@@ -301,6 +301,15 @@ Provide search guidance and help interpret results for visual projects.`;
     // Validate image count
     const imageCount = validateImageCount(input.n, this.config.gptImage.maxImages);
 
+    // Determine output format
+    const outputFormat = input.outputFormat || this.config.gptImage.outputFormat;
+
+    // For PNG format, only use compression if it's 100 (lossless)
+    // Otherwise, omit it to use default behavior
+    const compressionValue = input.outputCompression ?? this.config.gptImage.outputCompression;
+    const outputCompression =
+      outputFormat === 'png' && compressionValue !== 100 ? undefined : compressionValue;
+
     // Build request
     const request: GPTImageRequest = {
       prompt: sanitizedPrompt,
@@ -309,8 +318,8 @@ Provide search guidance and help interpret results for visual projects.`;
       size: input.size || this.config.gptImage.size,
       quality: input.quality || this.config.gptImage.quality,
       background: input.background || this.config.gptImage.background,
-      outputFormat: input.outputFormat || this.config.gptImage.outputFormat,
-      outputCompression: input.outputCompression ?? this.config.gptImage.outputCompression,
+      outputFormat,
+      outputCompression,
       partialImages: input.partialImages,
     };
 
@@ -359,6 +368,15 @@ Provide search guidance and help interpret results for visual projects.`;
     // Validate image count
     const imageCount = validateImageCount(input.n, this.config.gptImage.maxImages);
 
+    // Determine output format
+    const outputFormat = input.outputFormat || this.config.gptImage.outputFormat;
+
+    // For PNG format, only use compression if it's 100 (lossless)
+    // Otherwise, omit it to use default behavior
+    const compressionValue = input.outputCompression ?? this.config.gptImage.outputCompression;
+    const outputCompression =
+      outputFormat === 'png' && compressionValue !== 100 ? undefined : compressionValue;
+
     // Build request
     const request: GPTImageRequest = {
       prompt: sanitizedPrompt,
@@ -367,8 +385,8 @@ Provide search guidance and help interpret results for visual projects.`;
       size: input.size || this.config.gptImage.size,
       quality: input.quality || this.config.gptImage.quality,
       background: input.background || this.config.gptImage.background,
-      outputFormat: input.outputFormat || this.config.gptImage.outputFormat,
-      outputCompression: input.outputCompression ?? this.config.gptImage.outputCompression,
+      outputFormat,
+      outputCompression,
       inputFidelity: input.inputFidelity || this.config.gptImage.inputFidelity,
       inputImages: input.inputImages,
       inputImageMask: input.inputImageMask,
