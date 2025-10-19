@@ -1,8 +1,15 @@
 import OpenAI from 'openai';
+import type { Uploadable } from 'openai/uploads';
 import type { Config } from '../config/index.js';
 import type { Logger } from '../utils/logger.js';
 import { logLLMRequest, logLLMResponse, logError } from '../utils/logger.js';
-import type { LLMRequest, LLMResponse, LLMError } from './types.js';
+import type {
+  LLMRequest,
+  LLMResponse,
+  LLMError,
+  GPTImageRequest,
+  GPTImageResponse,
+} from './types.js';
 
 export class OpenAIClient {
   private client: OpenAI;
@@ -216,5 +223,207 @@ export class OpenAIClient {
       errorObj.code === 'ETIMEDOUT';
 
     return llmError;
+  }
+
+  /**
+   * Generate images using GPT Image model via OpenAI SDK
+   * @param request - GPT Image generation request
+   * @returns GPT Image generation response with image data and token usage
+   */
+  async generateImage(request: GPTImageRequest): Promise<GPTImageResponse> {
+    const model = request.model || 'gpt-image-1';
+    const startTime = Date.now();
+
+    this.logger.info(
+      {
+        model,
+        promptLength: request.prompt.length,
+        size: request.size,
+        quality: request.quality,
+        n: request.n || 1,
+      },
+      'Generating image'
+    );
+
+    try {
+      const response = await this.client.images.generate({
+        model,
+        prompt: request.prompt,
+        n: request.n,
+        size: request.size,
+        quality: request.quality,
+        background: request.background,
+        output_format: request.outputFormat,
+        output_compression: request.outputCompression,
+        moderation: 'auto', // Always use auto moderation
+      });
+
+      const duration = Date.now() - startTime;
+      const data = response.data || [];
+
+      this.logger.info(
+        {
+          model,
+          imagesGenerated: data.length,
+          duration,
+          tokensUsed: response.usage,
+        },
+        'Image generation complete'
+      );
+
+      return {
+        images: data.map(item => ({
+          b64_json: item.b64_json || '',
+          revised_prompt: item.revised_prompt,
+        })),
+        model: model,
+        created: response.created,
+      };
+    } catch (error) {
+      logError(this.logger, error as Error, { model, request });
+      throw this.handleError(error);
+    }
+  }
+
+  /**
+   * Create variations of an existing image using OpenAI SDK
+   * @param request - Image variation request with input image
+   * @returns GPT Image response with variations
+   */
+  async createVariation(request: GPTImageRequest): Promise<GPTImageResponse> {
+    const model = request.model || 'dall-e-2'; // Variations only support dall-e-2
+    const startTime = Date.now();
+
+    this.logger.info(
+      {
+        model,
+        hasInputImages: !!request.inputImages,
+        n: request.n || 1,
+      },
+      'Creating image variations'
+    );
+
+    try {
+      if (!request.inputImages || request.inputImages.length === 0) {
+        throw new Error('Input images are required for creating variations');
+      }
+
+      const response = await this.client.images.createVariation({
+        image: this.base64ToUploadable(request.inputImages[0]),
+        n: request.n,
+        size: request.size as '256x256' | '512x512' | '1024x1024' | null,
+        response_format: 'b64_json',
+      });
+
+      const duration = Date.now() - startTime;
+      const data = response.data || [];
+
+      this.logger.info(
+        {
+          model,
+          variationsCreated: data.length,
+          duration,
+        },
+        'Image variations created'
+      );
+
+      return {
+        images: data.map(item => ({
+          b64_json: item.b64_json || '',
+          revised_prompt: item.revised_prompt,
+        })),
+        model: 'dall-e-2',
+        created: response.created,
+      };
+    } catch (error) {
+      logError(this.logger, error as Error, { model, request });
+      throw this.handleError(error);
+    }
+  }
+
+  /**
+   * Edit an image with a prompt and optional mask using OpenAI SDK
+   * @param request - Image editing request with image, prompt, and optional mask
+   * @returns GPT Image response with edited image
+   */
+  async editImage(request: GPTImageRequest): Promise<GPTImageResponse> {
+    const model = request.model || 'gpt-image-1';
+    const startTime = Date.now();
+
+    this.logger.info(
+      {
+        model,
+        hasInputImages: !!request.inputImages,
+        hasMask: !!request.inputImageMask,
+        promptLength: request.prompt.length,
+      },
+      'Editing image'
+    );
+
+    try {
+      if (!request.inputImages || request.inputImages.length === 0) {
+        throw new Error('Input image is required for editing');
+      }
+
+      if (!request.prompt) {
+        throw new Error('Prompt is required for editing');
+      }
+
+      // Convert input images to uploadable format
+      const imageUploads = request.inputImages.map(img => this.base64ToUploadable(img));
+
+      const response = await this.client.images.edit({
+        image: imageUploads.length === 1 ? imageUploads[0] : imageUploads,
+        prompt: request.prompt,
+        mask: request.inputImageMask ? this.base64ToUploadable(request.inputImageMask) : undefined,
+        model,
+        n: request.n,
+        size: request.size,
+        quality: request.quality,
+        background: request.background,
+      });
+
+      const duration = Date.now() - startTime;
+      const data = response.data || [];
+
+      this.logger.info(
+        {
+          model,
+          imagesEdited: data.length,
+          duration,
+          tokensUsed: response.usage,
+        },
+        'Image editing complete'
+      );
+
+      return {
+        images: data.map(item => ({
+          b64_json: item.b64_json || '',
+          revised_prompt: item.revised_prompt,
+        })),
+        model: model,
+        created: response.created,
+      };
+    } catch (error) {
+      logError(this.logger, error as Error, { model, request });
+      throw this.handleError(error);
+    }
+  }
+
+  /**
+   * Convert base64 string to OpenAI SDK Uploadable type
+   * @param base64 - Base64 encoded image string (with or without data URI prefix)
+   * @returns Uploadable (File or Buffer)
+   */
+  private base64ToUploadable(base64: string): Uploadable {
+    // Remove data URI prefix if present (e.g., "data:image/png;base64,")
+    const base64Data = base64.replace(/^data:image\/\w+;base64,/, '');
+
+    // Convert base64 to buffer
+    const buffer = Buffer.from(base64Data, 'base64');
+
+    // Create a File object from the buffer for OpenAI SDK
+    const blob = new Blob([buffer], { type: 'image/png' });
+    return new File([blob], 'image.png', { type: 'image/png' });
   }
 }
