@@ -38,6 +38,53 @@ const PerplexityConfigSchema = z.object({
   returnRelatedQuestions: booleanSchema(false),
 });
 
+/**
+ * GPT Image configuration schema for image generation via Responses API
+ *
+ * Supports GPT Image (gpt-image-1) model with comprehensive configuration options
+ * for image generation, editing, and streaming.
+ *
+ * Note: Uses the shared OPENAI_API_KEY from the openai config section for authentication.
+ * No separate GPT_IMAGE_API_KEY is required.
+ */
+const GPTImageConfigSchema = z.object({
+  /** Image model to use (default: 'gpt-image-1') */
+  model: z.literal('gpt-image-1').default('gpt-image-1'),
+
+  /** Default image dimensions (default: 'auto' - model chooses based on prompt) */
+  size: z.enum(['1024x1024', '1536x1024', '1024x1536', 'auto']).default('auto'),
+
+  /** Default rendering quality (default: 'auto' - model chooses based on prompt) */
+  quality: z.enum(['low', 'medium', 'high', 'auto']).default('auto'),
+
+  /** Default background transparency (default: 'auto' - model chooses based on prompt) */
+  background: z.enum(['transparent', 'opaque', 'auto']).default('auto'),
+
+  /** Default output image format (default: 'png') */
+  outputFormat: z.enum(['png', 'jpeg', 'webp']).default('png'),
+
+  /** Default compression level for JPEG/WebP (0-100, default: 85) */
+  outputCompression: z.coerce.number().int().min(0).max(100).default(85),
+
+  /** Default input fidelity for preserving input image details (default: 'low') */
+  inputFidelity: z.enum(['low', 'high']).default('low'),
+
+  /** Maximum number of images per request (default: 4) */
+  maxImages: z.coerce.number().int().min(1).max(10).default(4),
+
+  /** Default partial images for streaming (0-3, default: 0 - only final image) */
+  partialImages: z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]).default(0),
+
+  /** API timeout in milliseconds (default: 120000 - 2 minutes) */
+  timeout: z.coerce.number().int().positive().default(120000),
+
+  /** Enable cost tracking for image generation (default: true) */
+  enableCostTracking: booleanSchema(true),
+
+  /** Cost alert threshold in dollars (default: 10.0) */
+  costAlertThreshold: z.coerce.number().positive().default(10.0),
+});
+
 // MCP Server configuration schema
 const ServerConfigSchema = z.object({
   name: z.string().default('kortx-mcp'),
@@ -71,6 +118,7 @@ const SecurityConfigSchema = z.object({
 const ConfigSchema = z.object({
   openai: OpenAIConfigSchema,
   perplexity: PerplexityConfigSchema,
+  gptImage: GPTImageConfigSchema,
   server: ServerConfigSchema,
   context: ContextConfigSchema,
   security: SecurityConfigSchema,
@@ -97,6 +145,20 @@ export function loadConfig(): Config {
         searchMode: process.env.PERPLEXITY_SEARCH_MODE,
         returnImages: process.env.PERPLEXITY_RETURN_IMAGES,
         returnRelatedQuestions: process.env.PERPLEXITY_RETURN_RELATED_QUESTIONS,
+      },
+      gptImage: {
+        model: process.env.GPT_IMAGE_MODEL,
+        size: process.env.GPT_IMAGE_SIZE,
+        quality: process.env.GPT_IMAGE_QUALITY,
+        background: process.env.GPT_IMAGE_BACKGROUND,
+        outputFormat: process.env.GPT_IMAGE_FORMAT,
+        outputCompression: process.env.GPT_IMAGE_COMPRESSION,
+        inputFidelity: process.env.GPT_IMAGE_FIDELITY,
+        maxImages: process.env.GPT_IMAGE_MAX_IMAGES,
+        partialImages: process.env.GPT_IMAGE_PARTIAL_IMAGES,
+        timeout: process.env.GPT_IMAGE_TIMEOUT,
+        enableCostTracking: process.env.GPT_IMAGE_ENABLE_COST_TRACKING,
+        costAlertThreshold: process.env.GPT_IMAGE_COST_ALERT_THRESHOLD,
       },
       server: {
         name: process.env.SERVER_NAME,
