@@ -233,11 +233,19 @@ export class OpenAIClient {
 
   /**
    * Generate images using GPT Image model via Responses API
+   *
+   * IMPORTANT: This uses the Responses API (responses.create) with image_generation tool,
+   * NOT the direct Images API (images.generate).
+   *
+   * Model selection per OpenAI documentation:
+   * - responses.create({ tools: [{ type: "image_generation" }] }) → model: "gpt-5"
+   * - images.generate() → model: "gpt-image-1" (NOT USED in this implementation)
+   *
    * @param request - GPT Image generation request
    * @returns GPT Image generation response with image data and token usage
    */
   async generateImage(request: GPTImageRequest): Promise<GPTImageResponse> {
-    const model = 'gpt-5'; // Use GPT-5 for Responses API with image_generation tool
+    const model = 'gpt-5'; // GPT-5 for Responses API with image_generation tool
     const startTime = Date.now();
     const timeout = this.config.gptImage.timeout;
 

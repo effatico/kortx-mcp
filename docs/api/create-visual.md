@@ -30,18 +30,57 @@ OPENAI_API_KEY=your-openai-key
 PERPLEXITY_API_KEY=your-perplexity-key
 ```
 
+### API Implementation Notes
+
+**Important:** This tool uses OpenAI's **Responses API** (`responses.create()`) with the `image_generation` tool, not the direct Images API (`images.generate()`).
+
+**Model Selection:**
+
+- Responses API with `image_generation` tool → `model: "gpt-5"` (used internally)
+- Direct Images API (not used) → `model: "gpt-image-1"`
+
+**Input Image Format:**
+
+- ✅ Base64-encoded images (inline: `data:image/png;base64,...`)
+- ✅ Raw base64 strings (automatically prefixed with data URL)
+- ❌ File IDs from `openai.files.create()` (not currently supported)
+
+For file ID support, you would need to convert files to base64 first.
+
 ### Optional GPT Image Configuration
 
 ```bash
 # Image generation defaults
-GPT_IMAGE_SIZE=auto                    # Options: auto, square, landscape, portrait
-GPT_IMAGE_QUALITY=auto                 # Options: auto, low, medium, high
-GPT_IMAGE_BACKGROUND=auto              # Options: auto, opaque, transparent
+GPT_IMAGE_SIZE=auto                    # Options: 1024x1024, 1536x1024, 1024x1536, auto (default)
+GPT_IMAGE_QUALITY=auto                 # Options: low, medium, high, auto (default)
+GPT_IMAGE_BACKGROUND=auto              # Options: transparent, opaque, auto (default)
 GPT_IMAGE_OUTPUT_FORMAT=png            # Options: png, jpeg, webp
-GPT_IMAGE_OUTPUT_COMPRESSION=95        # Range: 0-100 (for JPEG/WebP)
+GPT_IMAGE_OUTPUT_COMPRESSION=85        # Range: 0-100 (for JPEG/WebP only)
 GPT_IMAGE_INPUT_FIDELITY=low          # Options: low, high
 GPT_IMAGE_MAX_IMAGES=4                 # Maximum images per request (1-4)
 ```
+
+**Size Options:**
+
+- `1024x1024` (square) - Balanced composition, fastest to generate
+- `1536x1024` (landscape) - Wider scenes and panoramas
+- `1024x1536` (portrait) - Vertical subjects and compositions
+- `auto` (default) - Model chooses optimal size based on prompt
+
+**Quality Options:**
+
+- `low` - Fastest generation, 272-408 tokens, suitable for drafts
+- `medium` - Balanced quality, 1056-1584 tokens, good for most uses
+- `high` - Best quality, 4160-6240 tokens, detailed final outputs
+- `auto` (default) - Model chooses quality based on prompt complexity
+
+**Background Options:**
+
+- `transparent` - Transparent background (PNG/WebP only)
+- `opaque` - Opaque background
+- `auto` (default) - Model chooses based on prompt context
+
+**Note:** Square images with standard quality are fastest to generate. The `auto` option is recommended for best results.
 
 ## Usage Examples
 
