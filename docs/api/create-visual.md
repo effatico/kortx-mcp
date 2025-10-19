@@ -607,6 +607,55 @@ Each edit can reference previous edits naturally:
 4. Keep prompts focused on the specific change needed
 5. Save intermediate results for branching experiments
 
+## Troubleshooting
+
+### Timeout Errors
+
+If you encounter timeout errors (`Request timed out`), this typically happens when:
+
+- Generating high-quality images
+- Creating multiple images in one request
+- Editing images with high input fidelity
+- Network connectivity is slow
+
+**Solutions:**
+
+1. **Increase Timeout**: Set `GPT_IMAGE_TIMEOUT` to a higher value:
+
+   ```bash
+   # For high quality images
+   GPT_IMAGE_TIMEOUT=180000  # 3 minutes
+
+   # For multiple images or editing
+   GPT_IMAGE_TIMEOUT=240000  # 4 minutes
+   ```
+
+2. **Reduce Quality Settings**: Lower the quality or size to speed up generation:
+
+   ```bash
+   GPT_IMAGE_QUALITY=medium  # Instead of high
+   GPT_IMAGE_SIZE=1024x1024  # Instead of auto
+   ```
+
+3. **Generate Fewer Images**: Reduce the `n` parameter in your request
+
+**Recommended Timeout Settings:**
+
+| Scenario                   | Timeout     | Setting                              |
+| -------------------------- | ----------- | ------------------------------------ |
+| Low quality, single image  | 60 seconds  | `GPT_IMAGE_TIMEOUT=60000`            |
+| Medium quality, 1-2 images | 120 seconds | `GPT_IMAGE_TIMEOUT=120000` (default) |
+| High quality, single image | 180 seconds | `GPT_IMAGE_TIMEOUT=180000`           |
+| Multiple images or editing | 240 seconds | `GPT_IMAGE_TIMEOUT=240000`           |
+
+### PNG Compression Errors
+
+If you see "Compression less than 100 is not supported for PNG output format":
+
+- PNG only supports lossless compression (100)
+- Switch to JPEG or WebP for lossy compression
+- Or set `outputCompression: 100` for PNG
+
 ## Related Documentation
 
 - [OpenAI GPT Image Documentation](https://platform.openai.com/docs/guides/images)

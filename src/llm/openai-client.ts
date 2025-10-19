@@ -202,7 +202,14 @@ export class OpenAIClient {
 
   private handleError(error: unknown): LLMError {
     const errorObj = error as { message?: string; status?: number; code?: string };
-    const llmError = new Error(errorObj.message || 'OpenAI API error') as LLMError;
+
+    // Enhance timeout error messages
+    let errorMessage = errorObj.message || 'OpenAI API error';
+    if (errorObj.code === 'ETIMEDOUT' || errorMessage.includes('timeout')) {
+      errorMessage = `Request timed out after ${this.config.gptImage.timeout}ms. Image generation can take longer for high quality settings. Try increasing GPT_IMAGE_TIMEOUT or reducing image quality/size.`;
+    }
+
+    const llmError = new Error(errorMessage) as LLMError;
     llmError.name = 'LLMError';
 
     if (errorObj.status) {
@@ -232,6 +239,7 @@ export class OpenAIClient {
   async generateImage(request: GPTImageRequest): Promise<GPTImageResponse> {
     const model = 'gpt-4.1'; // Use GPT-4.1 as mainline model for Responses API
     const startTime = Date.now();
+    const timeout = this.config.gptImage.timeout;
 
     this.logger.info(
       {
@@ -240,6 +248,7 @@ export class OpenAIClient {
         size: request.size,
         quality: request.quality,
         n: request.n || 1,
+        timeout,
       },
       'Generating image via Responses API'
     );
@@ -261,13 +270,17 @@ export class OpenAIClient {
       if (request.partialImages !== undefined)
         imageGenerationTool.partial_images = request.partialImages;
 
+      // Use image-specific timeout for generation
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const response = (await this.client.responses.create({
-        model,
-        input: request.prompt,
-        tools: [imageGenerationTool],
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any)) as any;
+      const response = (await this.client.responses.create(
+        {
+          model,
+          input: request.prompt,
+          tools: [imageGenerationTool],
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
+        { timeout }
+      )) as any;
 
       const duration = Date.now() - startTime;
 
@@ -330,6 +343,7 @@ export class OpenAIClient {
   async editImage(request: GPTImageRequest): Promise<GPTImageResponse> {
     const model = 'gpt-4.1'; // Use GPT-4.1 as mainline model for Responses API
     const startTime = Date.now();
+    const timeout = this.config.gptImage.timeout;
 
     this.logger.info(
       {
@@ -338,6 +352,7 @@ export class OpenAIClient {
         hasMask: !!request.inputImageMask,
         promptLength: request.prompt.length,
         inputFidelity: request.inputFidelity,
+        timeout,
       },
       'Editing image via Responses API'
     );
@@ -388,18 +403,22 @@ export class OpenAIClient {
         imageGenerationTool.input_image_mask = { image_url: maskData };
       }
 
+      // Use image-specific timeout for editing
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const response = (await this.client.responses.create({
-        model,
-        input: [
-          {
-            role: 'user',
-            content: inputContent,
-          },
-        ],
-        tools: [imageGenerationTool],
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any)) as any;
+      const response = (await this.client.responses.create(
+        {
+          model,
+          input: [
+            {
+              role: 'user',
+              content: inputContent,
+            },
+          ],
+          tools: [imageGenerationTool],
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
+        { timeout }
+      )) as any;
 
       const duration = Date.now() - startTime;
 
