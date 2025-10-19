@@ -1,3 +1,9 @@
+## [1.2.1](https://github.com/effatico/kortx-mcp/compare/v1.2.0...v1.2.1) (2025-10-19)
+
+### Bug Fixes
+
+- PNG compression, audit logging, and timeout handling ([#53](https://github.com/effatico/kortx-mcp/issues/53)) ([854c6fa](https://github.com/effatico/kortx-mcp/commit/854c6fa19378a85c57a384ccd1937d538df73396))
+
 # [1.2.0](https://github.com/effatico/kortx-mcp/compare/v1.1.3...v1.2.0) (2025-10-19)
 
 ### Features
