@@ -86,7 +86,7 @@ export class PerplexityClient {
       } else if (Array.isArray(messageContent)) {
         messageContent.forEach((chunk: any) => {
           if ('text' in chunk && chunk.text) {
-            content += chunk.text;
+            content += (content ? ' ' : '') + chunk.text;
           } else if (chunk.type === 'image_url') {
             // Extract image URL and metadata
             const imageUrl =

@@ -142,7 +142,13 @@ import { OpenAIClient } from '../llm/openai-client.js';
 import { PerplexityClient } from '../llm/perplexity-client.js';
 import { ContextGatherer } from '../context/gatherer.js';
 import { BaseTool } from './base-tool.js';
-import type { GPTImageRequest, GPTImageResponse, PerplexityRequest } from '../llm/types.js';
+import type {
+  GPTImageRequest,
+  GPTImageResponse,
+  PerplexityRequest,
+  PerplexityImageResult,
+  PerplexitySearchResult,
+} from '../llm/types.js';
 
 /**
  * Result from visual generation
@@ -153,17 +159,8 @@ interface VisualResult {
   searchResults?: {
     content: string;
     citations: string[];
-    imageUrls?: Array<{
-      imageUrl: string;
-      originUrl?: string;
-      height?: number;
-      width?: number;
-    }>;
-    searchResults?: Array<{
-      title: string;
-      url: string;
-      snippet?: string;
-    }>;
+    imageUrls?: Array<PerplexityImageResult>;
+    searchResults?: Array<PerplexitySearchResult>;
   };
   model: string;
   tokensUsed: {
