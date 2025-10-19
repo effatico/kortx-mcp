@@ -36,6 +36,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Create Visual Tool**: Visual content creation and research using GPT Image and Perplexity with three integrated modes
+  - **Generate Mode**: Create images from text descriptions using GPT Image (gpt-image-1) via Responses API
+    - Quality settings (auto, low, medium, high) with token-aware cost estimation
+    - Size options (auto, square, landscape, portrait)
+    - Background control (auto, opaque, transparent) for logos and UI elements
+    - Format selection (PNG, JPEG, WebP) with configurable compression
+    - Streaming support with partial images (0-3 progressive previews)
+    - Generate up to 4 images per request
+  - **Edit Mode**: Modify existing images through multi-turn conversational refinement
+    - Input fidelity control (low/high) for preserving faces, logos, and fine details
+    - Inpainting with mask images for precise regional edits
+    - Multi-turn workflows where each edit builds on previous results
+    - High fidelity preservation across multiple edit rounds
+    - Support for multiple input images and masks
+  - **Search Mode**: Find visual inspiration using Perplexity web and academic search
+    - Image URL results with dimensions and source citations
+    - Search recency filters (week, month, year)
+    - Web and academic search domains
+    - Integration with search-content infrastructure
+  - Comprehensive API documentation with usage examples for all three modes
+  - Token usage tracking and cost estimation for both GPT Image and Perplexity
+  - Full test coverage for mode validation, parameter handling, and error cases
 - **Search Content Tool**: Real-time web search using Perplexity Sonar models with comprehensive citation support
   - Five Perplexity models: sonar, sonar-pro, sonar-deep-research, sonar-reasoning, sonar-reasoning-pro
   - Advanced search modes: web (general), academic (research papers), sec (SEC filings)
@@ -47,6 +69,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated configuration schema validation
   - Updated documentation across README, configuration guide, and integration guides
   - Model remains opt-in with `gpt-5-mini` as the default
+
+### Enhanced
+
+- **Documentation**: Added visual content creation workflow to business case scenarios demonstrating integrated research, generation, and iterative refinement advantages over separate tools
+- **README**: Updated features section to highlight six specialized tools including visual content creation with multi-turn conversational editing capabilities
 
 ## [1.0.0] - 2025-10-15
 

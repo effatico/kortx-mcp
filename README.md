@@ -5,7 +5,7 @@
 [![Build Status](https://github.com/effatico/kortx-mcp/workflows/CI/badge.svg)](https://github.com/effatico/kortx-mcp/actions)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.12.0-brightgreen)](https://nodejs.org)
 
-A lightweight, open-source MCP server that enables AI assistants like Claude Code to consult GPT-5 models for strategic planning, code improvement, and problem-solving, plus real-time web search with Perplexity Sonar, while automatically gathering relevant context from your codebase.
+A lightweight, open-source MCP server that enables AI assistants like Claude Code to consult GPT-5 models for strategic planning, code improvement, and problem-solving, plus real-time web search with Perplexity Sonar and visual content creation with GPT Image, while automatically gathering relevant context from your codebase.
 
 [Quick Start](#quick-start) • [Documentation](./docs) • [Examples](./examples) • [Contributing](./CONTRIBUTING.md)
 
@@ -19,9 +19,9 @@ This tool is designed for AI researchers, tool builders, and platform engineers 
 
 ## Features
 
-The server provides multiple GPT-5 variants (gpt-5, gpt-5-mini, gpt-5-nano, gpt-5-pro, gpt-5-codex) for consultation tasks and Perplexity Sonar models (sonar, sonar-pro, sonar-deep-research, sonar-reasoning, sonar-reasoning-pro) for real-time web search. It integrates with Serena, graph-memory, and cclsp MCPs to fetch relevant code and metadata for context.
+The server provides multiple GPT-5 variants (gpt-5, gpt-5-mini, gpt-5-nano, gpt-5-pro, gpt-5-codex) for consultation tasks, Perplexity Sonar models (sonar, sonar-pro, sonar-deep-research, sonar-reasoning, sonar-reasoning-pro) for real-time web search, and GPT Image (gpt-image-1) for visual content creation. It integrates with Serena, graph-memory, and cclsp MCPs to fetch relevant code and metadata for context.
 
-Five specialized tools handle strategic planning, alternative solutions, copy improvement, problem solving, and real-time web search with citations. Each consultation tool accepts an optional `preferredModel` parameter, allowing assistants to request specific models while the system optimizes selection based on task complexity. The server ships production-ready with Docker support, non-root execution, sensitive-data redaction, and comprehensive structured logging via Pino.
+Six specialized tools handle strategic planning, alternative solutions, copy improvement, problem solving, real-time web search with citations, and visual content creation with multi-turn conversational editing. Each consultation tool accepts an optional `preferredModel` parameter, allowing assistants to request specific models while the system optimizes selection based on task complexity. The server ships production-ready with Docker support, non-root execution, sensitive-data redaction, and comprehensive structured logging via Pino.
 
 You can install and run it with a single npx command. The defaults optimize for fast time-to-first-token using gpt-5-mini with minimal reasoning. The codebase maintains 80%+ test coverage with 86 passing unit tests.
 
@@ -261,7 +261,7 @@ The test script verifies:
 
 Consultation tools (think-about-plan, suggest-alternative, improve-copy, solve-problem) accept an optional `preferredModel` parameter. When set, the assistant treats it as a preference but may override it to select the most suitable GPT-5 variant (gpt-5, gpt-5-mini, gpt-5-nano, gpt-5-pro, or gpt-5-codex) based on task complexity and requirements.
 
-The search-content tool uses Perplexity Sonar models for real-time web search with citations.
+The search-content tool uses Perplexity Sonar models for real-time web search with citations. The create-visual tool uses GPT Image for visual content creation and Perplexity for visual research.
 
 ### 1. think-about-plan
 
@@ -375,6 +375,58 @@ Perform real-time web search using Perplexity's Sonar models. Returns comprehens
 
 The response includes comprehensive search results with citations, sources, and optional related questions for deeper exploration.
 
+### 6. create-visual
+
+Generate, edit, and search for images using GPT Image and Perplexity. Supports three modes: generate new images from text descriptions, edit existing images through multi-turn conversational refinement, and search the web for visual inspiration.
+
+**Parameters:**
+
+- `mode` (required): Operation mode - "generate", "edit", or "search"
+- `prompt` (required): Text description or search query
+- `quality` (optional): Image quality - auto, low, medium, high
+- `size` (optional): Image dimensions - auto, square, landscape, portrait
+- `background` (optional): Background type - auto, opaque, transparent
+- `outputFormat` (optional): Image format - png, jpeg, webp
+- `n` (optional): Number of images to generate (1-4)
+- `inputImages` (edit mode): Array of input images as base64 or file IDs
+- `inputFidelity` (edit mode): Detail preservation - low or high
+- `searchMode` (search mode): Search domain - web or academic
+- `searchRecencyFilter` (search mode): Time filter - week, month, year
+
+**Example Usage (Generate):**
+
+```
+"Create a modern minimalist logo for a tech startup,
+featuring geometric shapes in blue and white with transparent background"
+```
+
+**Example Usage (Edit):**
+
+```
+"Change the sky to a dramatic sunset with orange and purple clouds,
+preserving the faces and details in the foreground"
+```
+
+**Example Usage (Search):**
+
+```
+"Find examples of modern Scandinavian interior design
+with natural wood and neutral colors from the past month"
+```
+
+The response includes generated images with revised prompts, search results with image URLs and citations, token usage breakdown, and cost estimation.
+
+**Key Capabilities:**
+
+- **Multi-turn editing**: Iteratively refine images through conversational prompts
+- **High fidelity preservation**: Maintain faces, logos, and fine details during edits
+- **Streaming support**: Receive partial images during generation
+- **Transparency control**: Generate images with transparent backgrounds
+- **Inpainting**: Edit specific regions using mask images
+- **Visual research**: Find inspiration through web and academic search
+
+[API documentation →](./docs/api/create-visual.md)
+
 ---
 
 ## When Kortx-MCP Delivers Superior Results
@@ -461,15 +513,32 @@ Context gatherer integrates with Serena (semantic code search), graph-memory (pa
 
 **Real Example**: Adding rate limiting to API. Without context, ChatGPT suggested express-rate-limit (generic). With kortx-mcp, context gatherer found team already had a custom rate-limiter middleware for other endpoints, stored in graph memory from past decision. Suggest-alternative proposed extending existing middleware vs new library, showing how to reuse the existing pattern. Saved introducing another dependency and maintained consistency across API endpoints.
 
+### 6. When Visual Content Creation Needs Research and Iteration
+
+**The Problem**:
+Creating visual content typically requires separate tools for research (Google Images, Pinterest), generation (DALL-E, Midjourney), and iteration. You lose context between research and creation, manually transferring ideas between tools. Multi-turn refinement means multiple separate requests without conversational flow.
+
+**Why Kortx-MCP Wins**:
+
+One workflow combines Perplexity visual search for inspiration and reference gathering with GPT Image's multi-turn conversational editing. Research design trends with `create-visual` search mode, then generate variations using those insights, then iteratively refine through natural conversation without losing context or starting over.
+
+**Concrete Comparison**:
+
+- **Without kortx-mcp**: Search Pinterest for logo inspiration → screenshot examples → describe to DALL-E → regenerate entire image for each change → no conversation history → manually track what worked
+- **With kortx-mcp**: `create-visual` search mode finds current logo trends with citations → generate initial concepts → "make the icon more geometric" → "change blue to navy" → "add subtle gradient" → each edit builds on previous, preserving context
+
+**Real Example**: Designing marketing graphics for product launch. Used create-visual search mode to find current SaaS dashboard design trends (2025 examples with citations). Generated hero image with specific style references. Through 4 conversational turns, refined: changed color scheme to match brand, adjusted composition for text overlay, increased contrast for readability, added transparent background for flexible placement. Final result in 30 minutes vs 3 hours of back-and-forth with separate tools. High fidelity mode preserved brand logo perfectly across all edits.
+
 ## Bottom Line
 
 Kortx-MCP delivers superior results when you need:
 
 - **Current information + deep reasoning** in one workflow
 - **Codebase context** for accurate, specific advice
-- **Multiple AI capabilities** orchestrated together
+- **Multiple AI capabilities** orchestrated together (reasoning, search, visual creation)
 - **Organizational learning** that compounds over time
 - **Recommendations that fit your architecture**, not generic patterns
+- **Visual content creation** with research-backed iteration and conversational refinement
 
 Use ChatGPT/Claude directly for quick questions. Use kortx-mcp when the quality of the decision justifies the integration setup.
 
@@ -496,6 +565,7 @@ Use ChatGPT/Claude directly for quick questions. Use kortx-mcp when the quality 
 - [suggest-alternative](./docs/api/suggest-alternative.md)
 - [improve-copy](./docs/api/improve-copy.md)
 - [solve-problem](./docs/api/solve-problem.md)
+- [create-visual](./docs/api/create-visual.md)
 
 ### Examples
 
