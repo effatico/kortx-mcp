@@ -37,7 +37,12 @@ const BaseVisualSchema = z.object({
 
   // GPT Image generation parameters (optional, defaults from config)
   model: z.literal('gpt-image-1').optional().describe('Image model to use'),
-  size: z.enum(SIZE_OPTIONS).optional().describe('Image dimensions'),
+  size: z
+    .enum(SIZE_OPTIONS)
+    .optional()
+    .describe(
+      'Image dimensions. Supported sizes: 1024x1024 (square), 1536x1024 (landscape), 1024x1536 (portrait), auto. Note: Custom sizes like 512x512 are not supported by the API.'
+    ),
   quality: z.enum(QUALITY_OPTIONS).optional().describe('Rendering quality'),
   background: z.enum(BACKGROUND_OPTIONS).optional().describe('Background transparency'),
   outputFormat: z.enum(OUTPUT_FORMAT_OPTIONS).optional().describe('Output image format'),

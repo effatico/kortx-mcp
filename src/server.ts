@@ -365,7 +365,7 @@ export class MCPConsultantServer {
           {
             name: 'create-visual',
             description:
-              'Create, edit, or search for visual content. Supports three modes: generate (create images from text), edit (modify existing images), and search (find visual inspiration from the web).',
+              'Create, edit, or search for visual content. Supports three modes: generate (create images from text), edit (modify existing images), and search (find visual inspiration from the web). Note: Supported image sizes are 1024x1024, 1536x1024, 1024x1536, or auto - custom sizes like 512x512 are not available.',
             inputSchema: {
               type: 'object',
               properties: {
@@ -388,7 +388,8 @@ export class MCPConsultantServer {
                 size: {
                   type: 'string',
                   enum: ['1024x1024', '1536x1024', '1024x1536', 'auto'],
-                  description: 'Image dimensions (generate/edit modes only)',
+                  description:
+                    'Image dimensions (generate/edit modes only). IMPORTANT: Only these sizes are supported by the GPT Image API. Other sizes like 512x512 are not available. Use 1024x1024 for square images.',
                 },
                 quality: {
                   type: 'string',

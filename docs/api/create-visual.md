@@ -67,6 +67,8 @@ GPT_IMAGE_MAX_IMAGES=4                 # Maximum images per request (1-4)
 - `1024x1536` (portrait) - Vertical subjects and compositions
 - `auto` (default) - Model chooses optimal size based on prompt
 
+**Note:** These are the only sizes supported by the GPT Image API. Custom sizes like 512x512, 256x256, or other dimensions are not available. If you need a different size, generate at the closest supported size and resize using external image tools.
+
 **Quality Options:**
 
 - `low` - Fastest generation, 272-408 tokens, suitable for drafts
