@@ -146,19 +146,19 @@ export type InputFidelity = 'low' | 'high';
 export interface GPTImageRequest {
   /** The text prompt describing the image to generate */
   prompt: string;
-  /** The model to use for image generation. Defaults to 'gpt-image-1' */
+  /** The model to use for image generation. If omitted, treated as 'gpt-image-1' */
   model?: ImageModel;
-  /** Number of images to generate (default: 1) */
+  /** Number of images to generate. If omitted, treated as 1 */
   n?: number;
-  /** Image dimensions. Defaults to 'auto' */
+  /** Image dimensions. If omitted, treated as 'auto' */
   size?: ImageSize;
-  /** Rendering quality. Defaults to 'auto'. Higher quality uses more tokens */
+  /** Rendering quality. If omitted, treated as 'auto'. Higher quality uses more tokens */
   quality?: ImageQuality;
-  /** Background transparency. Only works with PNG/WebP formats. Defaults to 'auto' */
+  /** Background transparency. Only works with PNG/WebP formats. If omitted, treated as 'auto' */
   background?: ImageBackground;
-  /** Output image format. Defaults to 'png' */
+  /** Output image format. If omitted, treated as 'png' */
   outputFormat?: ImageFormat;
-  /** Compression level for JPEG/WebP (0-100). Higher = better quality, larger file */
+  /** Compression level for JPEG/WebP. Must be 0-100 (validated at runtime). Higher = better quality, larger file */
   outputCompression?: number;
   /** Input fidelity for preserving input image details. Use 'high' for faces/logos */
   inputFidelity?: InputFidelity;
@@ -167,7 +167,7 @@ export interface GPTImageRequest {
   /** Mask image for inpainting (editing specific regions). Must have alpha channel */
   inputImageMask?: string;
   /** Number of partial images to stream (0-3). 0 = only final image */
-  partialImages?: number;
+  partialImages?: 0 | 1 | 2 | 3;
 }
 
 /**
