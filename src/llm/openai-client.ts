@@ -1,5 +1,4 @@
 import OpenAI from 'openai';
-import type { Uploadable } from 'openai/uploads';
 import type { Config } from '../config/index.js';
 import type { Logger } from '../utils/logger.js';
 import { logLLMRequest, logLLMResponse, logError } from '../utils/logger.js';
@@ -226,12 +225,12 @@ export class OpenAIClient {
   }
 
   /**
-   * Generate images using GPT Image model via OpenAI SDK
+   * Generate images using GPT Image model via Responses API
    * @param request - GPT Image generation request
    * @returns GPT Image generation response with image data and token usage
    */
   async generateImage(request: GPTImageRequest): Promise<GPTImageResponse> {
-    const model = request.model || 'gpt-image-1';
+    const model = 'gpt-4.1'; // Use GPT-4.1 as mainline model for Responses API
     const startTime = Date.now();
 
     this.logger.info(
@@ -242,98 +241,80 @@ export class OpenAIClient {
         quality: request.quality,
         n: request.n || 1,
       },
-      'Generating image'
+      'Generating image via Responses API'
     );
 
     try {
-      const response = await this.client.images.generate({
+      // Build image_generation tool configuration
+      const imageGenerationTool: Record<string, unknown> = {
+        type: 'image_generation',
+      };
+
+      if (request.size) imageGenerationTool.size = request.size;
+      if (request.quality) imageGenerationTool.quality = request.quality;
+      if (request.background) imageGenerationTool.background = request.background;
+      if (request.outputFormat) imageGenerationTool.output_format = request.outputFormat;
+      if (request.outputCompression !== undefined) {
+        imageGenerationTool.output_compression = request.outputCompression;
+      }
+      if (request.inputFidelity) imageGenerationTool.input_fidelity = request.inputFidelity;
+      if (request.partialImages !== undefined)
+        imageGenerationTool.partial_images = request.partialImages;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const response = (await this.client.responses.create({
         model,
-        prompt: request.prompt,
-        n: request.n,
-        size: request.size,
-        quality: request.quality,
-        background: request.background,
-        output_format: request.outputFormat,
-        output_compression: request.outputCompression,
-        moderation: 'auto', // Always use auto moderation
-      });
+        input: request.prompt,
+        tools: [imageGenerationTool],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any)) as any;
 
       const duration = Date.now() - startTime;
-      const data = response.data || [];
 
-      this.logger.info(
-        {
-          model,
-          imagesGenerated: data.length,
-          duration,
-          tokensUsed: response.usage,
-        },
-        'Image generation complete'
+      // Extract image generation calls from response
+      const imageGenerationCalls = (response.output || []).filter(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (output: any) => output.type === 'image_generation_call'
       );
 
-      return {
-        images: data.map(item => ({
-          b64_json: item.b64_json || '',
-          revised_prompt: item.revised_prompt,
-        })),
-        model: model,
-        created: response.created,
-      };
-    } catch (error) {
-      logError(this.logger, error as Error, { model, request });
-      throw this.handleError(error);
-    }
-  }
-
-  /**
-   * Create variations of an existing image using OpenAI SDK
-   * @param request - Image variation request with input image
-   * @returns GPT Image response with variations
-   */
-  async createVariation(request: GPTImageRequest): Promise<GPTImageResponse> {
-    const model = request.model || 'dall-e-2'; // Variations only support dall-e-2
-    const startTime = Date.now();
-
-    this.logger.info(
-      {
-        model,
-        hasInputImages: !!request.inputImages,
-        n: request.n || 1,
-      },
-      'Creating image variations'
-    );
-
-    try {
-      if (!request.inputImages || request.inputImages.length === 0) {
-        throw new Error('Input images are required for creating variations');
+      if (imageGenerationCalls.length === 0) {
+        throw new Error('No images generated in response');
       }
 
-      const response = await this.client.images.createVariation({
-        image: this.base64ToUploadable(request.inputImages[0]),
-        n: request.n,
-        size: request.size as '256x256' | '512x512' | '1024x1024' | null,
-        response_format: 'b64_json',
-      });
+      const images = imageGenerationCalls.map(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (call: any) => ({
+          b64_json: call.result || '',
+          revised_prompt: call.revised_prompt,
+        })
+      );
 
-      const duration = Date.now() - startTime;
-      const data = response.data || [];
+      // Track token usage including image tokens
+      const usage = response.usage || {};
+      const inputTokens = usage.input_tokens || 0;
+      const outputTokens = usage.output_tokens || 0;
+
+      // Log rate limiting headers if present
+      this.logRateLimitInfo(response);
 
       this.logger.info(
         {
           model,
-          variationsCreated: data.length,
+          imagesGenerated: images.length,
           duration,
+          tokensUsed: {
+            input: inputTokens,
+            output: outputTokens,
+            total: inputTokens + outputTokens,
+          },
         },
-        'Image variations created'
+        'Image generation complete via Responses API'
       );
 
       return {
-        images: data.map(item => ({
-          b64_json: item.b64_json || '',
-          revised_prompt: item.revised_prompt,
-        })),
-        model: 'dall-e-2',
-        created: response.created,
+        images,
+        model: 'gpt-image-1',
+        created: Date.now(),
       };
     } catch (error) {
       logError(this.logger, error as Error, { model, request });
@@ -342,12 +323,12 @@ export class OpenAIClient {
   }
 
   /**
-   * Edit an image with a prompt and optional mask using OpenAI SDK
+   * Edit an image with a prompt and optional mask using Responses API
    * @param request - Image editing request with image, prompt, and optional mask
    * @returns GPT Image response with edited image
    */
   async editImage(request: GPTImageRequest): Promise<GPTImageResponse> {
-    const model = request.model || 'gpt-image-1';
+    const model = 'gpt-4.1'; // Use GPT-4.1 as mainline model for Responses API
     const startTime = Date.now();
 
     this.logger.info(
@@ -356,8 +337,9 @@ export class OpenAIClient {
         hasInputImages: !!request.inputImages,
         hasMask: !!request.inputImageMask,
         promptLength: request.prompt.length,
+        inputFidelity: request.inputFidelity,
       },
-      'Editing image'
+      'Editing image via Responses API'
     );
 
     try {
@@ -369,40 +351,102 @@ export class OpenAIClient {
         throw new Error('Prompt is required for editing');
       }
 
-      // Convert input images to uploadable format
-      const imageUploads = request.inputImages.map(img => this.base64ToUploadable(img));
+      // Build input with text and images
+      const inputContent: unknown[] = [{ type: 'input_text', text: request.prompt }];
 
-      const response = await this.client.images.edit({
-        image: imageUploads.length === 1 ? imageUploads[0] : imageUploads,
-        prompt: request.prompt,
-        mask: request.inputImageMask ? this.base64ToUploadable(request.inputImageMask) : undefined,
-        model,
-        n: request.n,
-        size: request.size,
-        quality: request.quality,
-        background: request.background,
+      // Add input images
+      request.inputImages.forEach(imageData => {
+        inputContent.push({
+          type: 'input_image',
+          image_url: imageData.startsWith('data:')
+            ? imageData
+            : `data:image/png;base64,${imageData}`,
+        });
       });
 
+      // Build image_generation tool configuration
+      const imageGenerationTool: Record<string, unknown> = {
+        type: 'image_generation',
+      };
+
+      if (request.size) imageGenerationTool.size = request.size;
+      if (request.quality) imageGenerationTool.quality = request.quality;
+      if (request.background) imageGenerationTool.background = request.background;
+      if (request.outputFormat) imageGenerationTool.output_format = request.outputFormat;
+      if (request.outputCompression !== undefined) {
+        imageGenerationTool.output_compression = request.outputCompression;
+      }
+      if (request.inputFidelity) imageGenerationTool.input_fidelity = request.inputFidelity;
+      if (request.partialImages !== undefined)
+        imageGenerationTool.partial_images = request.partialImages;
+
+      // Add mask if provided
+      if (request.inputImageMask) {
+        const maskData = request.inputImageMask.startsWith('data:')
+          ? request.inputImageMask
+          : `data:image/png;base64,${request.inputImageMask}`;
+        imageGenerationTool.input_image_mask = { image_url: maskData };
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const response = (await this.client.responses.create({
+        model,
+        input: [
+          {
+            role: 'user',
+            content: inputContent,
+          },
+        ],
+        tools: [imageGenerationTool],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any)) as any;
+
       const duration = Date.now() - startTime;
-      const data = response.data || [];
+
+      // Extract image generation calls from response
+      const imageGenerationCalls = (response.output || []).filter(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (output: any) => output.type === 'image_generation_call'
+      );
+
+      if (imageGenerationCalls.length === 0) {
+        throw new Error('No images generated in response');
+      }
+
+      const images = imageGenerationCalls.map(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (call: any) => ({
+          b64_json: call.result || '',
+          revised_prompt: call.revised_prompt,
+        })
+      );
+
+      // Track token usage including image tokens
+      const usage = response.usage || {};
+      const inputTokens = usage.input_tokens || 0;
+      const outputTokens = usage.output_tokens || 0;
+
+      // Log rate limiting headers if present
+      this.logRateLimitInfo(response);
 
       this.logger.info(
         {
           model,
-          imagesEdited: data.length,
+          imagesEdited: images.length,
           duration,
-          tokensUsed: response.usage,
+          tokensUsed: {
+            input: inputTokens,
+            output: outputTokens,
+            total: inputTokens + outputTokens,
+          },
         },
-        'Image editing complete'
+        'Image editing complete via Responses API'
       );
 
       return {
-        images: data.map(item => ({
-          b64_json: item.b64_json || '',
-          revised_prompt: item.revised_prompt,
-        })),
-        model: model,
-        created: response.created,
+        images,
+        model: 'gpt-image-1',
+        created: Date.now(),
       };
     } catch (error) {
       logError(this.logger, error as Error, { model, request });
@@ -411,19 +455,152 @@ export class OpenAIClient {
   }
 
   /**
-   * Convert base64 string to OpenAI SDK Uploadable type
-   * @param base64 - Base64 encoded image string (with or without data URI prefix)
-   * @returns Uploadable (File or Buffer)
+   * Stream image generation with partial images via Responses API
+   * @param request - GPT Image generation request
+   * @param onPartialImage - Callback for partial image updates
+   * @returns Final GPT Image response
    */
-  private base64ToUploadable(base64: string): Uploadable {
-    // Remove data URI prefix if present (e.g., "data:image/png;base64,")
-    const base64Data = base64.replace(/^data:image\/\w+;base64,/, '');
+  async streamImage(
+    request: GPTImageRequest,
+    onPartialImage?: (imageData: string, index: number) => void
+  ): Promise<GPTImageResponse> {
+    const model = 'gpt-4.1'; // Use GPT-4.1 as mainline model for Responses API
+    const startTime = Date.now();
+    const partialImages = request.partialImages !== undefined ? request.partialImages : 0;
 
-    // Convert base64 to buffer
-    const buffer = Buffer.from(base64Data, 'base64');
+    this.logger.info(
+      {
+        model,
+        promptLength: request.prompt.length,
+        size: request.size,
+        quality: request.quality,
+        partialImages,
+      },
+      'Streaming image generation via Responses API'
+    );
 
-    // Create a File object from the buffer for OpenAI SDK
-    const blob = new Blob([buffer], { type: 'image/png' });
-    return new File([blob], 'image.png', { type: 'image/png' });
+    try {
+      // Build image_generation tool configuration
+      const imageGenerationTool: Record<string, unknown> = {
+        type: 'image_generation',
+        partial_images: partialImages,
+      };
+
+      if (request.size) imageGenerationTool.size = request.size;
+      if (request.quality) imageGenerationTool.quality = request.quality;
+      if (request.background) imageGenerationTool.background = request.background;
+      if (request.outputFormat) imageGenerationTool.output_format = request.outputFormat;
+      if (request.outputCompression !== undefined) {
+        imageGenerationTool.output_compression = request.outputCompression;
+      }
+      if (request.inputFidelity) imageGenerationTool.input_fidelity = request.inputFidelity;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const stream = (await this.client.responses.create({
+        model,
+        input: request.prompt,
+        stream: true,
+        tools: [imageGenerationTool],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any)) as unknown as AsyncIterable<any>;
+
+      const finalImages: Array<{ b64_json: string; revised_prompt?: string }> = [];
+      let inputTokens = 0;
+      let outputTokens = 0;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      for await (const event of stream) {
+        // Handle partial image events
+        if (event.type === 'response.image_generation_call.partial_image' && onPartialImage) {
+          const partialImageData = event.partial_image_b64 || '';
+          const partialIndex = event.partial_image_index || 0;
+          onPartialImage(partialImageData, partialIndex);
+        }
+
+        // Handle final image generation call
+        if (event.type === 'response.image_generation_call.done') {
+          finalImages.push({
+            b64_json: event.result || '',
+            revised_prompt: event.revised_prompt,
+          });
+        }
+
+        // Capture token usage
+        if (event.type === 'response.done' && event.response?.usage) {
+          inputTokens = event.response.usage.input_tokens || 0;
+          outputTokens = event.response.usage.output_tokens || 0;
+        }
+      }
+
+      const duration = Date.now() - startTime;
+
+      this.logger.info(
+        {
+          model,
+          imagesGenerated: finalImages.length,
+          duration,
+          tokensUsed: {
+            input: inputTokens,
+            output: outputTokens,
+            total: inputTokens + outputTokens,
+          },
+        },
+        'Image streaming complete via Responses API'
+      );
+
+      return {
+        images: finalImages,
+        model: 'gpt-image-1',
+        created: Date.now(),
+      };
+    } catch (error) {
+      logError(this.logger, error as Error, { model, request });
+      throw this.handleError(error);
+    }
+  }
+
+  /**
+   * Log rate limiting information from response headers
+   * @param response - API response object
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private logRateLimitInfo(response: any): void {
+    // Check if response has rate limit headers (available in some API responses)
+    const headers = response.headers || response._headers || {};
+
+    if (headers['x-ratelimit-remaining-tokens']) {
+      const remainingTokens = parseInt(headers['x-ratelimit-remaining-tokens'], 10);
+      const limitTokens = parseInt(headers['x-ratelimit-limit-tokens'] || '0', 10);
+
+      if (limitTokens > 0) {
+        const usagePercent = ((limitTokens - remainingTokens) / limitTokens) * 100;
+
+        if (usagePercent > 80) {
+          this.logger.warn(
+            {
+              remainingTokens,
+              limitTokens,
+              usagePercent: usagePercent.toFixed(2),
+            },
+            'Approaching rate limit threshold'
+          );
+        }
+      }
+    }
+
+    if (headers['x-ratelimit-remaining-requests']) {
+      const remainingRequests = parseInt(headers['x-ratelimit-remaining-requests'], 10);
+      const limitRequests = parseInt(headers['x-ratelimit-limit-requests'] || '0', 10);
+
+      if (limitRequests > 0 && remainingRequests < limitRequests * 0.2) {
+        this.logger.warn(
+          {
+            remainingRequests,
+            limitRequests,
+          },
+          'Low remaining request quota'
+        );
+      }
+    }
   }
 }
