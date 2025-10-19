@@ -31,6 +31,7 @@ import {
 import { ImproveCopyTool, ImproveCopyInputSchema } from './tools/improve-copy.js';
 import { SolveProblemTool, SolveProblemInputSchema } from './tools/solve-problem.js';
 import { SearchContentTool, SearchContentInputSchema } from './tools/search-content.js';
+import { CreateVisualTool, CreateVisualInputSchema } from './tools/create-visual.js';
 import { RateLimiter } from './middleware/rate-limiter.js';
 
 /**
@@ -49,6 +50,7 @@ export class MCPConsultantServer {
   private improveCopyTool: ImproveCopyTool;
   private solveProblemTool: SolveProblemTool;
   private searchContentTool: SearchContentTool;
+  private createVisualTool: CreateVisualTool;
 
   constructor() {
     // Load configuration
@@ -113,6 +115,13 @@ export class MCPConsultantServer {
       this.contextGatherer
     );
     this.searchContentTool = new SearchContentTool(this.config, this.logger, this.perplexityClient);
+    this.createVisualTool = new CreateVisualTool(
+      this.config,
+      this.logger,
+      this.openaiClient,
+      this.contextGatherer,
+      this.perplexityClient
+    );
 
     // Create MCP server
     this.server = new Server(
@@ -353,6 +362,94 @@ export class MCPConsultantServer {
               required: ['query'],
             },
           },
+          {
+            name: 'create-visual',
+            description:
+              'Create, edit, or search for visual content. Supports three modes: generate (create images from text), edit (modify existing images), and search (find visual inspiration from the web).',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                mode: {
+                  type: 'string',
+                  enum: ['generate', 'edit', 'search'],
+                  description:
+                    'Operation mode: generate new images, edit existing images, or search for visual inspiration',
+                },
+                prompt: {
+                  type: 'string',
+                  description: 'Text description of the desired visual or search query',
+                  minLength: 1,
+                },
+                model: {
+                  type: 'string',
+                  enum: ['gpt-image-1'],
+                  description: 'Image model to use (generate/edit modes only)',
+                },
+                size: {
+                  type: 'string',
+                  enum: ['1024x1024', '1536x1024', '1024x1536', 'auto'],
+                  description: 'Image dimensions (generate/edit modes only)',
+                },
+                quality: {
+                  type: 'string',
+                  enum: ['low', 'medium', 'high', 'auto'],
+                  description: 'Rendering quality (generate/edit modes only)',
+                },
+                background: {
+                  type: 'string',
+                  enum: ['transparent', 'opaque', 'auto'],
+                  description: 'Background transparency (generate/edit modes only)',
+                },
+                outputFormat: {
+                  type: 'string',
+                  enum: ['png', 'jpeg', 'webp'],
+                  description: 'Output image format (generate/edit modes only)',
+                },
+                outputCompression: {
+                  type: 'number',
+                  minimum: 0,
+                  maximum: 100,
+                  description: 'Compression level for JPEG/WebP (generate/edit modes only)',
+                },
+                partialImages: {
+                  type: 'number',
+                  enum: [0, 1, 2, 3],
+                  description: 'Number of partial images for streaming (generate/edit modes only)',
+                },
+                n: {
+                  type: 'number',
+                  minimum: 1,
+                  maximum: 10,
+                  description: 'Number of images to generate (generate/edit modes only)',
+                },
+                inputImages: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  description: 'Input images as base64 strings or file IDs (edit mode only)',
+                },
+                inputImageMask: {
+                  type: 'string',
+                  description: 'Optional mask image for inpainting (edit mode only)',
+                },
+                inputFidelity: {
+                  type: 'string',
+                  enum: ['low', 'high'],
+                  description: 'Input image detail preservation level (edit mode only)',
+                },
+                searchMode: {
+                  type: 'string',
+                  enum: ['web', 'academic'],
+                  description: 'Search domain: web or academic papers (search mode only)',
+                },
+                searchRecencyFilter: {
+                  type: 'string',
+                  enum: ['week', 'month', 'year'],
+                  description: 'Filter results by recency (search mode only)',
+                },
+              },
+              required: ['mode', 'prompt'],
+            },
+          },
         ],
       };
     });
@@ -421,6 +518,12 @@ export class MCPConsultantServer {
           case 'search-content': {
             const input = SearchContentInputSchema.parse(args);
             result = await this.searchContentTool.execute(input);
+            break;
+          }
+
+          case 'create-visual': {
+            const input = CreateVisualInputSchema.parse(args);
+            result = await this.createVisualTool.execute(input);
             break;
           }
 
