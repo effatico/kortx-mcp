@@ -114,13 +114,13 @@ codex mcp add kortx-mcp -- npx @effatico/kortx-mcp@latest \
 
 Start Copilot CLI:
 
-```
+```bash
 copilot
 ```
 
 Start the dialog to add a new MCP server:
 
-```
+```bash
 /mcp add
 ```
 
@@ -164,7 +164,7 @@ Go to `Cursor Settings` → `MCP` → `New MCP Server`. Use the config provided 
   <summary>Gemini CLI</summary>
   Install kortx-mcp using the Gemini CLI.
 
-**Project wide:**
+**Project-wide:**
 
 ```bash
 gemini mcp add kortx-mcp npx @effatico/kortx-mcp@latest \
