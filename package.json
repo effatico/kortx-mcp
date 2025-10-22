@@ -76,7 +76,7 @@
     "dotenv": "^17.2.3",
     "express": "^4.18.2",
     "openai": "^6.5.0",
-    "pino": "^10.0.0",
+    "pino": "^10.1.0",
     "zod": "^4.1.12"
   },
   "devDependencies": {
