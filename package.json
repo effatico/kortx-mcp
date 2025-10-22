@@ -87,7 +87,7 @@
     "@typescript-eslint/parser": "^7.18.0",
     "@vitest/coverage-v8": "^1.1.0",
     "conventional-changelog-cli": "^4.1.0",
-    "eslint": "^8.56.0",
+    "eslint": "^9.38.0",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^8.0.3",
     "lint-staged": "^16.2.4",
