@@ -7,6 +7,11 @@ import type { ConsultationResult } from './types.js';
 import { ResponseCache } from '../utils/cache.js';
 
 /**
+ * Cache streaming configuration
+ */
+const CACHE_STREAM_CHUNK_SIZE = 50;
+
+/**
  * Base tool helper for consultation tools
  * Handles context gathering, prompt building, and LLM invocation
  */
@@ -29,6 +34,162 @@ export class BaseTool {
     this.openaiClient = openaiClient;
     this.contextGatherer = contextGatherer;
     this.cache = cache || null;
+  }
+
+  /**
+   * Stream a consultation with context gathering and progressive response
+   * Yields chunks as they arrive from the LLM
+   */
+  protected async *streamConsultation(
+    query: string,
+    systemPrompt: string,
+    options: {
+      gatherContext?: boolean;
+      preferredModel?: string;
+      additionalContext?: string;
+      toolName?: string;
+      bypassCache?: boolean;
+    } = {}
+  ): AsyncGenerator<string, ConsultationResult, void> {
+    const model = options.preferredModel || this.config.openai.model;
+
+    this.logger.info({ query, model, streaming: true }, 'Starting streaming consultation');
+
+    // Gather context if enabled
+    let contextText = '';
+    let contextSources: string[] = [];
+
+    if (options.gatherContext !== false) {
+      try {
+        const context = await this.contextGatherer.gatherContext(query);
+        contextText = ContextGatherer.formatContextForLLM(context);
+        contextSources = context.sourcesUsed;
+
+        this.logger.debug(
+          { contextSources, contextTokens: context.totalTokens },
+          'Context gathered'
+        );
+      } catch (error) {
+        this.logger.warn({ error }, 'Failed to gather context, proceeding without it');
+      }
+    }
+
+    // Build prompt
+    const userPrompt = this.buildUserPrompt(query, contextText, options.additionalContext);
+
+    // Check cache if enabled and not bypassing
+    if (this.cache && this.config.cache.enableResponseCache && !options.bypassCache) {
+      const cacheKey = this.cache.generateKey({
+        tool: options.toolName || 'unknown',
+        model,
+        prompt: systemPrompt + userPrompt,
+        context: contextText,
+      });
+
+      const cachedResponse = this.cache.get(cacheKey);
+      if (cachedResponse) {
+        this.logger.info({ model, cacheHit: true, streaming: true }, 'Returning cached response');
+        const cachedResult = JSON.parse(cachedResponse) as ConsultationResult;
+
+        // Yield the cached response in chunks (simulate streaming)
+        for (let i = 0; i < cachedResult.response.length; i += CACHE_STREAM_CHUNK_SIZE) {
+          yield cachedResult.response.slice(i, i + CACHE_STREAM_CHUNK_SIZE);
+        }
+
+        return {
+          ...cachedResult,
+          contextSources, // Include current context sources
+        };
+      }
+    }
+
+    // Call OpenAI with streaming
+    const request: LLMRequest = {
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      model,
+    };
+
+    // Use an async queue to yield chunks as they arrive
+    const chunkQueue: string[] = [];
+    let resolveChunk: ((value: string | null) => void) | null = null;
+    let done = false;
+
+    // Start chatStream, pushing chunks to the queue
+    const llmResponsePromise = this.openaiClient
+      .chatStream(request, (chunk: string) => {
+        if (resolveChunk) {
+          resolveChunk(chunk);
+          resolveChunk = null;
+        } else {
+          chunkQueue.push(chunk);
+        }
+      })
+      .then(res => {
+        done = true;
+        if (resolveChunk) {
+          resolveChunk(null);
+          resolveChunk = null;
+        }
+        return res;
+      });
+
+    // Yield chunks as they arrive
+    while (true) {
+      if (chunkQueue.length > 0) {
+        yield chunkQueue.shift()!;
+      } else if (done) {
+        break;
+      } else {
+        const chunk = await new Promise<string | null>(resolve => {
+          resolveChunk = resolve;
+        });
+        if (chunk !== null) {
+          yield chunk;
+        }
+      }
+    }
+
+    // Wait for llmResponse to finish and get the result
+    const llmResponse = await llmResponsePromise;
+
+    // Calculate cost (approximate based on GPT-5 pricing)
+    const cost = this.calculateCost(llmResponse.tokensUsed, model);
+
+    this.logger.info(
+      {
+        model: llmResponse.model,
+        tokensUsed: llmResponse.tokensUsed.total,
+        cost,
+        streaming: true,
+      },
+      'Streaming consultation complete'
+    );
+
+    const result: ConsultationResult = {
+      response: llmResponse.content,
+      model: llmResponse.model,
+      tokensUsed: llmResponse.tokensUsed,
+      contextSources,
+      cost,
+    };
+
+    // Store in cache if enabled
+    if (this.cache && this.config.cache.enableResponseCache && !options.bypassCache) {
+      const cacheKey = this.cache.generateKey({
+        tool: options.toolName || 'unknown',
+        model,
+        prompt: systemPrompt + userPrompt,
+        context: contextText,
+      });
+
+      const ttl = this.config.cache.consultationTTLSeconds;
+      this.cache.set(cacheKey, JSON.stringify(result), ttl);
+    }
+
+    return result;
   }
 
   /**
