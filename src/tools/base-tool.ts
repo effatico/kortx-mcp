@@ -32,6 +32,132 @@ export class BaseTool {
   }
 
   /**
+   * Stream a consultation with context gathering and progressive response
+   * Yields chunks as they arrive from the LLM
+   */
+  protected async *streamConsultation(
+    query: string,
+    systemPrompt: string,
+    options: {
+      gatherContext?: boolean;
+      preferredModel?: string;
+      additionalContext?: string;
+      toolName?: string;
+      bypassCache?: boolean;
+    } = {}
+  ): AsyncGenerator<string, ConsultationResult, void> {
+    const model = options.preferredModel || this.config.openai.model;
+
+    this.logger.info({ query, model, streaming: true }, 'Starting streaming consultation');
+
+    // Gather context if enabled
+    let contextText = '';
+    let contextSources: string[] = [];
+
+    if (options.gatherContext !== false) {
+      try {
+        const context = await this.contextGatherer.gatherContext(query);
+        contextText = ContextGatherer.formatContextForLLM(context);
+        contextSources = context.sourcesUsed;
+
+        this.logger.debug(
+          { contextSources, contextTokens: context.totalTokens },
+          'Context gathered'
+        );
+      } catch (error) {
+        this.logger.warn({ error }, 'Failed to gather context, proceeding without it');
+      }
+    }
+
+    // Build prompt
+    const userPrompt = this.buildUserPrompt(query, contextText, options.additionalContext);
+
+    // Check cache if enabled and not bypassing
+    if (this.cache && this.config.cache.enableResponseCache && !options.bypassCache) {
+      const cacheKey = this.cache.generateKey({
+        tool: options.toolName || 'unknown',
+        model,
+        prompt: systemPrompt + userPrompt,
+        context: contextText,
+      });
+
+      const cachedResponse = this.cache.get(cacheKey);
+      if (cachedResponse) {
+        this.logger.info({ model, cacheHit: true, streaming: true }, 'Returning cached response');
+        const cachedResult = JSON.parse(cachedResponse) as ConsultationResult;
+
+        // Yield the cached response in chunks (simulate streaming)
+        const chunkSize = 50;
+        for (let i = 0; i < cachedResult.response.length; i += chunkSize) {
+          yield cachedResult.response.slice(i, i + chunkSize);
+        }
+
+        return {
+          ...cachedResult,
+          contextSources, // Include current context sources
+        };
+      }
+    }
+
+    // Call OpenAI with streaming
+    const request: LLMRequest = {
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      model,
+    };
+
+    // Collect chunks and yield them as they arrive
+    const chunks: string[] = [];
+
+    const llmResponse = await this.openaiClient.chatStream(request, (chunk: string) => {
+      chunks.push(chunk);
+    });
+
+    // Yield all collected chunks
+    for (const chunk of chunks) {
+      yield chunk;
+    }
+
+    // Calculate cost (approximate based on GPT-5 pricing)
+    const cost = this.calculateCost(llmResponse.tokensUsed, model);
+
+    this.logger.info(
+      {
+        model: llmResponse.model,
+        tokensUsed: llmResponse.tokensUsed.total,
+        cost,
+        streaming: true,
+      },
+      'Streaming consultation complete'
+    );
+
+    const result: ConsultationResult = {
+      response: llmResponse.content,
+      model: llmResponse.model,
+      tokensUsed: llmResponse.tokensUsed,
+      contextSources,
+      cost,
+    };
+
+    // Store in cache if enabled
+    if (this.cache && this.config.cache.enableResponseCache && !options.bypassCache) {
+      const cacheKey = this.cache.generateKey({
+        tool: options.toolName || 'unknown',
+        model,
+        prompt: systemPrompt + userPrompt,
+        context: contextText,
+      });
+
+      const ttl = this.config.cache.consultationTTLSeconds;
+      this.cache.set(cacheKey, JSON.stringify(result), ttl);
+    }
+
+    return result;
+  }
+
+  /**
    * Execute a consultation with context gathering
    */
   protected async executeConsultation(
