@@ -149,7 +149,7 @@ export class MCPConsultantServer {
       this.contextGatherer,
       this.perplexityClient
     );
-    this.batchConsultTool = new BatchConsultTool(this.config, this.logger, {
+    this.batchConsultTool = new BatchConsultTool(this.logger, {
       thinkAboutPlan: this.thinkAboutPlanTool,
       suggestAlternative: this.suggestAlternativeTool,
       improveCopy: this.improveCopyTool,

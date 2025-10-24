@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import type { Config } from '../config/index.js';
 import type { Logger } from '../utils/logger.js';
 import type { ThinkAboutPlanTool } from './think-about-plan.js';
 import type { SuggestAlternativeTool } from './suggest-alternative.js';
@@ -50,6 +49,13 @@ export interface BatchResponseItem {
 }
 
 /**
+ * Common interface for tool execute method
+ */
+interface ToolExecute {
+  execute(input: Record<string, unknown>): Promise<unknown>;
+}
+
+/**
  * Tool instances interface
  */
 export interface ToolInstances {
@@ -68,7 +74,7 @@ export class BatchConsultTool {
   private logger: Logger;
   private toolInstances: ToolInstances;
 
-  constructor(config: Config, logger: Logger, toolInstances: ToolInstances) {
+  constructor(logger: Logger, toolInstances: ToolInstances) {
     this.logger = logger;
     this.toolInstances = toolInstances;
   }
@@ -101,8 +107,8 @@ export class BatchConsultTool {
             'Executing batch request item'
           );
 
-          const tool = this.getToolInstance(toolName);
-          const result = await (tool.execute as (input: any) => Promise<any>)(toolInput);
+          const tool = this.getToolInstance(toolName) as ToolExecute;
+          const result = await tool.execute(toolInput);
 
           return {
             requestId,
