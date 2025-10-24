@@ -142,11 +142,21 @@ export class MetricsTracker {
   }
 
   /**
-   * Calculate percentile from sorted array
+   * Calculate percentile from sorted array using linear interpolation
    */
   private calculatePercentile(sorted: number[], percentile: number): number {
-    const index = Math.ceil(sorted.length * percentile) - 1;
-    return sorted[Math.max(0, Math.min(index, sorted.length - 1))];
+    if (sorted.length === 0) return NaN;
+
+    const pos = percentile * (sorted.length - 1);
+    const lower = Math.floor(pos);
+    const upper = Math.ceil(pos);
+
+    if (lower === upper) {
+      return sorted[lower];
+    }
+
+    const weight = pos - lower;
+    return sorted[lower] * (1 - weight) + sorted[upper] * weight;
   }
 
   /**

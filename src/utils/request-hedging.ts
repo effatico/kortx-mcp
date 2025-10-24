@@ -171,14 +171,14 @@ export class RequestHedging {
 
       // Check if we were aborted while waiting
       if (abortController.signal.aborted) {
-        throw new Error('Request aborted');
+        throw new Error(`Request ${label} cancelled by hedging (another request won)`);
       }
 
       return { result, index };
     } catch (error) {
       if (abortController.signal.aborted) {
-        this.logger.debug({ requestId, index, label }, 'Request was aborted');
-        throw new Error('Request aborted');
+        this.logger.debug({ requestId, index, label }, 'Request was cancelled by hedging');
+        throw new Error(`Request ${label} cancelled by hedging (another request won)`);
       }
 
       this.logger.warn({ requestId, index, label, error }, 'Request failed');
@@ -203,13 +203,13 @@ export class RequestHedging {
 
       if (abortController.signal.aborted) {
         clearTimeout(timeout);
-        reject(new Error('Request aborted before delay'));
+        reject(new Error(`Hedged request ${label} cancelled before delay (another request won)`));
         return;
       }
 
       abortController.signal.addEventListener('abort', () => {
         clearTimeout(timeout);
-        reject(new Error('Request aborted during delay'));
+        reject(new Error(`Hedged request ${label} cancelled during delay (another request won)`));
       });
     });
 

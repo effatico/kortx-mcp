@@ -7,6 +7,11 @@ import type { ConsultationResult } from './types.js';
 import { ResponseCache } from '../utils/cache.js';
 
 /**
+ * Cache streaming configuration
+ */
+const CACHE_STREAM_CHUNK_SIZE = 50;
+
+/**
  * Base tool helper for consultation tools
  * Handles context gathering, prompt building, and LLM invocation
  */
@@ -87,9 +92,8 @@ export class BaseTool {
         const cachedResult = JSON.parse(cachedResponse) as ConsultationResult;
 
         // Yield the cached response in chunks (simulate streaming)
-        const chunkSize = 50;
-        for (let i = 0; i < cachedResult.response.length; i += chunkSize) {
-          yield cachedResult.response.slice(i, i + chunkSize);
+        for (let i = 0; i < cachedResult.response.length; i += CACHE_STREAM_CHUNK_SIZE) {
+          yield cachedResult.response.slice(i, i + CACHE_STREAM_CHUNK_SIZE);
         }
 
         return {
@@ -108,17 +112,48 @@ export class BaseTool {
       model,
     };
 
-    // Collect chunks and yield them as they arrive
-    const chunks: string[] = [];
+    // Use an async queue to yield chunks as they arrive
+    const chunkQueue: string[] = [];
+    let resolveChunk: ((value: string | null) => void) | null = null;
+    let done = false;
 
-    const llmResponse = await this.openaiClient.chatStream(request, (chunk: string) => {
-      chunks.push(chunk);
-    });
+    // Start chatStream, pushing chunks to the queue
+    const llmResponsePromise = this.openaiClient
+      .chatStream(request, (chunk: string) => {
+        if (resolveChunk) {
+          resolveChunk(chunk);
+          resolveChunk = null;
+        } else {
+          chunkQueue.push(chunk);
+        }
+      })
+      .then(res => {
+        done = true;
+        if (resolveChunk) {
+          resolveChunk(null);
+          resolveChunk = null;
+        }
+        return res;
+      });
 
-    // Yield all collected chunks
-    for (const chunk of chunks) {
-      yield chunk;
+    // Yield chunks as they arrive
+    while (true) {
+      if (chunkQueue.length > 0) {
+        yield chunkQueue.shift()!;
+      } else if (done) {
+        break;
+      } else {
+        const chunk = await new Promise<string | null>(resolve => {
+          resolveChunk = resolve;
+        });
+        if (chunk !== null) {
+          yield chunk;
+        }
+      }
     }
+
+    // Wait for llmResponse to finish and get the result
+    const llmResponse = await llmResponsePromise;
 
     // Calculate cost (approximate based on GPT-5 pricing)
     const cost = this.calculateCost(llmResponse.tokensUsed, model);
