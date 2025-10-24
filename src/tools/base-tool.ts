@@ -374,6 +374,16 @@ export class BaseTool {
       .filter(Boolean)
       .join('\n');
 
+    // Debug logging to verify response content
+    this.logger.debug(
+      {
+        responsePreview: result.response.substring(0, 200),
+        responseLength: result.response.length,
+        fullResponseTextLength: responseText.length,
+      },
+      'Formatted tool response'
+    );
+
     return {
       content: [
         {

@@ -351,12 +351,28 @@ export class OpenAIClient {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private parseResponsesAPIResponse(response: any): LLMResponse {
+    // Debug logging to understand actual response structure
+    this.logger.debug(
+      {
+        hasOutput: !!response.output,
+        outputLength: response.output?.length,
+        firstOutputType: response.output?.[0]?.type,
+        firstOutputKeys: response.output?.[0] ? Object.keys(response.output[0]) : [],
+        contentLength: response.output?.[0]?.content?.length,
+        firstContentType: response.output?.[0]?.content?.[0]?.type,
+        firstContentKeys: response.output?.[0]?.content?.[0]
+          ? Object.keys(response.output[0].content[0])
+          : [],
+      },
+      'Responses API structure debug'
+    );
+
     // Parse Responses API response format
+    // The output array may contain reasoning first, then message
+    // Find the message output element
+    const messageOutput = response.output?.find((item: any) => item.type === 'message');
     const outputText =
-      response.output?.[0]?.type === 'message' &&
-      response.output[0].content?.[0]?.type === 'output_text'
-        ? response.output[0].content[0].text
-        : '';
+      messageOutput?.content?.[0]?.type === 'output_text' ? messageOutput.content[0].text : '';
     const usage = response.usage;
 
     return {
