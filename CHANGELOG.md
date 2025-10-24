@@ -1,3 +1,17 @@
+## [1.2.4](https://github.com/effatico/kortx-mcp/compare/v1.2.3...v1.2.4) (2025-10-24)
+
+### Bug Fixes
+
+- Parse OpenAI Responses API output array correctly ([569a1f3](https://github.com/effatico/kortx-mcp/commit/569a1f316dd0be2479028c72f717f594a32d22ca))
+
+### Features
+
+- Add circuit breakers, fallback chains, and connection pooling ([#74](https://github.com/effatico/kortx-mcp/issues/74)) ([fffc004](https://github.com/effatico/kortx-mcp/commit/fffc004ecbc2625df0a2ad63b29b93dfa08f2000)), closes [#70](https://github.com/effatico/kortx-mcp/issues/70)
+- Multi-Agent & Parallel Execution Support (Issue [#71](https://github.com/effatico/kortx-mcp/issues/71)) ([#75](https://github.com/effatico/kortx-mcp/issues/75)) ([77c18ad](https://github.com/effatico/kortx-mcp/commit/77c18addadc3ea60382c5c37c90c4b1f9980e942))
+- Response Caching & Token Optimization ([#73](https://github.com/effatico/kortx-mcp/issues/73)) ([ecd3bec](https://github.com/effatico/kortx-mcp/commit/ecd3becd09aaa9eb1a1d757a1aae4166c1eb7eda)), closes [#69](https://github.com/effatico/kortx-mcp/issues/69) [#69](https://github.com/effatico/kortx-mcp/issues/69)
+- Streaming & Advanced Performance Features (Issue [#72](https://github.com/effatico/kortx-mcp/issues/72)) ([#77](https://github.com/effatico/kortx-mcp/issues/77)) ([7896d2c](https://github.com/effatico/kortx-mcp/commit/7896d2cb9d1e716a55eb9c5ff0ceb979d5807170))
+- Update package description to reflect all capabilities ([#58](https://github.com/effatico/kortx-mcp/issues/58)) ([55afbe2](https://github.com/effatico/kortx-mcp/commit/55afbe2705bd1909921d041114f309d53da97711))
+
 ## [1.2.3](https://github.com/effatico/kortx-mcp/compare/v1.2.2...v1.2.3) (2025-10-19)
 
 ### Features
