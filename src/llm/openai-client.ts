@@ -9,25 +9,126 @@ import type {
   GPTImageRequest,
   GPTImageResponse,
 } from './types.js';
+import {
+  createCircuitBreaker,
+  DEFAULT_CIRCUIT_BREAKER_CONFIG,
+  type CircuitBreakerConfig,
+} from '../utils/circuit-breaker.js';
+import type CircuitBreaker from 'opossum';
+import { Agent as HttpAgent } from 'http';
+import { Agent as HttpsAgent } from 'https';
+
+/**
+ * Fallback model chain for resilience
+ */
+const FALLBACK_MODELS = ['gpt-5', 'gpt-5-mini', 'gpt-5-nano'] as const;
 
 export class OpenAIClient {
   private client: OpenAI;
   private config: Config;
   private logger: Logger;
+  private circuitBreaker: CircuitBreaker<[LLMRequest, string], LLMResponse>;
+  private httpAgent: HttpAgent | HttpsAgent;
 
   constructor(config: Config, logger: Logger) {
     this.config = config;
     this.logger = logger.child({ component: 'openai-client' });
+
+    // Create HTTP agent with keep-alive for connection pooling
+    // Note: The OpenAI SDK v4+ doesn't expose httpAgent in ClientOptions TypeScript interface,
+    // but the underlying fetch implementation respects the global agent. For true connection
+    // pooling with custom agents, we would need to use the fetch option with a custom fetch
+    // implementation or wait for SDK support. For now, we keep the agent initialized for
+    // future use when SDK adds support or we implement custom fetch.
+    this.httpAgent = new HttpsAgent({
+      keepAlive: true,
+      keepAliveMsecs: 30000, // 30 seconds
+      maxSockets: 50,
+      maxFreeSockets: 10,
+      timeout: config.security.requestTimeoutMs,
+    });
 
     this.client = new OpenAI({
       apiKey: config.openai.apiKey,
       maxRetries: 3,
       timeout: config.security.requestTimeoutMs,
     });
+
+    // Create circuit breaker for API calls
+    const circuitConfig: CircuitBreakerConfig = {
+      ...DEFAULT_CIRCUIT_BREAKER_CONFIG,
+      name: 'openai-api',
+      timeout: config.security.requestTimeoutMs,
+    };
+
+    this.circuitBreaker = createCircuitBreaker(
+      async (request: LLMRequest, model: string) => this.executeChat(request, model),
+      circuitConfig,
+      this.logger
+    );
   }
 
   async chat(request: LLMRequest): Promise<LLMResponse> {
-    const model = request.model || this.config.openai.model;
+    const primaryModel = request.model || this.config.openai.model;
+
+    // Try with fallback chain: gpt-5 → gpt-5-mini → gpt-5-nano
+    const modelsToTry = this.getFallbackChain(primaryModel);
+
+    let lastError: Error | undefined;
+
+    for (let i = 0; i < modelsToTry.length; i++) {
+      const model = modelsToTry[i];
+      const isFallback = i > 0;
+
+      try {
+        if (isFallback) {
+          this.logger.info(
+            { primaryModel, fallbackModel: model, attempt: i + 1 },
+            'Trying fallback model'
+          );
+        }
+
+        // Use circuit breaker for the API call
+        const response = await this.circuitBreaker.fire(request, model);
+
+        if (isFallback) {
+          this.logger.info(
+            { primaryModel, fallbackModel: model, success: true },
+            'Fallback model succeeded'
+          );
+        }
+
+        return response;
+      } catch (error) {
+        lastError = error as Error;
+
+        if (isFallback) {
+          this.logger.warn(
+            { primaryModel, fallbackModel: model, error: lastError.message },
+            'Fallback model failed'
+          );
+        }
+
+        // If this is the last model in the chain, throw the error
+        if (i === modelsToTry.length - 1) {
+          logError(this.logger, lastError, { model, request });
+          throw this.handleError(lastError);
+        }
+
+        // Otherwise, continue to next fallback
+        continue;
+      }
+    }
+
+    // This should never be reached, but TypeScript needs it
+    throw this.handleError(lastError || new Error('All fallback models failed'));
+  }
+
+  /**
+   * Execute chat request without circuit breaker or fallback
+   * Used internally by circuit breaker
+   */
+  private async executeChat(request: LLMRequest, model: string): Promise<LLMResponse> {
     const reasoningEffort = this.adjustReasoningEffort(
       model,
       request.reasoningEffort || this.config.openai.reasoningEffort
@@ -39,33 +140,43 @@ export class OpenAIClient {
 
     logLLMRequest(this.logger, model, JSON.stringify(request.messages).length);
 
-    try {
-      return await this.retryWithBackoff(async () => {
-        // GPT-5 uses the Responses API, not Chat Completions
-        const response = (await this.client.responses.create({
-          model,
-          input: request.messages,
-          max_output_tokens: maxTokens,
-          reasoning: {
-            effort: reasoningEffort,
-          },
-          text: {
-            verbosity,
-          },
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any)) as any;
+    return await this.retryWithBackoff(async () => {
+      // GPT-5 uses the Responses API, not Chat Completions
+      const response = (await this.client.responses.create({
+        model,
+        input: request.messages,
+        max_output_tokens: maxTokens,
+        reasoning: {
+          effort: reasoningEffort,
+        },
+        text: {
+          verbosity,
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any)) as any;
 
-        const duration = Date.now() - startTime;
-        const llmResponse = this.parseResponsesAPIResponse(response);
+      const duration = Date.now() - startTime;
+      const llmResponse = this.parseResponsesAPIResponse(response);
 
-        logLLMResponse(this.logger, model, llmResponse.tokensUsed, duration);
+      logLLMResponse(this.logger, model, llmResponse.tokensUsed, duration);
 
-        return llmResponse;
-      });
-    } catch (error) {
-      logError(this.logger, error as Error, { model, request });
-      throw this.handleError(error);
+      return llmResponse;
+    });
+  }
+
+  /**
+   * Get fallback model chain starting from the given model
+   */
+  private getFallbackChain(primaryModel: string): string[] {
+    const startIndex = FALLBACK_MODELS.indexOf(primaryModel as any);
+
+    if (startIndex === -1) {
+      // If the model is not in the fallback chain, just return it alone
+      return [primaryModel];
     }
+
+    // Return the chain starting from the primary model
+    return FALLBACK_MODELS.slice(startIndex) as unknown as string[];
   }
 
   async chatStream(request: LLMRequest, onChunk: (chunk: string) => void): Promise<LLMResponse> {
@@ -84,7 +195,7 @@ export class OpenAIClient {
     try {
       return await this.retryWithBackoff(async () => {
         // GPT-5 uses the Responses API with streaming
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
         const stream = (await this.client.responses.create({
           model,
           input: request.messages,
@@ -358,7 +469,7 @@ export class OpenAIClient {
           imageGenerationTool.partial_images = request.partialImages;
 
         // Use image-specific timeout for generation
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
         const response = (await this.client.responses.create(
           {
             model,
@@ -493,7 +604,7 @@ export class OpenAIClient {
         }
 
         // Use image-specific timeout for editing
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
         const response = (await this.client.responses.create(
           {
             model,
@@ -607,7 +718,6 @@ export class OpenAIClient {
         }
         if (request.inputFidelity) imageGenerationTool.input_fidelity = request.inputFidelity;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const stream = (await this.client.responses.create(
           {
             model,
@@ -623,7 +733,6 @@ export class OpenAIClient {
         let inputTokens = 0;
         let outputTokens = 0;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         for await (const event of stream) {
           // Handle partial image events
           if (event.type === 'response.image_generation_call.partial_image' && onPartialImage) {
