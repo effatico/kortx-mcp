@@ -33,6 +33,7 @@ import { SolveProblemTool, SolveProblemInputSchema } from './tools/solve-problem
 import { SearchContentTool, SearchContentInputSchema } from './tools/search-content.js';
 import { CreateVisualTool, CreateVisualInputSchema } from './tools/create-visual.js';
 import { RateLimiter } from './middleware/rate-limiter.js';
+import { ResponseCache } from './utils/cache.js';
 
 /**
  * Main MCP server for GPT-5 consultation
@@ -45,6 +46,7 @@ export class MCPConsultantServer {
   private perplexityClient: PerplexityClient;
   private contextGatherer: ContextGatherer;
   private rateLimiter: RateLimiter | null;
+  private responseCache: ResponseCache | null;
   private thinkAboutPlanTool: ThinkAboutPlanTool;
   private suggestAlternativeTool: SuggestAlternativeTool;
   private improveCopyTool: ImproveCopyTool;
@@ -86,6 +88,25 @@ export class MCPConsultantServer {
       setInterval(() => this.rateLimiter?.cleanup(), 300000); // Every 5 minutes
     }
 
+    // Initialize response cache if enabled
+    this.responseCache = this.config.cache.enableResponseCache
+      ? new ResponseCache(
+          {
+            maxSizeMB: this.config.cache.maxSizeMB,
+            consultationTTL: this.config.cache.consultationTTLSeconds,
+            searchTTL: this.config.cache.searchTTLSeconds,
+            debug: this.config.cache.debug,
+          },
+          this.logger
+        )
+      : null;
+
+    if (this.responseCache) {
+      this.logger.info('Response caching enabled');
+      // Log cache stats periodically
+      setInterval(() => this.responseCache?.logStats(), 300000); // Every 5 minutes
+    }
+
     // Register context sources
     this.registerContextSources();
 
@@ -94,25 +115,29 @@ export class MCPConsultantServer {
       this.config,
       this.logger,
       this.openaiClient,
-      this.contextGatherer
+      this.contextGatherer,
+      this.responseCache || undefined
     );
     this.suggestAlternativeTool = new SuggestAlternativeTool(
       this.config,
       this.logger,
       this.openaiClient,
-      this.contextGatherer
+      this.contextGatherer,
+      this.responseCache || undefined
     );
     this.improveCopyTool = new ImproveCopyTool(
       this.config,
       this.logger,
       this.openaiClient,
-      this.contextGatherer
+      this.contextGatherer,
+      this.responseCache || undefined
     );
     this.solveProblemTool = new SolveProblemTool(
       this.config,
       this.logger,
       this.openaiClient,
-      this.contextGatherer
+      this.contextGatherer,
+      this.responseCache || undefined
     );
     this.searchContentTool = new SearchContentTool(this.config, this.logger, this.perplexityClient);
     this.createVisualTool = new CreateVisualTool(
@@ -594,6 +619,11 @@ export class MCPConsultantServer {
    */
   private async shutdown(signal: string): Promise<void> {
     logApplicationShutdown(this.logger, signal);
+
+    // Log cache statistics before shutdown
+    if (this.responseCache) {
+      this.responseCache.logStats();
+    }
 
     try {
       await this.server.close();

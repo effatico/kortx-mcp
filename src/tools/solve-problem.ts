@@ -72,6 +72,7 @@ Be thorough, practical, and focused on actionable solutions. Consider edge cases
     const result = await this.executeConsultation(query, this.SYSTEM_PROMPT, {
       gatherContext: true,
       preferredModel: input.preferredModel,
+      toolName: 'solve-problem',
     });
 
     return this.formatToolResponse(result, {

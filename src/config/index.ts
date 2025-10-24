@@ -131,6 +131,15 @@ const SecurityConfigSchema = z.object({
   maxInputSize: z.coerce.number().int().positive().default(100000), // 100KB
 });
 
+// Cache configuration
+const CacheConfigSchema = z.object({
+  enableResponseCache: booleanSchema(true),
+  maxSizeMB: z.coerce.number().int().positive().default(100),
+  consultationTTLSeconds: z.coerce.number().int().positive().default(3600), // 1 hour
+  searchTTLSeconds: z.coerce.number().int().positive().default(86400), // 24 hours
+  debug: booleanSchema(false),
+});
+
 // Complete configuration schema
 const ConfigSchema = z.object({
   openai: OpenAIConfigSchema,
@@ -139,6 +148,7 @@ const ConfigSchema = z.object({
   server: ServerConfigSchema,
   context: ContextConfigSchema,
   security: SecurityConfigSchema,
+  cache: CacheConfigSchema,
 });
 
 export type Config = z.infer<typeof ConfigSchema>;
@@ -203,6 +213,13 @@ export function loadConfig(): Config {
         maxTokensPerHour: process.env.MAX_TOKENS_PER_HOUR,
         requestTimeoutMs: process.env.REQUEST_TIMEOUT_MS,
         maxInputSize: process.env.MAX_INPUT_SIZE,
+      },
+      cache: {
+        enableResponseCache: process.env.ENABLE_RESPONSE_CACHE,
+        maxSizeMB: process.env.CACHE_MAX_SIZE_MB,
+        consultationTTLSeconds: process.env.CACHE_TTL_CONSULTATION_SECONDS,
+        searchTTLSeconds: process.env.CACHE_TTL_SEARCH_SECONDS,
+        debug: process.env.CACHE_DEBUG,
       },
     });
   } catch (error) {

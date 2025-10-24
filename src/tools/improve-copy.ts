@@ -65,6 +65,7 @@ Focus on making the text clearer, more professional, and more effective.`;
     const result = await this.executeConsultation(query, this.SYSTEM_PROMPT, {
       gatherContext: false, // Don't gather context for copy improvement
       preferredModel: input.preferredModel,
+      toolName: 'improve-copy',
     });
 
     return this.formatToolResponse(result, {

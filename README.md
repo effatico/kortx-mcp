@@ -266,6 +266,12 @@ ENABLE_SERENA=true                   # Semantic code search
 ENABLE_MEMORY=true                   # Knowledge graph persistence
 ENABLE_CCLSP=true                    # Language server features
 MAX_CONTEXT_TOKENS=32000             # Context limit
+
+# Optional - Response Caching
+ENABLE_RESPONSE_CACHE=true           # Cache LLM responses
+CACHE_MAX_SIZE_MB=100                # Maximum cache size (MB)
+CACHE_TTL_CONSULTATION_SECONDS=3600  # Consultation cache TTL (1 hour)
+CACHE_TTL_SEARCH_SECONDS=86400       # Search cache TTL (24 hours)
 ```
 
 ### Model Selection Guide
