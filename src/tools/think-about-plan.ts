@@ -51,6 +51,7 @@ Be direct, honest, and constructive. Focus on actionable insights.`;
       gatherContext: true,
       preferredModel: input.preferredModel,
       additionalContext: input.context,
+      toolName: 'think-about-plan',
     });
 
     return this.formatToolResponse(result, {

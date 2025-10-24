@@ -66,6 +66,7 @@ Be creative but practical. Consider both incremental improvements and radical re
     const result = await this.executeConsultation(query, this.SYSTEM_PROMPT, {
       gatherContext: true,
       preferredModel: input.preferredModel,
+      toolName: 'suggest-alternative',
     });
 
     return this.formatToolResponse(result, {

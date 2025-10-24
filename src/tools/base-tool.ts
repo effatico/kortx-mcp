@@ -4,6 +4,7 @@ import { OpenAIClient } from '../llm/openai-client.js';
 import { ContextGatherer } from '../context/gatherer.js';
 import type { LLMRequest } from '../llm/types.js';
 import type { ConsultationResult } from './types.js';
+import { ResponseCache } from '../utils/cache.js';
 
 /**
  * Base tool helper for consultation tools
@@ -14,17 +15,20 @@ export class BaseTool {
   protected logger: Logger;
   protected openaiClient: OpenAIClient;
   protected contextGatherer: ContextGatherer;
+  protected cache: ResponseCache | null;
 
   constructor(
     config: Config,
     logger: Logger,
     openaiClient: OpenAIClient,
-    contextGatherer: ContextGatherer
+    contextGatherer: ContextGatherer,
+    cache?: ResponseCache
   ) {
     this.config = config;
     this.logger = logger.child({ component: 'base-tool' });
     this.openaiClient = openaiClient;
     this.contextGatherer = contextGatherer;
+    this.cache = cache || null;
   }
 
   /**
@@ -37,6 +41,8 @@ export class BaseTool {
       gatherContext?: boolean;
       preferredModel?: string;
       additionalContext?: string;
+      toolName?: string;
+      bypassCache?: boolean;
     } = {}
   ): Promise<ConsultationResult> {
     const model = options.preferredModel || this.config.openai.model;
@@ -65,6 +71,26 @@ export class BaseTool {
     // Build prompt
     const userPrompt = this.buildUserPrompt(query, contextText, options.additionalContext);
 
+    // Check cache if enabled and not bypassing
+    if (this.cache && this.config.cache.enableResponseCache && !options.bypassCache) {
+      const cacheKey = this.cache.generateKey({
+        tool: options.toolName || 'unknown',
+        model,
+        prompt: systemPrompt + userPrompt,
+        context: contextText,
+      });
+
+      const cachedResponse = this.cache.get(cacheKey);
+      if (cachedResponse) {
+        this.logger.info({ model, cacheHit: true }, 'Returning cached response');
+        const cachedResult = JSON.parse(cachedResponse) as ConsultationResult;
+        return {
+          ...cachedResult,
+          contextSources, // Include current context sources
+        };
+      }
+    }
+
     // Call OpenAI
     const request: LLMRequest = {
       messages: [
@@ -88,13 +114,28 @@ export class BaseTool {
       'Consultation complete'
     );
 
-    return {
+    const result: ConsultationResult = {
       response: response.content,
       model: response.model,
       tokensUsed: response.tokensUsed,
       contextSources,
       cost,
     };
+
+    // Store in cache if enabled
+    if (this.cache && this.config.cache.enableResponseCache && !options.bypassCache) {
+      const cacheKey = this.cache.generateKey({
+        tool: options.toolName || 'unknown',
+        model,
+        prompt: systemPrompt + userPrompt,
+        context: contextText,
+      });
+
+      const ttl = this.config.cache.consultationTTLSeconds;
+      this.cache.set(cacheKey, JSON.stringify(result), ttl);
+    }
+
+    return result;
   }
 
   /**

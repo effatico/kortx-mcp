@@ -7,15 +7,27 @@ import type {
   ContextGatherOptions,
   ConsultationContext,
 } from './types.js';
+import { encoding_for_model, type TiktokenModel } from 'tiktoken';
 
 export class ContextGatherer {
   private sources: Map<string, ContextSource> = new Map();
   private config: Config;
   private logger: Logger;
+  private tokenizer: ReturnType<typeof encoding_for_model> | null = null;
 
   constructor(config: Config, logger: Logger) {
     this.config = config;
     this.logger = logger.child({ component: 'context-gatherer' });
+
+    // Initialize tokenizer (lazy loaded on first use)
+    try {
+      // Use cl100k_base encoding (used by GPT-4 and GPT-5 models)
+      this.tokenizer = encoding_for_model('gpt-4' as TiktokenModel);
+      this.logger.debug('Tokenizer initialized successfully');
+    } catch (error) {
+      this.logger.warn({ error }, 'Failed to initialize tokenizer, falling back to estimation');
+      this.tokenizer = null;
+    }
   }
 
   registerSource(source: ContextSource): void {
@@ -169,7 +181,17 @@ export class ContextGatherer {
   }
 
   private estimateTokens(text: string): number {
-    // Rough estimate: ~4 characters per token for English text
+    if (this.tokenizer) {
+      try {
+        // Use tiktoken for accurate token counting
+        const tokens = this.tokenizer.encode(text);
+        return tokens.length;
+      } catch (error) {
+        this.logger.warn({ error }, 'Token encoding failed, using fallback estimation');
+      }
+    }
+
+    // Fallback: Rough estimate ~4 characters per token for English text
     return Math.ceil(text.length / 4);
   }
 
