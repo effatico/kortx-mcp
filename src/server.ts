@@ -32,6 +32,7 @@ import { ImproveCopyTool, ImproveCopyInputSchema } from './tools/improve-copy.js
 import { SolveProblemTool, SolveProblemInputSchema } from './tools/solve-problem.js';
 import { SearchContentTool, SearchContentInputSchema } from './tools/search-content.js';
 import { CreateVisualTool, CreateVisualInputSchema } from './tools/create-visual.js';
+import { BatchConsultTool, BatchConsultInputSchema } from './tools/batch-consult.js';
 import { RateLimiter } from './middleware/rate-limiter.js';
 import { ResponseCache } from './utils/cache.js';
 
@@ -53,6 +54,7 @@ export class MCPConsultantServer {
   private solveProblemTool: SolveProblemTool;
   private searchContentTool: SearchContentTool;
   private createVisualTool: CreateVisualTool;
+  private batchConsultTool: BatchConsultTool;
 
   constructor() {
     // Load configuration
@@ -147,6 +149,14 @@ export class MCPConsultantServer {
       this.contextGatherer,
       this.perplexityClient
     );
+    this.batchConsultTool = new BatchConsultTool(this.config, this.logger, {
+      thinkAboutPlan: this.thinkAboutPlanTool,
+      suggestAlternative: this.suggestAlternativeTool,
+      improveCopy: this.improveCopyTool,
+      solveProblem: this.solveProblemTool,
+      searchContent: this.searchContentTool,
+      createVisual: this.createVisualTool,
+    });
 
     // Create MCP server
     this.server = new Server(
@@ -500,6 +510,53 @@ export class MCPConsultantServer {
               'x-stateless': true,
             },
           },
+          {
+            name: 'batch-consult',
+            description:
+              'Execute multiple consultation requests in parallel. Accepts an array of tool calls and executes them concurrently for improved performance.',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                requests: {
+                  type: 'array',
+                  minItems: 1,
+                  maxItems: 10,
+                  items: {
+                    type: 'object',
+                    properties: {
+                      toolName: {
+                        type: 'string',
+                        enum: [
+                          'think-about-plan',
+                          'suggest-alternative',
+                          'improve-copy',
+                          'solve-problem',
+                          'search-content',
+                          'create-visual',
+                        ],
+                        description: 'Name of the tool to execute',
+                      },
+                      input: {
+                        type: 'object',
+                        description: 'Input parameters for the tool',
+                      },
+                      requestId: {
+                        type: 'string',
+                        description: 'Optional request ID for tracking',
+                      },
+                    },
+                    required: ['toolName', 'input'],
+                  },
+                  description: 'Array of consultation requests (1-10 items)',
+                },
+              },
+              required: ['requests'],
+            },
+            annotations: {
+              'x-parallel-safe': true,
+              'x-stateless': true,
+            },
+          },
         ],
       };
     });
@@ -574,6 +631,12 @@ export class MCPConsultantServer {
           case 'create-visual': {
             const input = CreateVisualInputSchema.parse(args);
             result = await this.createVisualTool.execute(input);
+            break;
+          }
+
+          case 'batch-consult': {
+            const input = BatchConsultInputSchema.parse(args);
+            result = await this.batchConsultTool.execute(input);
             break;
           }
 
