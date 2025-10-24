@@ -107,7 +107,6 @@ export class HealthMonitor {
    * Handle successful health check
    */
   private handleSuccess(serviceName: string, responseTime: number): void {
-    this.consecutiveFailures.get(serviceName);
     const successes = (this.consecutiveSuccesses.get(serviceName) || 0) + 1;
 
     this.consecutiveSuccesses.set(serviceName, successes);
@@ -153,7 +152,6 @@ export class HealthMonitor {
    */
   private handleFailure(serviceName: string, error: string): void {
     const failures = (this.consecutiveFailures.get(serviceName) || 0) + 1;
-    this.consecutiveSuccesses.get(serviceName);
 
     this.consecutiveFailures.set(serviceName, failures);
     this.consecutiveSuccesses.set(serviceName, 0);

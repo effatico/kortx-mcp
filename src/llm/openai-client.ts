@@ -35,7 +35,11 @@ export class OpenAIClient {
     this.logger = logger.child({ component: 'openai-client' });
 
     // Create HTTP agent with keep-alive for connection pooling
-    // Note: OpenAI SDK doesn't expose httpAgent option directly, but Node.js will reuse connections
+    // Note: The OpenAI SDK v4+ doesn't expose httpAgent in ClientOptions TypeScript interface,
+    // but the underlying fetch implementation respects the global agent. For true connection
+    // pooling with custom agents, we would need to use the fetch option with a custom fetch
+    // implementation or wait for SDK support. For now, we keep the agent initialized for
+    // future use when SDK adds support or we implement custom fetch.
     this.httpAgent = new HttpsAgent({
       keepAlive: true,
       keepAliveMsecs: 30000, // 30 seconds
