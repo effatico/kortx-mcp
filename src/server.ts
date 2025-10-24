@@ -233,6 +233,10 @@ export class MCPConsultantServer {
               },
               required: ['plan'],
             },
+            annotations: {
+              'x-parallel-safe': true,
+              'x-stateless': true,
+            },
           },
           {
             name: 'suggest-alternative',
@@ -264,6 +268,10 @@ export class MCPConsultantServer {
               },
               required: ['currentApproach'],
             },
+            annotations: {
+              'x-parallel-safe': true,
+              'x-stateless': true,
+            },
           },
           {
             name: 'improve-copy',
@@ -293,6 +301,10 @@ export class MCPConsultantServer {
                 },
               },
               required: ['originalText', 'purpose'],
+            },
+            annotations: {
+              'x-parallel-safe': true,
+              'x-stateless': true,
             },
           },
           {
@@ -328,6 +340,10 @@ export class MCPConsultantServer {
                 },
               },
               required: ['problem'],
+            },
+            annotations: {
+              'x-parallel-safe': true,
+              'x-stateless': true,
             },
           },
           {
@@ -385,6 +401,10 @@ export class MCPConsultantServer {
                 },
               },
               required: ['query'],
+            },
+            annotations: {
+              'x-parallel-safe': true,
+              'x-stateless': true,
             },
           },
           {
@@ -474,6 +494,10 @@ export class MCPConsultantServer {
                 },
               },
               required: ['mode', 'prompt'],
+            },
+            annotations: {
+              'x-parallel-safe': true,
+              'x-stateless': true,
             },
           },
         ],
