@@ -31,7 +31,7 @@ Add to Cursor's MCP configuration:
 ```json
 {
   "mcp-servers": {
-    "consultant": {
+    "kortx-consultant": {
       "command": "npx -y @effatico/kortx-mcp",
       "env": {
         "OPENAI_API_KEY": "your-api-key-here"
@@ -54,7 +54,7 @@ Restart Cursor to load the new configuration.
 ```json
 {
   "mcp-servers": {
-    "consultant": {
+    "kortx-consultant": {
       "command": "npx -y @effatico/kortx-mcp",
       "env": {
         "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
@@ -69,7 +69,7 @@ Restart Cursor to load the new configuration.
 ```json
 {
   "mcp-servers": {
-    "consultant": {
+    "kortx-consultant": {
       "command": "npx -y @effatico/kortx-mcp",
       "env": {
         "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
@@ -92,7 +92,7 @@ Restart Cursor to load the new configuration.
 ```json
 {
   "mcp-servers": {
-    "consultant": {
+    "kortx-consultant": {
       "command": "npx",
       "args": ["-y", "@effatico/kortx-mcp"],
       "env": {
@@ -132,7 +132,7 @@ set OPENAI_API_KEY=sk-your-api-key-here
 ```json
 {
   "mcp-servers": {
-    "consultant": {
+    "kortx-consultant": {
       "command": "npx -y @effatico/kortx-mcp",
       "env": {
         "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
@@ -152,24 +152,27 @@ In Cursor:
 
 1. Open Command Palette (`Cmd+Shift+P` or `Ctrl+Shift+P`)
 2. Type "MCP: Status"
-3. Verify `consultant` appears in the list
+3. Verify `kortx-consultant` appears in the list
 
 ### 2. Test the Tools
 
 Use Cursor's chat interface:
 
 ```
-@mcp:consultant What do you think about implementing GraphQL?
+@mcp:kortx-consultant What do you think about implementing GraphQL?
 ```
 
 ### 3. Check Available Tools
 
-The consultant provides:
+kortx-consultant provides:
 
 - `think-about-plan`
 - `suggest-alternative`
 - `improve-copy`
 - `solve-problem`
+- `search-content`
+- `create-visual`
+- `batch-consult`
 
 ---
 
@@ -192,7 +195,7 @@ Cursor will automatically use the `think-about-plan` tool.
 Use the `@mcp` prefix to explicitly invoke MCP tools:
 
 ```
-@mcp:consultant think-about-plan
+@mcp:kortx-consultant think-about-plan
 I want to implement caching with Redis for our user sessions...
 ```
 
@@ -201,7 +204,7 @@ I want to implement caching with Redis for our user sessions...
 1. Select code or text
 2. Right-click → "Ask AI"
 3. Type your question/request
-4. Cursor will use the consultant when appropriate
+4. Cursor will use kortx-consultant when appropriate
 
 ---
 
@@ -209,8 +212,8 @@ I want to implement caching with Redis for our user sessions...
 
 ### Strategic Planning
 
-```
-@mcp:consultant
+```text
+@mcp:kortx-consultant
 
 I'm planning to migrate our PostgreSQL database to a multi-region setup.
 Current: Single region, 2TB data, 10k queries/sec
@@ -223,8 +226,8 @@ What do you think about this plan?
 
 ### Getting Alternatives
 
-```
-@mcp:consultant
+```text
+@mcp:kortx-consultant
 
 I'm using AWS Lambda for background job processing.
 Current issue: Cold starts causing 2-3 second delays
@@ -236,8 +239,8 @@ Can you suggest alternatives?
 
 ### Improving Copy
 
-```
-@mcp:consultant
+```text
+@mcp:kortx-consultant
 
 Improve this error message for our SaaS application:
 "Error: Request failed. Try again later or contact support."
@@ -247,8 +250,8 @@ Target audience: Non-technical business users
 
 ### Problem Solving
 
-```
-@mcp:consultant
+```text
+@mcp:kortx-consultant
 
 Problem: Next.js application showing inconsistent hydration errors in production
 Frequency: 5-10% of page loads
@@ -261,6 +264,39 @@ Steps taken:
 What could be causing this?
 ```
 
+### Web Research
+
+```text
+@mcp:kortx-consultant search-content
+
+Query: Latest CDN latency benchmarks for 2025 comparing Cloudflare, Fastly, and Akamai
+```
+
+Cursor will trigger `search-content` and return Perplexity results with citations.
+
+### Visual Content
+
+```text
+@mcp:kortx-consultant create-visual
+
+Prompt: Generate a 16:9 hero illustration of engineers collaborating in a neon-lit operations center
+```
+
+Use `create-visual` to generate new imagery or iterate on existing assets.
+
+### Batch Requests
+
+```text
+@mcp:kortx-consultant batch-consult
+
+Requests:
+- {"toolName":"think-about-plan","input":{"plan":"Migrate monolith to services over 3 quarters"}}
+- {"toolName":"suggest-alternative","input":{"currentApproach":"Use Redis pub/sub for notifications"}}
+- {"toolName":"improve-copy","input":{"originalText":"We are currently experiencing downtime","purpose":"status page"}}
+```
+
+`batch-consult` lets you execute multiple tool calls in parallel from a single command.
+
 ---
 
 ## Model Selection
@@ -270,7 +306,7 @@ Configure in MCP settings:
 ```json
 {
   "mcp-servers": {
-    "consultant": {
+    "kortx-consultant": {
       "env": {
         "OPENAI_MODEL": "gpt-5-mini"
       }
@@ -296,7 +332,7 @@ Control thinking depth:
 ```json
 {
   "mcp-servers": {
-    "consultant": {
+    "kortx-consultant": {
       "env": {
         "OPENAI_REASONING_EFFORT": "minimal"
       }
@@ -321,7 +357,7 @@ Configure what code context is sent:
 ```json
 {
   "mcp-servers": {
-    "consultant": {
+    "kortx-consultant": {
       "env": {
         "ENABLE_SERENA": "true",
         "ENABLE_MEMORY": "true",
@@ -346,7 +382,7 @@ Configure different profiles for different needs:
 ```json
 {
   "mcp-servers": {
-    "consultant-fast": {
+    "kortx-consultant-fast": {
       "command": "npx -y @effatico/kortx-mcp",
       "env": {
         "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
@@ -354,7 +390,7 @@ Configure different profiles for different needs:
         "OPENAI_REASONING_EFFORT": "minimal"
       }
     },
-    "consultant-pro": {
+    "kortx-consultant-pro": {
       "command": "npx -y @effatico/kortx-mcp",
       "env": {
         "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
@@ -369,17 +405,17 @@ Configure different profiles for different needs:
 Use them in chat:
 
 ```
-@mcp:consultant-fast Quick question about this approach...
-@mcp:consultant-pro Need deep analysis of this architecture...
+@mcp:kortx-consultant-fast Quick question about this approach...
+@mcp:kortx-consultant-pro Need deep analysis of this architecture...
 ```
 
 ---
 
 ## Troubleshooting
 
-### Consultant Not Available
+### kortx-consultant Not Available
 
-**Problem**: Cursor doesn't show consultant in MCP servers
+**Problem**: Cursor doesn't show kortx-consultant in MCP servers
 
 **Solutions**:
 
@@ -415,14 +451,14 @@ curl https://api.openai.com/v1/models \
 
 ### Slow Responses
 
-**Problem**: Consultant takes too long
+**Problem**: kortx-consultant takes too long
 
 **Solutions**:
 
 ```json
 {
   "mcp-servers": {
-    "consultant": {
+    "kortx-consultant": {
       "env": {
         "OPENAI_MODEL": "gpt-5-mini",
         "OPENAI_REASONING_EFFORT": "minimal",
@@ -514,9 +550,9 @@ Cursor's built-in AI and MCP Consultant work together:
 Example workflow:
 
 ```
-1. Use @mcp:consultant to plan architecture
+1. Use @mcp:kortx-consultant to plan architecture
 2. Use Cursor AI (Cmd+K) to implement the plan
-3. Use @mcp:consultant to review the implementation
+3. Use @mcp:kortx-consultant to review the implementation
 ```
 
 ### Keyboard Shortcuts
@@ -538,7 +574,7 @@ For testing or development:
 ```json
 {
   "mcp-servers": {
-    "consultant": {
+    "kortx-consultant": {
       "command": "node",
       "args": ["/absolute/path/to/kortx-mcp/build/index.js"],
       "env": {
@@ -555,7 +591,7 @@ For testing or development:
 ```json
 {
   "mcp-servers": {
-    "consultant": {
+    "kortx-consultant": {
       "env": {
         "LOG_LEVEL": "debug",
         "LOG_FILE": "/custom/path/kortx-mcp.log"
@@ -572,7 +608,7 @@ For privacy or performance:
 ```json
 {
   "mcp-servers": {
-    "consultant": {
+    "kortx-consultant": {
       "env": {
         "ENABLE_SERENA": "false",
         "ENABLE_MEMORY": "false",
@@ -593,13 +629,13 @@ For privacy or performance:
 ```json
 {
   "mcp-servers": {
-    "gpt5-consultant": {
+    "gpt5-kortx-consultant": {
       "command": "npx -y @effatico/kortx-mcp",
       "env": {
         "OPENAI_MODEL": "gpt-5"
       }
     },
-    "gpt5-mini-consultant": {
+    "gpt5-mini-kortx-consultant": {
       "command": "npx -y @effatico/kortx-mcp",
       "env": {
         "OPENAI_MODEL": "gpt-5-mini"
@@ -614,7 +650,7 @@ For privacy or performance:
 Provide more context for better answers:
 
 ```
-@mcp:consultant
+@mcp:kortx-consultant
 
 Context: E-commerce platform, 100k daily users, Node.js backend
 Question: Should we implement server-side rendering or stick with CSR?
@@ -626,12 +662,12 @@ Constraints: Small team (3 devs), tight timeline (2 months)
 Build on previous consultations:
 
 ```
-@mcp:consultant think-about-plan
+@mcp:kortx-consultant think-about-plan
 Plan: Migrate to microservices
 
 [Review response]
 
-@mcp:consultant suggest-alternative
+@mcp:kortx-consultant suggest-alternative
 Based on your feedback about our timeline, what are simpler alternatives?
 ```
 

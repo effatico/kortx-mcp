@@ -184,7 +184,7 @@ ENABLE_SERENA=false
 
 ### `ENABLE_MEMORY`
 
-Enable graph-memory MCP for knowledge graph and project memory. This provides a project knowledge graph, entity relationships, historical context, and persistent memory across sessions.
+Enable the MCP Knowledge Graph server (commonly published as `graph-memory`) for knowledge graph and project memory. This provides a project knowledge graph, entity relationships, historical context, and persistent memory across sessions.
 
 - **Required**: No
 - **Default**: `true`

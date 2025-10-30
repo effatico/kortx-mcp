@@ -18,11 +18,11 @@ The fastest way to add MCP Consultant to Claude Code:
 
 ```bash
 # Using npx (recommended - no installation required)
-claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- npx -y @effatico/kortx-mcp
+claude mcp add --transport stdio kortx-consultant --env OPENAI_API_KEY=YOUR_KEY -- npx -y @effatico/kortx-mcp
 
 # Using global install
 npm install -g @effatico/kortx-mcp
-claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- kortx-mcp
+claude mcp add --transport stdio kortx-consultant --env OPENAI_API_KEY=YOUR_KEY -- kortx-mcp
 ```
 
 That's it! Claude Code will now have access to MCP Consultant's tools.
@@ -43,7 +43,7 @@ After running the `claude mcp add` command, your configuration will look like th
 ```json
 {
   "mcpServers": {
-    "consultant": {
+    "kortx-consultant": {
       "type": "stdio",
       "command": "npx",
       "args": ["-y", "@effatico/kortx-mcp"],
@@ -62,7 +62,7 @@ You can verify your configuration using:
 claude mcp list
 
 # Get details for a specific server
-claude mcp get consultant
+claude mcp get kortx-consultant
 ```
 
 ---
@@ -74,7 +74,7 @@ claude mcp get consultant
 For most users, the basic setup command works best:
 
 ```bash
-claude mcp add --transport stdio consultant --env OPENAI_API_KEY=YOUR_KEY -- npx -y @effatico/kortx-mcp
+claude mcp add --transport stdio kortx-consultant --env OPENAI_API_KEY=YOUR_KEY -- npx -y @effatico/kortx-mcp
 ```
 
 This uses:
@@ -88,7 +88,7 @@ This uses:
 For more control over behavior, you can add multiple environment variables:
 
 ```bash
-claude mcp add --transport stdio consultant \
+claude mcp add --transport stdio kortx-consultant \
   --env OPENAI_API_KEY=YOUR_KEY \
   --env OPENAI_MODEL=gpt-5 \
   --env OPENAI_REASONING_EFFORT=high \
@@ -114,7 +114,7 @@ export OPENAI_API_KEY="sk-your-api-key-here"
 Then use the basic command without exposing the key:
 
 ```bash
-claude mcp add --transport stdio consultant --env OPENAI_API_KEY=$OPENAI_API_KEY -- npx -y @effatico/kortx-mcp
+claude mcp add --transport stdio kortx-consultant --env OPENAI_API_KEY=$OPENAI_API_KEY -- npx -y @effatico/kortx-mcp
 ```
 
 ---
@@ -127,7 +127,7 @@ claude mcp add --transport stdio consultant --env OPENAI_API_KEY=$OPENAI_API_KEY
 claude mcp list
 ```
 
-You should see `consultant` in the list of configured servers.
+You should see `kortx-consultant` in the list of configured servers.
 
 ### 2. Test the Tools
 
@@ -142,15 +142,18 @@ Claude Code should invoke the `think-about-plan` tool from MCP Consultant.
 ### 3. Check Available Tools
 
 ```bash
-claude mcp inspect consultant
+claude mcp inspect kortx-consultant
 ```
 
-You should see four tools:
+You should see these kortx-consultant tools:
 
 - `think-about-plan`
 - `suggest-alternative`
 - `improve-copy`
 - `solve-problem`
+- `search-content`
+- `create-visual`
+- `batch-consult`
 
 ---
 
@@ -158,7 +161,7 @@ You should see four tools:
 
 ### Strategic Planning
 
-```
+```text
 I'm planning to migrate our REST API to GraphQL. The API currently has
 50+ endpoints serving 10k+ requests per day. We want to improve
 developer experience and reduce over-fetching. What do you think?
@@ -168,7 +171,7 @@ Claude Code will use the `think-about-plan` tool to get strategic feedback from 
 
 ### Getting Alternatives
 
-```
+```text
 I'm using Redis for caching user sessions. Can you suggest alternatives
 considering we need cross-datacenter replication and want to minimize costs?
 ```
@@ -177,7 +180,7 @@ Claude Code will use the `suggest-alternative` tool.
 
 ### Improving Copy
 
-```
+```text
 Can you improve this error message:
 "Error 500: Internal server error. Try again later."
 ```
@@ -186,13 +189,40 @@ Claude Code will use the `improve-copy` tool.
 
 ### Problem Solving
 
-```
+```text
 Users are experiencing intermittent 500 errors when uploading files > 10MB.
 I've checked nginx timeout (60s), app timeout (30s), and server memory (8GB).
 Errors occur randomly, not consistently. What could be wrong?
 ```
 
 Claude Code will use the `solve-problem` tool.
+
+### Web Research
+
+```text
+Find recent articles comparing PlanetScale and Neon for multi-region read replicas.
+```
+
+Claude Code will use the `search-content` tool for Perplexity-backed research with citations.
+
+### Visual Content
+
+```text
+Create a launch graphic showing a dark-mode dashboard with glowing widgets.
+```
+
+Claude Code will call `create-visual` to generate or iterate on imagery via GPT Image.
+
+### Parallel Requests
+
+```text
+Run these together:
+- Review the rollout plan for risks
+- Suggest alternative monitoring tools
+- Draft a customer announcement
+```
+
+Bundle the prompts with `batch-consult` to execute multiple consultations in parallel.
 
 ---
 
@@ -226,25 +256,25 @@ Choose the right model for your use case:
 
 ### Configuration Example
 
-You can set up multiple consultant configurations with different models:
+You can set up multiple kortx-consultant configurations with different models:
 
 ```bash
-# Fast consultant for quick tasks
-claude mcp add --transport stdio consultant-mini \
+# Fast kortx-consultant for quick tasks
+claude mcp add --transport stdio kortx-consultant-mini \
   --env OPENAI_API_KEY=$OPENAI_API_KEY \
   --env OPENAI_MODEL=gpt-5-mini \
   --env OPENAI_REASONING_EFFORT=minimal \
   -- npx -y @effatico/kortx-mcp
 
-# Deep consultant for complex tasks
-claude mcp add --transport stdio consultant-pro \
+# Deep kortx-consultant for complex tasks
+claude mcp add --transport stdio kortx-consultant-pro \
   --env OPENAI_API_KEY=$OPENAI_API_KEY \
   --env OPENAI_MODEL=gpt-5 \
   --env OPENAI_REASONING_EFFORT=high \
   -- npx -y @effatico/kortx-mcp
 ```
 
-Now you can choose which consultant to use based on the task complexity!
+Now you can choose which kortx-consultant profile to use based on the task complexity!
 
 ---
 
@@ -284,7 +314,7 @@ Control how much reasoning GPT-5 performs:
 
 ```bash
 # Change OPENAI_REASONING_EFFORT to low, medium, or high as needed
-claude mcp add --transport stdio consultant \
+claude mcp add --transport stdio kortx-consultant \
   --env OPENAI_API_KEY=$OPENAI_API_KEY \
   --env OPENAI_MODEL=gpt-5-mini \
   --env OPENAI_REASONING_EFFORT=minimal \
@@ -299,7 +329,7 @@ MCP Consultant can automatically gather context from your codebase:
 
 ### What Gets Gathered
 
-When enabled, the consultant can access:
+When enabled, kortx-consultant can access:
 
 - **Serena**: Semantic code search and symbol navigation
 - **Memory**: Knowledge graph with project information
@@ -310,7 +340,7 @@ When enabled, the consultant can access:
 ### Configuration
 
 ```bash
-claude mcp add --transport stdio consultant \
+claude mcp add --transport stdio kortx-consultant \
   --env OPENAI_API_KEY=$OPENAI_API_KEY \
   --env ENABLE_SERENA=true \
   --env ENABLE_MEMORY=true \
@@ -332,7 +362,7 @@ Be aware that enabling context gathering sends code to OpenAI's API:
 To disable context gathering:
 
 ```bash
-claude mcp add --transport stdio consultant \
+claude mcp add --transport stdio kortx-consultant \
   --env OPENAI_API_KEY=$OPENAI_API_KEY \
   --env ENABLE_SERENA=false \
   --env ENABLE_MEMORY=false \
@@ -347,7 +377,7 @@ claude mcp add --transport stdio consultant \
 
 ### MCP Consultant Not Available
 
-**Problem**: Claude Code doesn't show consultant tools
+**Problem**: Claude Code doesn't show kortx-consultant tools
 
 **Solutions**:
 
@@ -394,8 +424,8 @@ curl https://api.openai.com/v1/models \
 
 ```bash
 # Reconfigure for faster responses
-claude mcp remove consultant
-claude mcp add --transport stdio consultant \
+claude mcp remove kortx-consultant
+claude mcp add --transport stdio kortx-consultant \
   --env OPENAI_API_KEY=$OPENAI_API_KEY \
   --env OPENAI_MODEL=gpt-5-mini \
   --env OPENAI_REASONING_EFFORT=minimal \
@@ -415,8 +445,8 @@ claude mcp add --transport stdio consultant \
 
 ```bash
 # Reconfigure without context gathering
-claude mcp remove consultant
-claude mcp add --transport stdio consultant \
+claude mcp remove kortx-consultant
+claude mcp add --transport stdio kortx-consultant \
   --env OPENAI_API_KEY=$OPENAI_API_KEY \
   --env ENABLE_SERENA=false \
   --env ENABLE_MEMORY=false \
@@ -437,8 +467,8 @@ claude mcp add --transport stdio consultant \
 
 ```bash
 # Reconfigure for minimal costs
-claude mcp remove consultant
-claude mcp add --transport stdio consultant \
+claude mcp remove kortx-consultant
+claude mcp add --transport stdio kortx-consultant \
   --env OPENAI_API_KEY=$OPENAI_API_KEY \
   --env OPENAI_MODEL=gpt-5-nano \
   --env OPENAI_REASONING_EFFORT=minimal \
@@ -465,7 +495,7 @@ npm install
 npm run build
 
 # Configure Claude Code to use local version
-claude mcp add --transport stdio consultant-dev \
+claude mcp add --transport stdio kortx-consultant-dev \
   --env OPENAI_API_KEY=$OPENAI_API_KEY \
   --env LOG_LEVEL=debug \
   -- node /path/to/kortx-mcp/build/index.js
@@ -476,15 +506,15 @@ claude mcp add --transport stdio consultant-dev \
 Run different configurations for different purposes:
 
 ```bash
-# Fast consultant for quick tasks
-claude mcp add --transport stdio consultant-fast \
+# Fast kortx-consultant for quick tasks
+claude mcp add --transport stdio kortx-consultant-fast \
   --env OPENAI_API_KEY=$OPENAI_API_KEY \
   --env OPENAI_MODEL=gpt-5-nano \
   --env OPENAI_REASONING_EFFORT=minimal \
   -- npx -y @effatico/kortx-mcp
 
-# Deep consultant for complex analysis
-claude mcp add --transport stdio consultant-deep \
+# Deep kortx-consultant for complex analysis
+claude mcp add --transport stdio kortx-consultant-deep \
   --env OPENAI_API_KEY=$OPENAI_API_KEY \
   --env OPENAI_MODEL=gpt-5 \
   --env OPENAI_REASONING_EFFORT=high \
@@ -496,7 +526,7 @@ claude mcp add --transport stdio consultant-deep \
 For debugging or monitoring:
 
 ```bash
-claude mcp add --transport stdio consultant \
+claude mcp add --transport stdio kortx-consultant \
   --env OPENAI_API_KEY=$OPENAI_API_KEY \
   --env LOG_LEVEL=debug \
   --env LOG_FILE=/custom/path/kortx-mcp.log \

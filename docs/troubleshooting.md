@@ -484,13 +484,13 @@ This guide helps you diagnose and resolve common issues with MCP Consultant.
 
 4. Check logs for Serena-related errors
 
-### Graph memory not accessible
+### MCP Knowledge Graph not accessible
 
-**Symptoms**: graph-memory MCP not providing data
+**Symptoms**: MCP Knowledge Graph (graph-memory) MCP not providing data
 
 **Solutions**:
 
-1. Verify graph-memory MCP is installed
+1. Verify MCP Knowledge Graph MCP is installed
 
 2. Enable memory:
 
@@ -498,7 +498,7 @@ This guide helps you diagnose and resolve common issues with MCP Consultant.
    ENABLE_MEMORY=true
    ```
 
-3. Ensure graph-memory is in AI assistant's MCP config
+3. Ensure the server ID (`graph-memory`) is in your AI assistant's MCP config
 
 4. Check memory location is accessible
 
@@ -553,7 +553,7 @@ Or in your MCP config:
 ```json
 {
   "mcpServers": {
-    "consultant": {
+    "kortx-consultant": {
       "env": {
         "LOG_LEVEL": "debug"
       }

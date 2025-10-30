@@ -24,13 +24,13 @@ The location depends on your operating system and Copliot installation:
 
 ### 2. Add MCP Consultant Configuration
 
-Edit the config file and add the consultant server:
+Edit the config file and add the kortx-consultant server:
 
 ```json
 {
   "mcp": {
     "servers": {
-      "consultant": {
+      "kortx-consultant": {
         "command": "npx",
         "args": ["-y", "@effatico/kortx-mcp"],
         "env": {
@@ -56,7 +56,7 @@ Restart Copliot to load the new configuration.
 {
   "mcp": {
     "servers": {
-      "consultant": {
+      "kortx-consultant": {
         "command": "npx",
         "args": ["-y", "@effatico/kortx-mcp"],
         "env": {
@@ -74,7 +74,7 @@ Restart Copliot to load the new configuration.
 {
   "mcp": {
     "servers": {
-      "consultant": {
+      "kortx-consultant": {
         "command": "npx",
         "args": ["-y", "@effatico/kortx-mcp"],
         "env": {
@@ -115,19 +115,22 @@ Then reference in the config:
 
 ### Check Available Tools
 
-In Copliot, the consultant should provide four tools:
+In Copliot, kortx-consultant should provide these tools:
 
 - `think-about-plan`
 - `suggest-alternative`
 - `improve-copy`
 - `solve-problem`
+- `search-content`
+- `create-visual`
+- `batch-consult`
 
 ### Test the Integration
 
 Try asking Copliot:
 
-```
-Use the consultant to think about my plan to implement OAuth 2.0 authentication
+```text
+Use kortx-consultant to think about my plan to implement OAuth 2.0 authentication
 ```
 
 ---
@@ -136,7 +139,7 @@ Use the consultant to think about my plan to implement OAuth 2.0 authentication
 
 ### Strategic Planning
 
-```
+```text
 I'm planning to migrate from MongoDB to PostgreSQL. Our current database
 has 50GB of data across 20 collections. We need zero downtime and
 want to maintain data consistency. What do you think of this approach?
@@ -144,25 +147,52 @@ want to maintain data consistency. What do you think of this approach?
 
 ### Getting Alternatives
 
-```
+```text
 I'm using WebSockets for real-time updates. Can you suggest alternatives
 that work better on mobile with intermittent connectivity?
 ```
 
 ### Improving Copy
 
-```
+```text
 Can you improve this user-facing error message:
 "Error: Invalid input. Check your data and try again."
 ```
 
 ### Problem Solving
 
-```
+```text
 My application is consuming more memory over time (memory leak).
 I've checked event listeners (properly cleaned up) and database
 connections (pooled correctly). What else could cause this?
 ```
+
+### Web Research
+
+```text
+What 2025 resources compare Vercel and Netlify for large-scale Next.js deployments?
+```
+
+Copliot routes this to `search-content` for a Perplexity-powered answer with citations.
+
+### Visual Content
+
+```text
+Generate a marketing banner with a dark gradient background and white hero text.
+```
+
+This uses `create-visual` for GPT Image generation or editing.
+
+### Batch Requests
+
+```text
+@kortx-consultant batch:
+- Evaluate the migration plan timeline
+- Suggest alternative cache strategies
+- Improve this release note copy
+```
+
+Combine prompts with `batch-consult` to execute the kortx-consultant consultations in parallel.
 
 ---
 
@@ -219,7 +249,7 @@ Control how much thinking GPT-5 does:
 
 ## Context Gathering
 
-Configure what context is sent to the consultant:
+Configure what context is sent to kortx-consultant:
 
 ```json
 {

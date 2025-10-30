@@ -31,7 +31,7 @@ Create `.vscode/mcp-config.json` in your project root:
 
 ```json
 {
-  "consultant": {
+  "kortx-consultant": {
     "command": "npx",
     "args": ["-y", "@effatico/kortx-mcp"],
     "env": {
@@ -73,7 +73,7 @@ Developer: Reload Window
 
 ```json
 {
-  "consultant": {
+  "kortx-consultant": {
     "command": "npx",
     "args": ["-y", "@effatico/kortx-mcp"],
     "env": {
@@ -87,7 +87,7 @@ Developer: Reload Window
 
 ```json
 {
-  "consultant": {
+  "kortx-consultant": {
     "command": "npx",
     "args": ["-y", "@effatico/kortx-mcp"],
     "env": {
@@ -127,20 +127,23 @@ Developer: Reload Window
 
 1. Open Command Palette (`Cmd+Shift+P` or `Ctrl+Shift+P`)
 2. Type "MCP: Show Status"
-3. Verify `consultant` appears in the list
+3. Verify `kortx-consultant` appears in the list
 
 ### 2. Test the Tools
 
-Open the MCP panel in VS Code and try using the consultant tools.
+Open the MCP panel in VS Code and try using the kortx-consultant tools.
 
 ### 3. Check Available Tools
 
-The consultant should provide:
+kortx-consultant should provide:
 
 - `think-about-plan`
 - `suggest-alternative`
 - `improve-copy`
 - `solve-problem`
+- `search-content`
+- `create-visual`
+- `batch-consult`
 
 ---
 
@@ -149,7 +152,7 @@ The consultant should provide:
 ### Using the MCP Panel
 
 1. Open the MCP panel (usually in the sidebar)
-2. Select the `consultant` server
+2. Select the `kortx-consultant` server
 3. Choose a tool to use
 4. Enter your question/request
 
@@ -158,7 +161,7 @@ The consultant should provide:
 If your MCP extension supports chat:
 
 ```
-@consultant think about my plan to implement caching with Redis
+@kortx-consultant think about my plan to implement caching with Redis
 ```
 
 ### Using Commands
@@ -167,7 +170,7 @@ Access via Command Palette:
 
 1. `Cmd+Shift+P` or `Ctrl+Shift+P`
 2. Type "MCP: "
-3. Select the consultant tool you want to use
+3. Select the kortx-consultant tool you want to use
 
 ---
 
@@ -175,7 +178,7 @@ Access via Command Palette:
 
 ### Strategic Planning
 
-```
+```text
 I'm planning to split our monolith into microservices.
 Current monolith: 100k LOC, 50 API endpoints, 5 developers.
 Target: 5-7 microservices by domain.
@@ -185,7 +188,7 @@ What do you think about this plan?
 
 ### Getting Alternatives
 
-```
+```text
 I'm using Elasticsearch for full-text search on product descriptions.
 Cost is $500/month for our 100k products.
 Can you suggest cost-effective alternatives?
@@ -193,20 +196,47 @@ Can you suggest cost-effective alternatives?
 
 ### Improving Copy
 
-```
+```text
 Improve this README section:
 "This tool does stuff with files. It's fast and works good."
 ```
 
 ### Problem Solving
 
-```
+```text
 CI/CD pipeline failing intermittently on the test stage.
 Tests pass locally 100% of the time.
 Error: "ECONNREFUSED connecting to localhost:5432"
 Database service starts before tests in docker-compose.
 What could be wrong?
 ```
+
+### Web Research
+
+```text
+Search for up-to-date comparisons of feature flag platforms LaunchDarkly vs Flagsmith.
+```
+
+VS Code will invoke `search-content` to query Perplexity with citations.
+
+### Visual Content
+
+```text
+Create a 1024x1024 illustration of a development team collaborating around holographic monitors.
+```
+
+`create-visual` handles image generation, editing, or inspiration search.
+
+### Batch Requests
+
+```text
+Run these together:
+- Analyze our incident response plan
+- Suggest a cheaper search architecture
+- Improve this status-page copy
+```
+
+Chain multiple tool calls with `batch-consult` to fetch parallel responses.
 
 ---
 
@@ -216,7 +246,7 @@ Configure the model in `.vscode/mcp-config.json`:
 
 ```json
 {
-  "consultant": {
+  "kortx-consultant": {
     "env": {
       "OPENAI_MODEL": "gpt-5-mini"
     }
@@ -238,7 +268,7 @@ Control how much thinking the model does:
 
 ```json
 {
-  "consultant": {
+  "kortx-consultant": {
     "env": {
       "OPENAI_REASONING_EFFORT": "minimal"
     }
@@ -261,7 +291,7 @@ Configure what context is sent:
 
 ```json
 {
-  "consultant": {
+  "kortx-consultant": {
     "env": {
       "ENABLE_SERENA": "true",
       "ENABLE_MEMORY": "true",
@@ -280,11 +310,11 @@ Configure what context is sent:
 
 ## Multiple Profiles
 
-Create different consultant configurations for different needs:
+Create different kortx-consultant configurations for different needs:
 
 ```json
 {
-  "consultant-fast": {
+  "kortx-consultant-fast": {
     "command": "npx",
     "args": ["-y", "@effatico/kortx-mcp"],
     "env": {
@@ -293,7 +323,7 @@ Create different consultant configurations for different needs:
       "OPENAI_REASONING_EFFORT": "minimal"
     }
   },
-  "consultant-deep": {
+  "kortx-consultant-deep": {
     "command": "npx",
     "args": ["-y", "@effatico/kortx-mcp"],
     "env": {
@@ -311,7 +341,7 @@ Create different consultant configurations for different needs:
 
 ### Consultant Not Found
 
-**Problem**: VS Code doesn't see the consultant server
+**Problem**: VS Code doesn't see the kortx-consultant server
 
 **Solutions**:
 
@@ -350,7 +380,7 @@ Create different consultant configurations for different needs:
 
 ```json
 {
-  "consultant": {
+  "kortx-consultant": {
     "env": {
       "OPENAI_MODEL": "gpt-5-mini",
       "OPENAI_REASONING_EFFORT": "minimal",
@@ -387,7 +417,7 @@ Commit `.vscode/mcp-config.json` to git (without secrets):
 
 ```json
 {
-  "consultant": {
+  "kortx-consultant": {
     "command": "npx",
     "args": ["-y", "@effatico/kortx-mcp"],
     "env": {
@@ -450,7 +480,7 @@ For testing changes:
 
 ```json
 {
-  "consultant": {
+  "kortx-consultant": {
     "command": "node",
     "args": ["/absolute/path/to/kortx-mcp/build/index.js"],
     "env": {
@@ -465,7 +495,7 @@ For testing changes:
 
 ```json
 {
-  "consultant": {
+  "kortx-consultant": {
     "env": {
       "LOG_LEVEL": "debug",
       "LOG_FILE": "${workspaceFolder}/logs/kortx-mcp.log"

@@ -6,13 +6,9 @@ This guide explains how to set up MCP Consultant and integrate it with your AI a
 
 You'll need Node.js 22.12.0 or newer (download from [nodejs.org](https://nodejs.org)), which includes npm 9.0.0 or newer. Get an OpenAI API key from [platform.openai.com](https://platform.openai.com/api-keys). You'll also need an AI assistant like Claude Code, Copliot, VS Code with the MCP extension, or Cursor.
 
-## Installation Options
+## Package Distribution
 
-The fastest way to get started uses npx with no installation required. Run `npx -y @effatico/kortx-mcp` to download and run the latest version automatically, which works well for trying it out or occasional use.
-
-For regular use, install globally with `npm install -g @effatico/kortx-mcp` and then run `kortx-mcp` anytime.
-
-For containerized deployments, pull the Docker image with `docker pull ghcr.io/effatico/kortx-mcp:latest` and run it with `docker run -e OPENAI_API_KEY=sk-your-key ghcr.io/effatico/kortx-mcp:latest`.
+Kortx ships as the npm package `@effatico/kortx-mcp`. MCP clients such as Claude Code or Cursor typically launch it by running `npx -y @effatico/kortx-mcp@latest`, so you usually do not start the server manually. If you want the binary ready for local debugging you can install it globally with `npm install -g @effatico/kortx-mcp` (the executable name is `kortx-mcp`). For containerized workflows, use `docker pull ghcr.io/effatico/kortx-mcp:latest` and supply the same environment variables your client would set.
 
 ## Configuration
 
@@ -55,7 +51,7 @@ The simplest integration:
 
 ```bash
 # Add the server
-claude mcp add consultant -- npx -y @effatico/kortx-mcp
+claude mcp add kortx-consultant -- npx -y @effatico/kortx-mcp
 ```
 
 Or manually edit `~/.config/claude/mcp.json`:
@@ -63,7 +59,7 @@ Or manually edit `~/.config/claude/mcp.json`:
 ```json
 {
   "mcpServers": {
-    "consultant": {
+    "kortx-consultant": {
       "command": "npx",
       "args": ["-y", "@effatico/kortx-mcp"],
       "env": {
@@ -84,7 +80,7 @@ Edit your Copliot configuration file:
 {
   "mcp": {
     "servers": {
-      "consultant": {
+      "kortx-consultant": {
         "command": "npx",
         "args": ["-y", "@effatico/kortx-mcp"],
         "env": {
@@ -104,7 +100,7 @@ Install the MCP extension, then add to `.vscode/mcp-config.json`:
 
 ```json
 {
-  "consultant": {
+  "kortx-consultant": {
     "command": "npx",
     "args": ["-y", "@effatico/kortx-mcp"],
     "env": {
@@ -123,7 +119,7 @@ Add to Cursor's MCP settings:
 ```json
 {
   "mcp-servers": {
-    "consultant": {
+    "kortx-consultant": {
       "command": "npx -y @effatico/kortx-mcp",
       "env": {
         "OPENAI_API_KEY": "your-key-here"
@@ -143,22 +139,25 @@ After setting up, verify the server is working:
 
 In Claude Code or your AI assistant, try asking:
 
-```
+```text
 Can you list available MCP tools?
 ```
 
-You should see four consultant tools:
+You should see these kortx-consultant tools:
 
 - `think-about-plan`
 - `suggest-alternative`
 - `improve-copy`
 - `solve-problem`
+- `search-content`
+- `create-visual`
+- `batch-consult`
 
 ### Test with a Simple Query
 
 Try a basic consultation:
 
-```
+```text
 Can you think about my plan to add user authentication using JWT tokens?
 ```
 
@@ -172,7 +171,7 @@ Now that you're set up, here are some things to try:
 
 Ask for thoughts on a plan or approach:
 
-```
+```text
 I'm planning to migrate our database from PostgreSQL to MongoDB.
 What do you think about this plan?
 ```
@@ -181,7 +180,7 @@ What do you think about this plan?
 
 Request different approaches to a problem:
 
-```
+```text
 I'm using polling to check for updates every 5 seconds.
 Can you suggest alternative approaches?
 ```
@@ -190,7 +189,7 @@ Can you suggest alternative approaches?
 
 Enhance user-facing text:
 
-```
+```text
 Improve this error message: "Error: Something went wrong"
 ```
 
@@ -198,14 +197,34 @@ Improve this error message: "Error: Something went wrong"
 
 Get help with issues:
 
-```
+```text
 My app crashes with "Cannot read property 'map' of undefined".
 I've checked that the array exists. What could be wrong?
 ```
 
+### 5. Research with Web Search
+
+```text
+What are the latest best practices for securing WebAuthn on mobile devices?
+```
+
+Use the `search-content` tool for Perplexity-powered results with citations.
+
+### 6. Create or Edit Visuals
+
+```text
+Generate a hero image of a futuristic control room with cool blue lighting.
+```
+
+The `create-visual` tool can generate images, refine uploads, or search for inspiration.
+
+### 7. Batch Multiple Requests
+
+Submit several consultations together with `batch-consult` to run them in parallel when you need a bundle of answers at once.
+
 ## Understanding Context Gathering
 
-MCP Consultant automatically gathers relevant context from your workspace. It reads related files you mention from the file system, uses Serena MCP for semantic code search if installed, accesses knowledge graph data through Graph Memory if available, and leverages CCLSP for language server features when present. No additional setup is needed since the server detects and integrates with other MCPs automatically.
+MCP Consultant automatically gathers relevant context from your workspace. It reads related files you mention from the file system, uses Serena MCP for semantic code search if installed, accesses knowledge graph data through the MCP Knowledge Graph server (published as `graph-memory`) if available, and leverages CCLSP for language server features when present. No additional setup is needed since the server detects and integrates with other MCPs automatically.
 
 ## Performance Tips
 
@@ -244,7 +263,7 @@ OPENAI_MAX_TOKENS=1024
 
 ## Next Steps
 
-Now that you're up and running, try each of the four tools with different queries to explore their capabilities. See real-world workflows in the [examples/](../examples) directory, fine-tune settings for your needs in the configuration guide, and check [troubleshooting.md](./troubleshooting.md) if you hit any issues.
+Now that you're up and running, try each of the core tools with different queries to explore their capabilities. See real-world workflows in the [examples/](../examples) directory, fine-tune settings for your needs in the configuration guide, and check [troubleshooting.md](./troubleshooting.md) if you hit any issues.
 
 ## Common Issues
 

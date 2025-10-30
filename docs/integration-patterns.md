@@ -10,10 +10,10 @@ Best practices for integrating the kortx-mcp server with AI assistants and exter
 
 ```bash
 # Using npx (recommended for published package)
-claude mcp add consultant -- npx @effatico/kortx-mcp
+claude mcp add kortx-consultant -- npx @effatico/kortx-mcp
 
 # Using local development build
-claude mcp add consultant-dev -s local -- node /absolute/path/to/kortx-mcp/build/index.js
+claude mcp add kortx-consultant-dev -s local -- node /absolute/path/to/kortx-mcp/build/index.js
 ```
 
 ### Configuration
@@ -23,7 +23,7 @@ Manual configuration in `~/.config/claude/mcp.json`:
 ```json
 {
   "mcpServers": {
-    "consultant": {
+    "kortx-consultant": {
       "command": "npx",
       "args": ["@effatico/kortx-mcp"],
       "env": {
@@ -43,7 +43,7 @@ During development, rebuild before testing:
 
 ```bash
 npm run build
-claude mcp add consultant-dev -s local -- node $(pwd)/build/index.js
+claude mcp add kortx-consultant-dev -s local -- node $(pwd)/build/index.js
 ```
 
 ## Copliot Integration
@@ -54,7 +54,7 @@ Configuration in Copliot settings:
 {
   "mcp": {
     "servers": {
-      "consultant": {
+      "kortx-consultant": {
         "command": "npx",
         "args": ["@effatico/kortx-mcp"],
         "env": {
@@ -108,7 +108,7 @@ class SerenaContextSource implements ContextSource {
 }
 ```
 
-### Graph Memory MCP (Project Context)
+### MCP Knowledge Graph (graph-memory) MCP (Project Context)
 
 **Purpose**: Provides project history, decisions, and architectural patterns
 
@@ -116,10 +116,11 @@ class SerenaContextSource implements ContextSource {
 
 ```typescript
 class GraphMemoryContextSource implements ContextSource {
+  // Server is typically registered under the ID "graph-memory"
   name = 'graph-memory';
 
   async gather(query: string): Promise<ContextChunk[]> {
-    // Search graph-memory for relevant entities and relations
+    // Search MCP Knowledge Graph for relevant entities and relations
     const nodes = await searchGraphMemory({
       query,
       context: 'project-name',
@@ -305,7 +306,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const server = new McpServer({ name: 'consultant', version: '1.0.0' });
+  const server = new McpServer({ name: 'kortx-consultant', version: '1.0.0' });
   // Register tools...
 
   const transport = new StreamableHTTPServerTransport({
@@ -479,7 +480,7 @@ npm run build
 npx @modelcontextprotocol/inspector build/index.js
 
 # Test with Claude Code
-claude mcp add consultant-dev -s local -- node $(pwd)/build/index.js
+claude mcp add kortx-consultant-dev -s local -- node $(pwd)/build/index.js
 ```
 
 ### CI/CD Testing
