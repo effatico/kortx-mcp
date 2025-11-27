@@ -8,7 +8,15 @@ export const ThinkAboutPlanInputSchema = z.object({
   plan: z.string().min(10, 'Plan description must be at least 10 characters'),
   context: z.string().optional().describe('Additional context about the plan'),
   preferredModel: z
-    .enum(['gpt-5', 'gpt-5-mini', 'gpt-5-nano', 'gpt-5-pro', 'gpt-5-codex'])
+    .enum([
+      'gpt-5',
+      'gpt-5-mini',
+      'gpt-5-nano',
+      'gpt-5-pro',
+      'gpt-5-codex',
+      'gpt-5.1-2025-11-13',
+      'gpt-5.1-codex',
+    ])
     .optional()
     .describe('Preferred GPT-5 model to use'),
 });

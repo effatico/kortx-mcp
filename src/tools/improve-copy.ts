@@ -16,7 +16,15 @@ export const ImproveCopyInputSchema = z.object({
     .optional()
     .describe('Target audience (e.g., "developers", "end users", "stakeholders")'),
   preferredModel: z
-    .enum(['gpt-5', 'gpt-5-mini', 'gpt-5-nano', 'gpt-5-pro', 'gpt-5-codex'])
+    .enum([
+      'gpt-5',
+      'gpt-5-mini',
+      'gpt-5-nano',
+      'gpt-5-pro',
+      'gpt-5-codex',
+      'gpt-5.1-2025-11-13',
+      'gpt-5.1-codex',
+    ])
     .optional()
     .describe('Preferred GPT-5 model to use'),
 });

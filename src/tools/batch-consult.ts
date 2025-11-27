@@ -4,6 +4,7 @@ import type { ThinkAboutPlanTool } from './think-about-plan.js';
 import type { SuggestAlternativeTool } from './suggest-alternative.js';
 import type { ImproveCopyTool } from './improve-copy.js';
 import type { SolveProblemTool } from './solve-problem.js';
+import type { ConsultTool } from './consult.js';
 import type { SearchContentTool } from './search-content.js';
 import type { CreateVisualTool } from './create-visual.js';
 
@@ -16,6 +17,7 @@ export const BatchRequestItemSchema = z.object({
     'suggest-alternative',
     'improve-copy',
     'solve-problem',
+    'consult',
     'search-content',
     'create-visual',
   ]),
@@ -63,6 +65,7 @@ export interface ToolInstances {
   suggestAlternative: SuggestAlternativeTool;
   improveCopy: ImproveCopyTool;
   solveProblem: SolveProblemTool;
+  consult: ConsultTool;
   searchContent: SearchContentTool;
   createVisual: CreateVisualTool;
 }
@@ -194,6 +197,7 @@ export class BatchConsultTool {
     | SuggestAlternativeTool
     | ImproveCopyTool
     | SolveProblemTool
+    | ConsultTool
     | SearchContentTool
     | CreateVisualTool {
     switch (toolName) {
@@ -205,6 +209,8 @@ export class BatchConsultTool {
         return this.toolInstances.improveCopy;
       case 'solve-problem':
         return this.toolInstances.solveProblem;
+      case 'consult':
+        return this.toolInstances.consult;
       case 'search-content':
         return this.toolInstances.searchContent;
       case 'create-visual':

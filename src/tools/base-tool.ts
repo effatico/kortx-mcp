@@ -340,6 +340,8 @@ export class BaseTool {
       'gpt-5-nano': { input: 0.08, output: 0.3 },
       'gpt-5-pro': { input: 5.0, output: 15.0, reasoning: 10.0 },
       'gpt-5-codex': { input: 3.0, output: 12.0, reasoning: 6.0 },
+      'gpt-5.1-2025-11-13': { input: 3.0, output: 12.0, reasoning: 6.0 },
+      'gpt-5.1-codex': { input: 3.0, output: 12.0, reasoning: 6.0 },
     };
 
     const rates = pricing[model] || pricing['gpt-5'];

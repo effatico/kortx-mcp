@@ -11,7 +11,15 @@ export const SuggestAlternativeInputSchema = z.object({
   constraints: z.array(z.string()).optional().describe('Constraints or limitations to consider'),
   goals: z.array(z.string()).optional().describe('Goals or objectives to achieve'),
   preferredModel: z
-    .enum(['gpt-5', 'gpt-5-mini', 'gpt-5-nano', 'gpt-5-pro', 'gpt-5-codex'])
+    .enum([
+      'gpt-5',
+      'gpt-5-mini',
+      'gpt-5-nano',
+      'gpt-5-pro',
+      'gpt-5-codex',
+      'gpt-5.1-2025-11-13',
+      'gpt-5.1-codex',
+    ])
     .optional()
     .describe('Preferred GPT-5 model to use'),
 });

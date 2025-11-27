@@ -10,7 +10,15 @@ export const SolveProblemInputSchema = z.object({
   errorMessages: z.array(z.string()).optional().describe('Error messages or stack traces'),
   relevantCode: z.string().optional().describe('Relevant code snippets'),
   preferredModel: z
-    .enum(['gpt-5', 'gpt-5-mini', 'gpt-5-nano', 'gpt-5-pro', 'gpt-5-codex'])
+    .enum([
+      'gpt-5',
+      'gpt-5-mini',
+      'gpt-5-nano',
+      'gpt-5-pro',
+      'gpt-5-codex',
+      'gpt-5.1-2025-11-13',
+      'gpt-5.1-codex',
+    ])
     .optional()
     .describe('Preferred GPT-5 model to use'),
 });

@@ -30,6 +30,7 @@ import {
 } from './tools/suggest-alternative.js';
 import { ImproveCopyTool, ImproveCopyInputSchema } from './tools/improve-copy.js';
 import { SolveProblemTool, SolveProblemInputSchema } from './tools/solve-problem.js';
+import { ConsultTool, ConsultInputSchema } from './tools/consult.js';
 import { SearchContentTool, SearchContentInputSchema } from './tools/search-content.js';
 import { CreateVisualTool, CreateVisualInputSchema } from './tools/create-visual.js';
 import { BatchConsultTool, BatchConsultInputSchema } from './tools/batch-consult.js';
@@ -52,6 +53,7 @@ export class MCPConsultantServer {
   private suggestAlternativeTool: SuggestAlternativeTool;
   private improveCopyTool: ImproveCopyTool;
   private solveProblemTool: SolveProblemTool;
+  private consultTool: ConsultTool;
   private searchContentTool: SearchContentTool;
   private createVisualTool: CreateVisualTool;
   private batchConsultTool: BatchConsultTool;
@@ -141,6 +143,13 @@ export class MCPConsultantServer {
       this.contextGatherer,
       this.responseCache || undefined
     );
+    this.consultTool = new ConsultTool(
+      this.config,
+      this.logger,
+      this.openaiClient,
+      this.contextGatherer,
+      this.responseCache || undefined
+    );
     this.searchContentTool = new SearchContentTool(this.config, this.logger, this.perplexityClient);
     this.createVisualTool = new CreateVisualTool(
       this.config,
@@ -154,6 +163,7 @@ export class MCPConsultantServer {
       suggestAlternative: this.suggestAlternativeTool,
       improveCopy: this.improveCopyTool,
       solveProblem: this.solveProblemTool,
+      consult: this.consultTool,
       searchContent: this.searchContentTool,
       createVisual: this.createVisualTool,
     });
@@ -237,7 +247,13 @@ export class MCPConsultantServer {
                 },
                 preferredModel: {
                   type: 'string',
-                  enum: ['gpt-5', 'gpt-5-mini', 'gpt-5-nano'],
+                  enum: [
+                    'gpt-5',
+                    'gpt-5-mini',
+                    'gpt-5-nano',
+                    'gpt-5.1-2025-11-13',
+                    'gpt-5.1-codex',
+                  ],
                   description: 'Preferred GPT-5 model to use',
                 },
               },
@@ -272,7 +288,13 @@ export class MCPConsultantServer {
                 },
                 preferredModel: {
                   type: 'string',
-                  enum: ['gpt-5', 'gpt-5-mini', 'gpt-5-nano'],
+                  enum: [
+                    'gpt-5',
+                    'gpt-5-mini',
+                    'gpt-5-nano',
+                    'gpt-5.1-2025-11-13',
+                    'gpt-5.1-codex',
+                  ],
                   description: 'Preferred GPT-5 model to use',
                 },
               },
@@ -306,7 +328,13 @@ export class MCPConsultantServer {
                 },
                 preferredModel: {
                   type: 'string',
-                  enum: ['gpt-5', 'gpt-5-mini', 'gpt-5-nano'],
+                  enum: [
+                    'gpt-5',
+                    'gpt-5-mini',
+                    'gpt-5-nano',
+                    'gpt-5.1-2025-11-13',
+                    'gpt-5.1-codex',
+                  ],
                   description: 'Preferred GPT-5 model to use',
                 },
               },
@@ -345,11 +373,72 @@ export class MCPConsultantServer {
                 },
                 preferredModel: {
                   type: 'string',
-                  enum: ['gpt-5', 'gpt-5-mini', 'gpt-5-nano'],
+                  enum: [
+                    'gpt-5',
+                    'gpt-5-mini',
+                    'gpt-5-nano',
+                    'gpt-5.1-2025-11-13',
+                    'gpt-5.1-codex',
+                  ],
                   description: 'Preferred GPT-5 model to use',
                 },
               },
               required: ['problem'],
+            },
+            annotations: {
+              'x-parallel-safe': true,
+              'x-stateless': true,
+            },
+          },
+          {
+            name: 'consult',
+            description:
+              'Ask domain-specific questions with expert consultation. Supports multiple domains: software-architecture, security, performance, database, devops, frontend, backend, ai-ml, or general.',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                question: {
+                  type: 'string',
+                  description: 'The question to ask the expert',
+                  minLength: 10,
+                },
+                domain: {
+                  type: 'string',
+                  enum: [
+                    'software-architecture',
+                    'security',
+                    'performance',
+                    'database',
+                    'devops',
+                    'frontend',
+                    'backend',
+                    'ai-ml',
+                    'general',
+                  ],
+                  description: 'Domain expertise to consult (default: general)',
+                },
+                context: {
+                  type: 'string',
+                  description: 'Additional context about the question',
+                },
+                constraints: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  description: 'Constraints or limitations to consider',
+                },
+                preferredModel: {
+                  type: 'string',
+                  enum: [
+                    'gpt-5',
+                    'gpt-5-mini',
+                    'gpt-5-nano',
+                    'gpt-5.1-2025-11-13',
+                    'gpt-5.1-codex',
+                  ],
+                  description: 'Preferred GPT-5 model to use',
+                },
+              },
+              required: ['question'],
             },
             annotations: {
               'x-parallel-safe': true,
@@ -531,6 +620,7 @@ export class MCPConsultantServer {
                           'suggest-alternative',
                           'improve-copy',
                           'solve-problem',
+                          'consult',
                           'search-content',
                           'create-visual',
                         ],
@@ -619,6 +709,12 @@ export class MCPConsultantServer {
           case 'solve-problem': {
             const input = SolveProblemInputSchema.parse(args);
             result = await this.solveProblemTool.execute(input);
+            break;
+          }
+
+          case 'consult': {
+            const input = ConsultInputSchema.parse(args);
+            result = await this.consultTool.execute(input);
             break;
           }
 

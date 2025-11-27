@@ -21,7 +21,13 @@ import { Agent as HttpsAgent } from 'https';
 /**
  * Fallback model chain for resilience
  */
-const FALLBACK_MODELS = ['gpt-5', 'gpt-5-mini', 'gpt-5-nano'] as const;
+const FALLBACK_MODELS = [
+  'gpt-5.1-2025-11-13',
+  'gpt-5.1-codex',
+  'gpt-5',
+  'gpt-5-mini',
+  'gpt-5-nano',
+] as const;
 
 export class OpenAIClient {
   private client: OpenAI;
