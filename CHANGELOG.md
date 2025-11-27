@@ -1,3 +1,9 @@
+# [1.3.0](https://github.com/effatico/kortx-mcp/compare/v1.2.4...v1.3.0) (2025-11-27)
+
+### Features
+
+- add GPT-5.1 models and consult tool ([aee9a40](https://github.com/effatico/kortx-mcp/commit/aee9a402853323cdf519b08f7259be5c29104338))
+
 ## [1.2.4](https://github.com/effatico/kortx-mcp/compare/v1.2.3...v1.2.4) (2025-10-24)
 
 ### Bug Fixes
