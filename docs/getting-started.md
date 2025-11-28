@@ -149,6 +149,7 @@ You should see these kortx-consultant tools:
 - `suggest-alternative`
 - `improve-copy`
 - `solve-problem`
+- `consult`
 - `search-content`
 - `create-visual`
 - `batch-consult`

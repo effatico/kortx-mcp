@@ -42,21 +42,29 @@ The GPT-5 model to use for consultations.
 
 - **Required**: No
 - **Default**: `gpt-5-mini`
-- **Valid values**: `gpt-5`, `gpt-5-mini`, `gpt-5-nano`, `gpt-5-codex`
+- **Valid values**: `gpt-5`, `gpt-5-mini`, `gpt-5-nano`, `gpt-5-codex`, `gpt-5.1-2025-11-13`, `gpt-5.1-codex`
 - **Example**: `OPENAI_MODEL=gpt-5-mini`
 
 #### Model Comparison
 
-| Model           | Speed     | Cost | Reasoning | Best For                                   |
-| --------------- | --------- | ---- | --------- | ------------------------------------------ |
-| **gpt-5**       | Moderate  | $$$  | Excellent | Complex reasoning, architectural decisions |
-| **gpt-5-mini**  | Fast      | $$   | Good      | General consultation, balanced use         |
-| **gpt-5-nano**  | Very Fast | $    | Basic     | High-throughput, simple questions          |
-| **gpt-5-codex** | Moderate  | $$$  | Excellent | Code generation, refactoring, debugging    |
+| Model                  | Speed     | Cost | Reasoning | Best For                                   |
+| ---------------------- | --------- | ---- | --------- | ------------------------------------------ |
+| **gpt-5.1-2025-11-13** | Moderate  | $$$$ | Superior  | Latest capabilities, premium performance   |
+| **gpt-5.1-codex**      | Moderate  | $$$$ | Superior  | Advanced code tasks, latest features       |
+| **gpt-5**              | Moderate  | $$$  | Excellent | Complex reasoning, architectural decisions |
+| **gpt-5-mini**         | Fast      | $$   | Good      | General consultation, balanced use         |
+| **gpt-5-nano**         | Very Fast | $    | Basic     | High-throughput, simple questions          |
+| **gpt-5-codex**        | Moderate  | $$$  | Excellent | Code generation, refactoring, debugging    |
 
 ```bash
 # Fast and economical (recommended)
 OPENAI_MODEL=gpt-5-mini
+
+# Latest GPT-5.1 model with superior capabilities
+OPENAI_MODEL=gpt-5.1-2025-11-13
+
+# Latest code-focused model
+OPENAI_MODEL=gpt-5.1-codex
 
 # Deep reasoning for complex tasks
 OPENAI_MODEL=gpt-5

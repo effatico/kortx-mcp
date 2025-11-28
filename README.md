@@ -9,7 +9,7 @@
 
 Kortx is a lightweight [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server that gives coding copilots access to:
 
-- OpenAI GPT-5 models (`gpt-5`, `gpt-5-mini`, `gpt-5-nano`, `gpt-5-codex`) with automatic fallback.
+- OpenAI GPT-5 models (`gpt-5`, `gpt-5-mini`, `gpt-5-nano`, `gpt-5-codex`, `gpt-5.1-2025-11-13`, `gpt-5.1-codex`) with automatic fallback.
 - Perplexity Sonar models for real-time research.
 - GPT Image (`gpt-image-1`) for visual generation and editing.
 - A default context gatherer that can ingest local file excerpts and optional connectors for [Serena](https://github.com/oraios/serena), [MCP Knowledge Graph](https://github.com/shaneholloman/mcp-knowledge-graph), and [CCLSP](https://github.com/ktnyt/cclsp) MCP servers when those are running.
@@ -20,7 +20,7 @@ The server ships with structured logging, request rate limiting, response cachin
 
 ## Highlights
 
-- Six consultation tools plus a batch runner covering planning, alternatives, copy improvement, debugging, research, and image workflows.
+- Seven consultation tools plus a batch runner covering planning, alternatives, copy improvement, debugging, expert consultation, research, and image workflows.
 - File-based context enrichment out of the box, with pluggable MCP connectors ready for [Serena](https://github.com/oraios/serena)/[MCP Knowledge Graph](https://github.com/shaneholloman/mcp-knowledge-graph)/[CCLSP](https://github.com/ktnyt/cclsp) when available.
 - Perplexity integration (requires API key) for citation-backed answers and image search.
 - Configurable OpenAI model, reasoning effort, verbosity, and retry behaviour.
@@ -65,11 +65,12 @@ Client-specific walkthroughs for Claude Code, VS Code Copilot, Cursor, and other
 - `suggest-alternative` – Generates viable alternatives with trade-offs and constraints.
 - `improve-copy` – Refines technical copy with tone, clarity, and accessibility guidance.
 - `solve-problem` – Debugging assistant covering root cause analysis and remediation steps.
+- `consult` – Expert consultation with domain-specific personas (software-architecture, security, performance, database, devops, frontend, backend, ai-ml, general).
 - `search-content` – Perplexity-backed web/academic/SEC search with citations and optional images.
 - `create-visual` – GPT Image based generator/editor; search mode reuses Perplexity for visual inspiration.
 - `batch-consult` – Runs multiple tool calls in parallel and returns aggregated results.
 
-Every consultation tool accepts an optional `preferredModel`. The OpenAI client falls back through `gpt-5 → gpt-5-mini → gpt-5-nano` automatically on failures.
+Every consultation tool accepts an optional `preferredModel`. The OpenAI client falls back through `gpt-5.1-2025-11-13 → gpt-5.1-codex → gpt-5 → gpt-5-mini → gpt-5-nano` automatically on failures.
 
 ---
 
@@ -84,7 +85,7 @@ Common overrides (see `.env.example` for the full list):
 
 ```bash
 # OpenAI behaviour
-OPENAI_MODEL=gpt-5-mini        # gpt-5 | gpt-5-mini | gpt-5-nano | gpt-5-codex
+OPENAI_MODEL=gpt-5-mini        # gpt-5 | gpt-5-mini | gpt-5-nano | gpt-5-codex | gpt-5.1-2025-11-13 | gpt-5.1-codex
 OPENAI_REASONING_EFFORT=minimal
 OPENAI_VERBOSITY=low
 OPENAI_MAX_TOKENS=1024
